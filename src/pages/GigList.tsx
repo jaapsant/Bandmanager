@@ -21,6 +21,7 @@ export function GigList() {
   const { roles } = useRole();
   const [showHistory, setShowHistory] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid');
+  const [expandedYears, setExpandedYears] = useState<{ [year: string]: boolean }>({});
 
   const canManageGigs = roles.admin || roles.bandManager;
 
@@ -126,46 +127,63 @@ export function GigList() {
       })
     );
 
-    const renderTable = (gigsToRender: Gig[], yearHeader?: string) => (
-      <>
-        {yearHeader && (
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">{yearHeader}</h2>
-        )}
-        <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Gig
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Time
-                </th>
-                {!showHistory && (
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Your Status
-                  </th>
-                )}
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {renderGigRows(gigsToRender)}
-            </tbody>
-          </table>
-          {gigsToRender.length === 0 && (
-            <div className="text-center text-gray-500 py-8">
-              No {showHistory ? 'past' : 'upcoming'} gigs found
+    const renderTable = (gigsToRender: Gig[], yearHeader?: string) => {
+      const currentYear = new Date().getFullYear().toString();
+      const isExpanded = expandedYears[yearHeader] ?? (yearHeader >= currentYear - 1);
+      
+      return (
+        <>
+          {yearHeader && (
+            <div 
+              className="flex items-center cursor-pointer mb-4"
+              onClick={() => setExpandedYears(prev => ({ ...prev, [yearHeader]: !isExpanded }))}
+            >
+              <h2 className="text-xl font-semibold text-gray-800">
+                {yearHeader}
+              </h2>
+              <button className="ml-2 text-gray-500">
+                {isExpanded ? '▼' : '▶'}
+              </button>
             </div>
           )}
-        </div>
-      </>
-    );
+          {(!yearHeader || isExpanded) && (
+            <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Gig
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Time
+                    </th>
+                    {!showHistory && (
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Your Status
+                      </th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {renderGigRows(gigsToRender)}
+                </tbody>
+              </table>
+              {gigsToRender.length === 0 && (
+                <div className="text-center text-gray-500 py-8">
+                  No {showHistory ? 'past' : 'upcoming'} gigs found
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      );
+    };
 
     if (showHistory && !Array.isArray(gigs)) {
       // Render grouped gigs
