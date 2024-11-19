@@ -1,0 +1,100 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return request.auth != null && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.admin == true;
+    }
+
+    function isBandManager() {
+      return request.auth != null && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.bandManager == true;
+    }
+
+    function isBandMember() {
+      return request.auth != null && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.bandMember == true;
+    }
+
+    function isAdminOrBandManager() {
+      return isAdmin() || isBandManager();
+    }
+
+    function hasAnyRole() {
+      return isAdmin() || isBandManager() || isBandMember();
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAuthenticated() && request.auth.uid == userId;
+      // Allow admins to delete users
+      allow delete: if isAuthenticated() && isAdmin() && request.auth.uid != userId;
+    }
+
+    // Roles collection
+    match /roles/{userId} {
+      // Allow admins to read all roles, users can read their own
+      allow read: if isAuthenticated() && (isAdmin() || request.auth.uid == userId);
+      
+      // Allow users to create their initial role document (non-admin)
+      allow create: if isAuthenticated() && request.auth.uid == userId && 
+        (!request.resource.data.keys().hasAny(['admin', 'bandManager', 'bandMember']) || 
+        (request.resource.data.admin == false && 
+         request.resource.data.bandManager == false && 
+         request.resource.data.bandMember == false));
+      
+      // Only admins can update role documents
+      allow update: if isAuthenticated() && isAdmin();
+      
+      // Allow admins to delete role documents
+      allow delete: if isAuthenticated() && isAdmin() && request.auth.uid != userId;
+    }
+
+    // Band members collection
+    match /bandMembers/{memberId} {
+      allow read: if isAuthenticated() && hasAnyRole();
+      allow create: if isEmailVerified() && hasAnyRole();
+      allow update: if isEmailVerified() && (
+        request.auth.uid == memberId || 
+        request.auth.uid == resource.data.createdBy ||
+        isAdminOrBandManager()
+      );
+      // Allow admins to delete band members
+      allow delete: if isEmailVerified() && (
+        (isAdminOrBandManager() && request.auth.uid != memberId) || 
+        request.auth.uid == memberId
+      );
+    }
+
+    // Instruments collection
+    match /instruments/{instrumentId} {
+      allow read: if isAuthenticated() && hasAnyRole();
+      allow create: if isAdminOrBandManager();
+      allow update: if isAdminOrBandManager();
+      allow delete: if isAdminOrBandManager();
+    }
+
+    // Gigs collection
+    match /gigs/{gigId} {
+      allow read: if isAuthenticated() && hasAnyRole();
+      allow create: if isEmailVerified() && isAdminOrBandManager();
+      allow update: if isEmailVerified() && (
+        (resource.data.createdBy == request.auth.uid && isAdminOrBandManager()) || 
+        isAdminOrBandManager() ||
+        (isBandMember() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberAvailability']))
+      );
+      allow delete: if isEmailVerified() && (
+        resource.data.createdBy == request.auth.uid || 
+        isAdminOrBandManager()
+      );
+    }
+  }
+}
