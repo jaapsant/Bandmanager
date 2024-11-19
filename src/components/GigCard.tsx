@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, Clock, AlertCircle, Car, MapPin } from 'lucide-react';
 import { Gig } from '../types';
 import { statusOptions } from '../data';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AvailabilityOverview } from './AvailabilityOverview';
 import { useAuth } from '../context/AuthContext';
 import { AddToCalendar } from './AddToCalendar';
@@ -12,6 +12,7 @@ interface GigCardProps {
 }
 
 export function GigCard({ gig }: GigCardProps) {
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const status = gig.status === 'completed' 
@@ -39,16 +40,22 @@ export function GigCard({ gig }: GigCardProps) {
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 h-full flex flex-col ${
-      !hasUserAvailability ? 'border-l-4 border-yellow-400' : ''
-    }`}>
+    <div
+      onClick={() => navigate(`/gig/${gig.id}`)}
+      className={`bg-white rounded-lg shadow overflow-hidden cursor-pointer hover:shadow-md transition-shadow p-4 ${
+        !hasUserAvailability ? 'ring-2 ring-yellow-400' : ''
+      }`}
+    >
       <div className="flex justify-between items-start mb-4">
         <Link to={`/gig/${gig.id}`} className="flex-grow">
           <h3 className="text-xl font-semibold text-gray-900">{gig.name}</h3>
         </Link>
         <div className="flex items-center space-x-2">
           {!hasUserAvailability && (
-            <span className="flex items-center text-yellow-600 text-xs bg-yellow-50 px-2 py-1 rounded">
+            <span 
+              className="flex items-center text-yellow-600 text-xs bg-yellow-50 px-2 py-1 rounded"
+              onClick={(e) => e.stopPropagation()}
+            >
               <AlertCircle className="w-3 h-3 mr-1" />
               Set availability
             </span>
