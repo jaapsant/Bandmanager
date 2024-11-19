@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Gig } from '../types';
 import { useAuth } from './AuthContext';
@@ -8,6 +8,7 @@ interface GigContextType {
   gigs: Gig[];
   addGig: (gig: Omit<Gig, 'id'>) => Promise<void>;
   updateGig: (gig: Gig) => Promise<void>;
+  deleteGig: (gigId: string) => Promise<void>;
   loading: boolean;
 }
 
@@ -174,8 +175,22 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const deleteGig = async (gigId: string) => {
+    if (!user?.emailVerified) {
+      throw new Error('Email verification required');
+    }
+
+    try {
+      const gigRef = doc(db, 'gigs', gigId);
+      await deleteDoc(gigRef);
+    } catch (error) {
+      console.error('Error deleting gig:', error);
+      throw error instanceof Error ? error : new Error('Failed to delete gig');
+    }
+  };
+
   return (
-    <GigContext.Provider value={{ gigs, addGig, updateGig, loading }}>
+    <GigContext.Provider value={{ gigs, addGig, updateGig, deleteGig, loading }}>
       {children}
     </GigContext.Provider>
   );

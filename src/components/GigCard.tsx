@@ -15,6 +15,8 @@ export function GigCard({ gig }: GigCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const isPastGig = new Date(gig.date) < new Date();
+
   const status = gig.status === 'completed' 
     ? { value: 'completed', label: 'Completed', color: 'bg-blue-100 text-blue-800' }
     : statusOptions.find((s) => s.value === gig.status);
@@ -51,7 +53,7 @@ export function GigCard({ gig }: GigCardProps) {
           <h3 className="text-xl font-semibold text-gray-900">{gig.name}</h3>
         </Link>
         <div className="flex items-center space-x-2">
-          {!hasUserAvailability && (
+          {!hasUserAvailability && !isPastGig && (
             <span 
               className="flex items-center text-yellow-600 text-xs bg-yellow-50 px-2 py-1 rounded"
               onClick={(e) => e.stopPropagation()}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, DollarSign, ArrowLeft, Edit2, Save, X, Car, MapPin } from 'lucide-react';
+import { Calendar, Clock, DollarSign, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2 } from 'lucide-react';
 import { statusOptions } from '../data';
 import { AvailabilityStatus } from '../components/AvailabilityStatus';
 import { AvailabilityOverview } from '../components/AvailabilityOverview';
@@ -14,7 +14,7 @@ import { useRole } from '../hooks/useRole';
 export function GigDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { gigs, updateGig } = useGigs();
+  const { gigs, updateGig, deleteGig } = useGigs();
   const { bandMembers } = useBand();
   const { user } = useAuth();
   const { roles } = useRole();
@@ -26,6 +26,7 @@ export function GigDetails() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedGig, setEditedGig] = useState<Gig | null>(null);
   const [error, setError] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (!gig) return <div>Gig not found</div>;
   if (!user) return <div>Please sign in</div>;
@@ -175,6 +176,17 @@ export function GigDetails() {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteGig(gig.id);
+      navigate('/gigs');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete gig');
+    }
+  };
+
+  const isPastGig = new Date(gig.date) < new Date();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -229,12 +241,20 @@ export function GigDetails() {
                 </span>
               )}
               {canEditGig && !isEditing && (
-                <button
-                  onClick={handleEdit}
-                  className="p-2 text-gray-400 hover:text-indigo-600 rounded-full hover:bg-gray-100"
-                >
-                  <Edit2 className="w-5 h-5" />
-                </button>
+                <>
+                  <button
+                    onClick={handleEdit}
+                    className="p-2 text-gray-400 hover:text-indigo-600 rounded-full hover:bg-gray-100"
+                  >
+                    <Edit2 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </>
               )}
               <AddToCalendar gig={gig} />
               {isEditing && (
@@ -379,60 +399,58 @@ export function GigDetails() {
 
             <div>
               {/* Your Availability Section */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4">Your Availability</h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => updateAvailability('available', gig.memberAvailability[user.uid]?.canDrive)}
-                        className={`p-2 rounded-full hover:bg-green-100 ${
-                          gig.memberAvailability[user.uid]?.status === 'available' ? 'bg-green-100' : ''
-                        }`}
-                        title="Available"
-                      >
-                        <AvailabilityStatus status="available" />
-                      </button>
-                      <button
-                        onClick={() => updateAvailability('unavailable', gig.memberAvailability[user.uid]?.canDrive)}
-                        className={`p-2 rounded-full hover:bg-red-100 ${
-                          gig.memberAvailability[user.uid]?.status === 'unavailable' ? 'bg-red-100' : ''
-                        }`}
-                        title="Unavailable"
-                      >
-                        <AvailabilityStatus status="unavailable" />
-                      </button>
-                      <button
-                        onClick={() => updateAvailability('tentative', gig.memberAvailability[user.uid]?.canDrive)}
-                        className={`p-2 rounded-full hover:bg-yellow-100 ${
-                          gig.memberAvailability[user.uid]?.status === 'tentative' ? 'bg-yellow-100' : ''
-                        }`}
-                        title="Tentative"
-                      >
-                        <AvailabilityStatus status="tentative" />
-                      </button>
+              {!isPastGig && (
+                <div className="bg-white shadow rounded-lg p-6 mb-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Your Availability</h3>
+                  <div className="space-y-4">
+                    <div className="flex space-x-4">
+                      {['available', 'unavailable', 'tentative'].map((status) => (
+                        <button
+                          key={status}
+                          onClick={() => updateAvailability(status as AvailabilityStatus)}
+                          className={`px-4 py-2 rounded-full text-sm font-medium ${
+                            gig.memberAvailability[user.uid]?.status === status
+                              ? status === 'available'
+                                ? 'bg-green-100 text-green-800'
+                                : status === 'unavailable'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                          }`}
+                        >
+                          {status.charAt(0).toUpperCase() + status.slice(1)}
+                        </button>
+                      ))}
                     </div>
+
                     {gig.memberAvailability[user.uid]?.status === 'available' && (
-                      <button
-                        onClick={toggleDriving}
-                        className={`p-2 rounded-full hover:bg-blue-100 ${
-                          gig.memberAvailability[user.uid]?.canDrive ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
-                        }`}
-                        title="Available to drive"
-                      >
-                        <Car className="w-5 h-5" />
-                      </button>
+                      <div>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={gig.memberAvailability[user.uid]?.canDrive}
+                            onChange={(e) => updateAvailability('available', e.target.checked)}
+                            className="rounded text-indigo-600"
+                          />
+                          <span className="text-sm text-gray-700">I can drive</span>
+                        </label>
+                      </div>
                     )}
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Notes (optional)
+                      </label>
+                      <textarea
+                        value={gig.memberAvailability[user.uid]?.note || ''}
+                        onChange={(e) => updateNote(e.target.value)}
+                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        rows={3}
+                      />
+                    </div>
                   </div>
-                  <textarea
-                    className="w-full mt-2 p-2 text-sm border rounded-md"
-                    placeholder="Add a note about your availability..."
-                    value={gig.memberAvailability[user.uid]?.note || ''}
-                    onChange={(e) => updateNote(e.target.value)}
-                    rows={2}
-                  />
                 </div>
-              </div>
+              )}
 
               {/* Other Band Members Section */}
               <div>
@@ -465,6 +483,29 @@ export function GigDetails() {
           </div>
         </div>
       </div>
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full">
+            <h3 className="text-lg font-semibold mb-4">Delete Gig</h3>
+            <p className="text-gray-600 mb-6">Are you sure you want to delete this gig? This action cannot be undone.</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
