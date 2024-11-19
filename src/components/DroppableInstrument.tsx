@@ -7,6 +7,7 @@ interface DroppableInstrumentProps {
   members: any[];
   children: React.ReactNode;
   canManage: boolean;
+  headerContent?: React.ReactNode;
 }
 
 export function DroppableInstrument({ 
@@ -14,6 +15,7 @@ export function DroppableInstrument({
   members, 
   children,
   canManage,
+  headerContent,
 }: DroppableInstrumentProps) {
   const { setNodeRef, isOver, active } = useDroppable({
     id: instrument,
@@ -27,14 +29,17 @@ export function DroppableInstrument({
         isOver && active ? 'ring-2 ring-indigo-500 ring-opacity-50 bg-indigo-50' : ''
       }`}
     >
-      <div className="flex items-center mb-3">
-        <Music className="w-4 h-4 text-gray-400 mr-2" />
-        <h3 className="font-medium text-gray-900">
-          {instrument}
-          <span className="ml-2 text-sm text-gray-500">
-            ({members.length})
-          </span>
-        </h3>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center">
+          <Music className="w-4 h-4 text-gray-400 mr-2" />
+          <h3 className="font-medium text-gray-900">
+            {instrument}
+            <span className="ml-2 text-sm text-gray-500">
+              ({members.length})
+            </span>
+          </h3>
+        </div>
+        {headerContent}
       </div>
       <div className="space-y-1 min-h-[2rem]">
         {children}

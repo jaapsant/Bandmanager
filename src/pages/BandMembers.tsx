@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Music, Users } from 'lucide-react';
+import { ArrowLeft, Music, Users, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { DndContext, DragEndEvent, closestCenter, DragOverlay, useSensor, useSensors, PointerSensor } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -19,6 +19,7 @@ export function BandMembers() {
     instruments: unsortedInstruments, 
     updateMemberInstrument,
     addInstrument, 
+    removeInstrument,
     loading,
   } = useBand();
 
@@ -116,6 +117,25 @@ export function BandMembers() {
     }
   };
 
+  const handleRemoveInstrument = async (instrument: string) => {
+    if (!canManageBand) return;
+    
+    const hasMembers = membersByInstrument[instrument]?.length > 0;
+    if (hasMembers) {
+      setError('Cannot remove an instrument that has members assigned to it');
+      return;
+    }
+
+    try {
+      setError('');
+      setSuccess('');
+      await removeInstrument(instrument);
+      setSuccess('Instrument removed successfully');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to remove instrument');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -201,7 +221,18 @@ export function BandMembers() {
                   key={instrument}
                   instrument={instrument}
                   members={membersByInstrument[instrument] || []}
-                  canManage={canManageBand || user?.uid}
+                  canManage={canManageBand || !!user?.uid}
+                  headerContent={
+                    canManageBand && instrument !== 'Unassigned' && (
+                      <button
+                        onClick={() => handleRemoveInstrument(instrument)}
+                        className="p-1 text-gray-400 hover:text-red-500"
+                        title="Remove instrument"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )
+                  }
                 >
                   <SortableContext
                     items={membersByInstrument[instrument]?.map(m => m.id) || []}
