@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, DollarSign, ArrowLeft, Edit2, Save, X, Car } from 'lucide-react';
+import { Calendar, Clock, DollarSign, ArrowLeft, Edit2, Save, X, Car, MapPin } from 'lucide-react';
 import { statusOptions } from '../data';
 import { AvailabilityStatus } from '../components/AvailabilityStatus';
 import { AvailabilityOverview } from '../components/AvailabilityOverview';
@@ -314,6 +314,21 @@ export function GigDetails() {
                   )}
                 </div>
                 
+                <div className="flex items-center text-gray-600">
+                  <MapPin className="w-5 h-5 mr-3" />
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                      value={editedGig?.location || ''}
+                      onChange={(e) => setEditedGig(prev => prev ? { ...prev, location: e.target.value } : null)}
+                      placeholder="Enter location"
+                    />
+                  ) : (
+                    gig.location && <span>{gig.location}</span>
+                  )}
+                </div>
+
                 <div className="flex items-center text-gray-600">
                   <DollarSign className="w-5 h-5 mr-3" />
                   {isEditing ? (

@@ -23,7 +23,7 @@ export interface Gig {
   endTime: string | null;
   isWholeDay: boolean;
   status: GigStatus['value'];
-  location?: string | null;
+  location?: string;
   pay?: number | null;
   description?: string | null;
   memberAvailability: Record<string, {
