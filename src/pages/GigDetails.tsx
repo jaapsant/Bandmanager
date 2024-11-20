@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, DollarSign, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2, Check, HelpCircle } from 'lucide-react';
+import { Calendar, Clock, DollarSign, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2 } from 'lucide-react';
 import { statusOptions } from '../data';
 import { AvailabilityStatus } from '../components/AvailabilityStatus';
 import { AvailabilityOverview } from '../components/AvailabilityOverview';
@@ -465,7 +465,6 @@ export function GigDetails() {
                       <h4 className="font-medium text-gray-900 mb-3">{instrument}</h4>
                       <div className="space-y-3">
                         {membersByInstrument[instrument].map((member) => (
-                          member.id !== user.uid && (
                             <div key={member.id} className="flex items-center justify-between text-sm">
                               <span className="text-gray-700">{member.name}</span>
                               <div className="flex items-center space-x-2">
@@ -476,7 +475,6 @@ export function GigDetails() {
                                 )}
                               </div>
                             </div>
-                          )
                         ))}
                       </div>
                     </div>
