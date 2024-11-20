@@ -79,29 +79,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, name: string) => {
     try {
-      const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Update profile and send verification email
-      await updateProfile(firebaseUser, { displayName: name });
-      await sendEmailVerification(firebaseUser);
+      // Create the user account
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
 
-      // Create user document in Firestore
+      // Update profile
+      await updateProfile(firebaseUser, {
+        displayName: name
+      });
+
+      // Create user document
       await setDoc(doc(db, 'users', firebaseUser.uid), {
         email,
         displayName: name,
         createdAt: new Date().toISOString(),
       });
 
-      // Create band member document
-      await setDoc(doc(db, 'bandMembers', firebaseUser.uid), {
-        id: firebaseUser.uid,
-        name,
-        instrument: '',
+      // Create roles document
+      await setDoc(doc(db, 'roles', firebaseUser.uid), {
+        admin: false,
+        bandManager: false,
+        bandMember: false
       });
 
+      // Send verification email
+      await sendEmailVerification(firebaseUser);
+
+      return firebaseUser;
     } catch (error) {
-      console.error('Error signing up:', error);
-      throw new Error(getAuthErrorMessage(error as AuthError));
+      console.error('Error during sign up:', error);
+      throw error;
     }
   };
 
