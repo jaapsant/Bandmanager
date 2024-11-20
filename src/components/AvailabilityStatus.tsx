@@ -1,4 +1,3 @@
-import React from 'react';
 import { Check, X, HelpCircle } from 'lucide-react';
 import { BandMember } from '../types';
 

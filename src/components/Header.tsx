@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { Music, User, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -14,7 +13,7 @@ export function Header() {
         <div className="flex justify-between items-center h-16">
           <Link to="/gigs" className="flex items-center text-indigo-600">
             <Music className="w-8 h-8" />
-            <span className="ml-2 text-lg font-semibold">Band Manager</span>
+            <span className="ml-2 text-lg font-semibold">Alarmfase 3</span>
           </Link>
 
           <div className="relative group">

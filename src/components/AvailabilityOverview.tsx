@@ -1,5 +1,3 @@
-import React from 'react';
-import { Car } from 'lucide-react';
 import { AvailabilityStatus } from './AvailabilityStatus';
 import { Gig } from '../types';
 import { useBand } from '../context/BandContext';

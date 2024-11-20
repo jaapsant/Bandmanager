@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, Clock, DollarSign, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2 } from 'lucide-react';
 import { statusOptions } from '../data';

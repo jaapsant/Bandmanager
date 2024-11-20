@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { CalendarPlus } from 'lucide-react';
 import { Gig } from '../types';
 import { generateCalendarEvent, generateGoogleCalendarUrl, generateOutlookCalendarUrl } from '../utils/calendar';

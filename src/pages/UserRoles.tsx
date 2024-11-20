@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield, AlertCircle, Trash2 } from 'lucide-react';
 import { collection, query, getDocs, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';

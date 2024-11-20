@@ -1,4 +1,3 @@
-import React from 'react';
 import { Calendar, Clock, AlertCircle, Car, MapPin } from 'lucide-react';
 import { Gig } from '../types';
 import { statusOptions } from '../data';
