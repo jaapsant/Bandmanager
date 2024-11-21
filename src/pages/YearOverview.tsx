@@ -1,13 +1,13 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGigs } from '../context/GigContext';
-import { useMembers } from '../context/MemberContext';
 import { ArrowLeft } from 'lucide-react';
+import { useBand } from '../context/BandContext';
 
 export function YearOverview() {
   const { year } = useParams();
   const { gigs } = useGigs();
-  const { members } = useMembers();
   const navigate = useNavigate();
+  const { bandMembers } = useBand();
 
   const yearGigs = gigs.filter(
     gig => new Date(gig.date).getFullYear().toString() === year
@@ -21,32 +21,39 @@ export function YearOverview() {
     totalDistance: yearGigs.reduce((sum, gig) => sum + (Number(gig.distance) || 0), 0),
   };
 
-  const memberStats = members.map(member => {
+  const memberStats = Array.from(new Set(
+    yearGigs.flatMap(gig => 
+      Object.entries(gig.memberAvailability || {}).map(([memberId]) => memberId)
+    )
+  )).map(memberId => {
+    const memberName = bandMembers.find(m => m.id === memberId)?.name || memberId;
+
     const memberGigs = yearGigs.filter(gig => 
-      gig.availability?.some(a => a.memberId === member.id)
+      gig.memberAvailability?.[memberId]?.status !== undefined
     );
 
     return {
-      member,
+      member: { id: memberId, name: memberName },
       stats: {
         available: memberGigs.filter(gig => 
-          gig.availability?.find(a => a.memberId === member.id)?.status === 'available'
+          gig.memberAvailability?.[memberId]?.status === 'available'
         ).length,
         unavailable: memberGigs.filter(gig => 
-          gig.availability?.find(a => a.memberId === member.id)?.status === 'unavailable'
+          gig.memberAvailability?.[memberId]?.status === 'unavailable'
         ).length,
         tentative: memberGigs.filter(gig => 
-          gig.availability?.find(a => a.memberId === member.id)?.status === 'tentative'
+          gig.memberAvailability?.[memberId]?.status === 'tentative'
         ).length,
         totalDistance: memberGigs.reduce((sum, gig) => {
-          const isAvailable = gig.availability?.find(a => 
-            a.memberId === member.id
-          )?.status === 'available';
+          const isAvailable = gig.memberAvailability?.[memberId]?.status === 'available';
           return sum + (isAvailable ? (Number(gig.distance) || 0) : 0);
         }, 0)
       }
     };
   });
+
+  console.log('Year Gigs:', yearGigs);
+  console.log('Member Stats:', memberStats);
 
   return (
     <div className="min-h-screen bg-gray-50">
