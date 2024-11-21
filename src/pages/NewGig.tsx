@@ -18,6 +18,7 @@ export function NewGig() {
     status: 'pending',
     isWholeDay: false,
     location: '',
+    distance: null,
     memberAvailability: {},
   });
 
@@ -65,6 +66,7 @@ export function NewGig() {
         startTime: formData.isWholeDay ? null : formData.startTime || null,
         endTime: formData.isWholeDay ? null : formData.endTime || null,
         location: formData.location?.trim() || null,
+        distance: formData.distance || null,
         pay: formData.pay || null,
         description: formData.description?.trim() || null,
         createdBy: user.uid,
@@ -116,17 +118,37 @@ export function NewGig() {
                 />
               </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  value={formData.location || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                  placeholder="Enter venue or location"
-                />
+              <div className="md:col-span-2 grid grid-cols-4 gap-6">
+                <div className="col-span-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value={formData.location || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                    placeholder="Enter venue or location"
+                  />
+                </div>
+
+                <div className="col-span-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Distance (km)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value={formData.distance || ''}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      distance: e.target.value ? parseFloat(e.target.value) : null 
+                    }))}
+                    placeholder="km"
+                  />
+                </div>
               </div>
 
               <div>

@@ -82,6 +82,14 @@ export function GigList() {
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
               <div className="text-sm font-medium text-gray-900">{gig.name}</div>
+              <div className="text-sm text-gray-500">
+                {gig.location}
+                {gig.distance && (
+                  <span className="text-gray-400 ml-2">
+                    ({gig.distance} km)
+                  </span>
+                )}
+              </div>
               {gig.pay && (
                 <div className="text-sm text-gray-500">${gig.pay}</div>
               )}

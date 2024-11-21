@@ -32,6 +32,7 @@ export interface Gig {
     canDrive?: boolean;
   }>;
   createdBy: string;
+  distance: number | null;
 }
 
 export interface User {

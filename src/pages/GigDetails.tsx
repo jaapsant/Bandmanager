@@ -337,15 +337,36 @@ export function GigDetails() {
                 <div className="flex items-center text-gray-600">
                   <MapPin className="w-5 h-5 mr-3" />
                   {isEditing ? (
-                    <input
-                      type="text"
-                      className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
-                      value={editedGig?.location || ''}
-                      onChange={(e) => setEditedGig(prev => prev ? { ...prev, location: e.target.value } : null)}
-                      placeholder="Enter location"
-                    />
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                        value={editedGig?.location || ''}
+                        onChange={(e) => setEditedGig(prev => prev ? { ...prev, location: e.target.value } : null)}
+                        placeholder="Enter location"
+                      />
+                      <input
+                        type="number"
+                        className="w-20 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                        value={editedGig?.distance || ''}
+                        onChange={(e) => setEditedGig(prev => prev ? { 
+                          ...prev, 
+                          distance: e.target.value ? parseFloat(e.target.value) : null 
+                        } : null)}
+                        placeholder="km"
+                        min="0"
+                        step="0.1"
+                      />
+                    </div>
                   ) : (
-                    gig.location && <span>{gig.location}</span>
+                    <span>
+                      {gig.location}
+                      {gig.distance && (
+                        <span className="text-gray-400 ml-2">
+                          ({gig.distance} km)
+                        </span>
+                      )}
+                    </span>
                   )}
                 </div>
 

@@ -84,9 +84,16 @@ export function GigCard({ gig }: GigCardProps) {
         </div>
 
         {gig.location && (
-          <div className="flex items-center text-gray-600">
+          <div className="flex items-center text-gray-600 mb-2">
             <MapPin className="w-4 h-4 mr-2" />
-            <span>{gig.location}</span>
+            <span>
+              {gig.location}
+              {gig.distance && (
+                <span className="text-gray-400 ml-2">
+                  ({gig.distance} km)
+                </span>
+              )}
+            </span>
           </div>
         )}
         
