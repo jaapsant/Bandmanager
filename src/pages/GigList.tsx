@@ -91,7 +91,7 @@ export function GigList() {
                 )}
               </div>
               {gig.pay && (
-                <div className="text-sm text-gray-500">${gig.pay}</div>
+                <div className="text-sm text-gray-500">€{gig.pay}</div>
               )}
             </td>
             <td className="px-6 py-4 whitespace-nowrap">

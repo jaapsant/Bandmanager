@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, DollarSign, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2 } from 'lucide-react';
+import { Calendar, Clock, Euro, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2 } from 'lucide-react';
 import { statusOptions } from '../data';
 import { AvailabilityStatus } from '../components/AvailabilityStatus';
 import { AvailabilityOverview } from '../components/AvailabilityOverview';
@@ -476,7 +476,7 @@ export function GigDetails() {
                 </div>
 
                 <div className="flex items-center text-gray-600">
-                  <DollarSign className="w-5 h-5 mr-3" />
+                  <Euro className="w-5 h-5 mr-3" />
                   {isEditing ? (
                     <input
                       type="number"
@@ -486,7 +486,7 @@ export function GigDetails() {
                       placeholder="Enter pay amount"
                     />
                   ) : (
-                    gig.pay && <span>${gig.pay}</span>
+                    gig.pay && <span>€{gig.pay}</span>
                   )}
                 </div>
               </div>

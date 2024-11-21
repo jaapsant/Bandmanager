@@ -99,7 +99,7 @@ export function GigCard({ gig }: GigCardProps) {
         
         {gig.pay && (
           <div className="text-gray-600">
-            <span className="font-medium">${gig.pay}</span>
+            <span className="font-medium">€{gig.pay}</span>
           </div>
         )}
       </div>

@@ -137,11 +137,11 @@ export function YearOverview() {
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900">Total Pay</h3>
             <p className="text-3xl font-bold text-indigo-600">
-              ${stats.completedPay.toLocaleString()}
+              €{stats.completedPay.toLocaleString()}
             </p>
             {year === new Date().getFullYear().toString() && (
               <p className="text-sm text-gray-500 mt-1">
-                Confirmed: ${stats.confirmedPay.toLocaleString()}
+                Confirmed: €{stats.confirmedPay.toLocaleString()}
               </p>
             )}
           </div>
