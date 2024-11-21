@@ -122,7 +122,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
         id: memberId,
         name: newMember.name.trim(),
         instrument: newMember.instrument,
-        createdBy: user.uid,
+        createdBy: user?.uid,
       });
     } catch (error) {
       console.error('Error adding band member:', error);
@@ -134,7 +134,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
     checkAdminOrManagerPermission();
 
     try {
-      if (memberId === user.uid) {
+      if (memberId === user?.uid) {
         throw new Error('You cannot remove yourself from the band');
       }
 
@@ -154,7 +154,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
 
     try {
       // Only allow users to update their own instrument unless they're admin/manager
-      if (memberId !== user.uid && !roles.admin && !roles.bandManager) {
+      if (memberId !== user?.uid && !roles.admin && !roles.bandManager) {
         throw new Error('You can only update your own instrument');
       }
 
@@ -164,9 +164,9 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
       if (memberSnapshot.empty) {
         await setDoc(memberDoc, {
           id: memberId,
-          name: user.displayName || '',
+          name: user?.displayName || '',
           instrument: instrument,
-          createdBy: user.uid,
+          createdBy: user?.uid,
         });
       } else {
         await updateDoc(memberDoc, { instrument });
@@ -185,7 +185,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
 
     try {
       // Only allow users to update their own name unless they're admin/manager
-      if (memberId !== user.uid && !roles.admin && !roles.bandManager) {
+      if (memberId !== user?.uid && !roles.admin && !roles.bandManager) {
         throw new Error('You can only update your own name');
       }
 
@@ -197,7 +197,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
           id: memberId,
           name: name.trim(),
           instrument: '',
-          createdBy: user.uid,
+          createdBy: user?.uid,
         });
       } else {
         await updateDoc(memberDoc, { name: name.trim() });
@@ -261,7 +261,6 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
       removeInstrument,
       isInstrumentInUse,
       loading,
-      currentBand: null,
     }}>
       {children}
     </BandContext.Provider>

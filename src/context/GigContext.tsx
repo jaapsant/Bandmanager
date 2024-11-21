@@ -147,7 +147,7 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
       }
 
       const gigRef = doc(db, 'gigs', updatedGig.id);
-      await updateDoc(gigRef, updatedGig);
+      await updateDoc(gigRef, updatedGig as any);
       
       setGigs(prev => prev.map(gig => 
         gig.id === updatedGig.id ? updatedGig : gig

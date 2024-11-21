@@ -104,8 +104,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Send verification email
       await sendEmailVerification(firebaseUser);
-
-      return firebaseUser;
     } catch (error) {
       console.error('Error during sign up:', error);
       throw error;
