@@ -261,6 +261,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
       removeInstrument,
       isInstrumentInUse,
       loading,
+      currentBand: null,
     }}>
       {children}
     </BandContext.Provider>

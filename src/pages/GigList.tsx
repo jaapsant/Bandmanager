@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Users, History, Calendar, LayoutGrid, List, AlertCircle } from 'lucide-react';
+import { Plus, Users, History, Calendar, LayoutGrid, List, AlertCircle, BarChart3 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GigCard } from '../components/GigCard';
 import { useGigs } from '../context/GigContext';
@@ -142,15 +142,24 @@ export function GigList() {
       return (
         <>
           {yearHeader && (
-            <div 
-              className="flex items-center cursor-pointer mb-4"
-              onClick={() => setExpandedYears(prev => ({ ...prev, [yearHeader]: !isExpanded }))}
-            >
-              <h2 className="text-xl font-semibold text-gray-800">
-                {yearHeader}
-              </h2>
-              <button className="ml-2 text-gray-500">
-                {isExpanded ? '▼' : '▶'}
+            <div className="flex items-center mb-4">
+              <div 
+                className="flex items-center cursor-pointer"
+                onClick={() => setExpandedYears(prev => ({ ...prev, [yearHeader]: !isExpanded }))}
+              >
+                <h2 className="text-xl font-semibold text-gray-800">
+                  {yearHeader}
+                </h2>
+                <button className="ml-2 text-gray-500">
+                  {isExpanded ? '▼' : '▶'}
+                </button>
+              </div>
+              <button
+                onClick={() => navigate(`/year-overview/${yearHeader}`)}
+                className="ml-4 text-gray-500 hover:text-indigo-600"
+                title="View Year Overview"
+              >
+                <BarChart3 className="w-5 h-5" />
               </button>
             </div>
           )}

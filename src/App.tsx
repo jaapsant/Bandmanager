@@ -11,19 +11,23 @@ import { UserRoles } from './pages/UserRoles';
 import { AuthProvider } from './context/AuthContext';
 import { GigProvider } from './context/GigContext';
 import { BandProvider } from './context/BandContext';
+import { MemberProvider } from './context/MemberContext';
 import { PrivateRoute } from './components/PrivateRoute';
 import { Header } from './components/Header';
 import { EmailVerificationBanner } from './components/EmailVerificationBanner';
+import { YearOverview } from './pages/YearOverview';
 
 function AuthenticatedApp({ children }: { children: React.ReactNode }) {
   return (
-    <GigProvider>
-      <BandProvider>
-        <Header />
-        <EmailVerificationBanner />
-        {children}
-      </BandProvider>
-    </GigProvider>
+    <MemberProvider>
+      <GigProvider>
+        <BandProvider>
+          <Header />
+          <EmailVerificationBanner />
+          {children}
+        </BandProvider>
+      </GigProvider>
+    </MemberProvider>
   );
 }
 
@@ -100,6 +104,16 @@ function App() {
               <PrivateRoute>
                 <AuthenticatedApp>
                   <UserRoles />
+                </AuthenticatedApp>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/year-overview/:year"
+            element={
+              <PrivateRoute>
+                <AuthenticatedApp>
+                  <YearOverview />
                 </AuthenticatedApp>
               </PrivateRoute>
             }
