@@ -25,13 +25,11 @@ export function GigList() {
 
   const canManageGigs = roles.admin || roles.bandManager;
 
-  // Set showHistory based on navigation state
+  // Update this useEffect to reset showHistory when location changes
   useEffect(() => {
     const state = location.state as { showHistory?: boolean } | null;
-    if (state?.showHistory) {
-      setShowHistory(true);
-    }
-  }, [location.state]);
+    setShowHistory(state?.showHistory || false);
+  }, [location]);
 
   if (loading) {
     return (

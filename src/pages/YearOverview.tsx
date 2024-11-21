@@ -3,12 +3,14 @@ import { useGigs } from '../context/GigContext';
 import { ArrowLeft, ArrowUpDown, X } from 'lucide-react';
 import { useBand } from '../context/BandContext';
 import { useState } from 'react';
+import { useRole } from '../hooks/useRole';
 
 export function YearOverview() {
   const { year } = useParams();
   const { gigs } = useGigs();
   const navigate = useNavigate();
   const { bandMembers } = useBand();
+  const { roles } = useRole();
 
   const yearGigs = gigs.filter(
     gig => new Date(gig.date).getFullYear().toString() === year
@@ -167,14 +169,16 @@ export function YearOverview() {
                     Name <ArrowUpDown className="h-4 w-4" />
                   </button>
                 </th>
-                <th className="px-6 py-3 text-left">
-                  <button 
-                    className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
-                    onClick={() => handleSort('available')}
-                  >
-                    Gigs Played <ArrowUpDown className="h-4 w-4" />
-                  </button>
-                </th>
+                {(roles.admin || roles.bandManager) && (
+                  <th className="px-6 py-3 text-left">
+                    <button 
+                      className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
+                      onClick={() => handleSort('available')}
+                    >
+                      Gigs Played <ArrowUpDown className="h-4 w-4" />
+                    </button>
+                  </th>
+                )}
                 <th className="px-6 py-3 text-left border-l">
                   <button 
                     className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
@@ -189,7 +193,9 @@ export function YearOverview() {
               {sortedMemberStats.map(({ member, stats }) => (
                 <tr key={member.id} className="border-b hover:bg-gray-50">
                   <td className="px-6 py-4 font-medium">{member.name}</td>
-                  <td className="px-6 py-4 text-green-600">{stats.available}</td>
+                  {(roles.admin || roles.bandManager) && (
+                    <td className="px-6 py-4 text-green-600">{stats.available}</td>
+                  )}
                   <td className="px-6 py-4 border-l text-indigo-600">
                     <button
                       onClick={() => setSelectedMember({
