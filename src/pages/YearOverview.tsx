@@ -18,7 +18,12 @@ export function YearOverview() {
     totalGigs: yearGigs.length,
     completedGigs: yearGigs.filter(gig => gig.status === 'completed').length,
     cancelledGigs: yearGigs.filter(gig => gig.status === 'declined').length,
-    totalPay: yearGigs.reduce((sum, gig) => sum + (Number(gig.pay) || 0), 0),
+    completedPay: yearGigs
+      .filter(gig => gig.status === 'completed')
+      .reduce((sum, gig) => sum + (Number(gig.pay) || 0), 0),
+    confirmedPay: yearGigs
+      .filter(gig => gig.status === 'completed' || gig.status === 'confirmed')
+      .reduce((sum, gig) => sum + (Number(gig.pay) || 0), 0),
     totalDistance: yearGigs.reduce((sum, gig) => sum + (Number(gig.distance) || 0), 0),
   };
 
@@ -132,8 +137,13 @@ export function YearOverview() {
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900">Total Pay</h3>
             <p className="text-3xl font-bold text-indigo-600">
-              ${stats.totalPay.toLocaleString()}
+              ${stats.completedPay.toLocaleString()}
             </p>
+            {year === new Date().getFullYear().toString() && (
+              <p className="text-sm text-gray-500 mt-1">
+                Confirmed: ${stats.confirmedPay.toLocaleString()}
+              </p>
+            )}
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
