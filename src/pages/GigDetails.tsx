@@ -225,6 +225,54 @@ export function GigDetails() {
     window.open(`https://www.google.com/maps/dir/Theaterkerk+Bemmel,+Markt+5,+6681+AE+Bemmel/${encodedLocation}`, '_blank');
   };
 
+  const updateMemberAvailability = async (memberId: string, status: 'available' | 'unavailable' | 'tentative') => {
+    try {
+      const currentAvailability = gig.memberAvailability[memberId] || {};
+      const updatedAvailability = {
+        ...gig.memberAvailability,
+        [memberId]: {
+          ...currentAvailability,
+          status,
+          note: currentAvailability.note || '',
+          canDrive: currentAvailability.canDrive || false,
+        },
+      };
+
+      await updateGig({
+        ...gig,
+        memberAvailability: updatedAvailability,
+      });
+      setError('');
+    } catch (err) {
+      console.error('Error updating member availability:', err);
+      setError('Failed to update member availability');
+    }
+  };
+
+  const toggleMemberDriving = async (memberId: string) => {
+    try {
+      const currentAvailability = gig.memberAvailability[memberId] || {};
+      const updatedAvailability = {
+        ...gig.memberAvailability,
+        [memberId]: {
+          ...currentAvailability,
+          status: currentAvailability.status || 'tentative',
+          note: currentAvailability.note || '',
+          canDrive: !currentAvailability.canDrive,
+        },
+      };
+
+      await updateGig({
+        ...gig,
+        memberAvailability: updatedAvailability,
+      });
+      setError('');
+    } catch (err) {
+      console.error('Error updating member driving status:', err);
+      setError('Failed to update driving status');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -543,16 +591,59 @@ export function GigDetails() {
                       <h4 className="font-medium text-gray-900 mb-3">{instrument}</h4>
                       <div className="space-y-3">
                         {membersByInstrument[instrument].map((member) => (
-                            <div key={member.id} className="flex items-center justify-between text-sm">
-                              <span className="text-gray-700">{member.name}</span>
-                              <div className="flex items-center space-x-2">
-                                <AvailabilityStatus status={gig.memberAvailability[member.id]?.status} size="sm" />
-                                {gig.memberAvailability[member.id]?.status === 'available' && 
-                                 gig.memberAvailability[member.id]?.canDrive && (
-                                  <Car className="w-4 h-4 text-blue-600" />
-                                )}
-                              </div>
+                          <div key={member.id} className="flex items-center justify-between text-sm">
+                            <span className="text-gray-700">{member.name}</span>
+                            <div className="flex items-center space-x-2">
+                              {(canEditGig && isPastGig) ? (
+                                <>
+                                  <div className="flex space-x-1">
+                                    <button
+                                      onClick={() => updateMemberAvailability(member.id, 'available')}
+                                      className={`p-1 rounded-full hover:bg-green-100 ${
+                                        gig.memberAvailability[member.id]?.status === 'available' ? 'bg-green-100' : ''
+                                      }`}
+                                    >
+                                      <AvailabilityStatus status="available" size="sm" />
+                                    </button>
+                                    <button
+                                      onClick={() => updateMemberAvailability(member.id, 'unavailable')}
+                                      className={`p-1 rounded-full hover:bg-red-100 ${
+                                        gig.memberAvailability[member.id]?.status === 'unavailable' ? 'bg-red-100' : ''
+                                      }`}
+                                    >
+                                      <AvailabilityStatus status="unavailable" size="sm" />
+                                    </button>
+                                    <button
+                                      onClick={() => updateMemberAvailability(member.id, 'tentative')}
+                                      className={`p-1 rounded-full hover:bg-yellow-100 ${
+                                        gig.memberAvailability[member.id]?.status === 'tentative' ? 'bg-yellow-100' : ''
+                                      }`}
+                                    >
+                                      <AvailabilityStatus status="tentative" size="sm" />
+                                    </button>
+                                  </div>
+                                  {gig.memberAvailability[member.id]?.status === 'available' && (
+                                    <button
+                                      onClick={() => toggleMemberDriving(member.id)}
+                                      className={`p-1 rounded-full hover:bg-blue-100 ${
+                                        gig.memberAvailability[member.id]?.canDrive ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
+                                      }`}
+                                    >
+                                      <Car className="w-4 h-4" />
+                                    </button>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  <AvailabilityStatus status={gig.memberAvailability[member.id]?.status} size="sm" />
+                                  {gig.memberAvailability[member.id]?.status === 'available' && 
+                                   gig.memberAvailability[member.id]?.canDrive && (
+                                    <Car className="w-4 h-4 text-blue-600" />
+                                  )}
+                                </>
+                              )}
                             </div>
+                          </div>
                         ))}
                       </div>
                     </div>
