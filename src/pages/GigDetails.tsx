@@ -45,6 +45,37 @@ export function GigDetails() {
   const handleSave = async () => {
     if (editedGig) {
       try {
+        // Validate required fields
+        if (!editedGig.name?.trim() || !editedGig.date) {
+          throw new Error('Name and date are required');
+        }
+
+        if (!user) {
+          throw new Error('You must be logged in to edit a gig');
+        }
+
+        // Only validate date if it's being changed
+        if (editedGig.date !== gig.date) {
+          const gigDate = new Date(editedGig.date);
+          gigDate.setHours(23, 59, 59, 999); // End of the selected day
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Start of today
+
+          if (gigDate < today) {
+            throw new Error('Cannot set date to the past');
+          }
+        }
+
+        // Validate time range if not whole day event
+        if (!editedGig.isWholeDay && editedGig.startTime && editedGig.endTime) {
+          const [startHours, startMinutes] = editedGig.startTime.split(':').map(Number);
+          const [endHours, endMinutes] = editedGig.endTime.split(':').map(Number);
+          
+          if (startHours > endHours || (startHours === endHours && startMinutes >= endMinutes)) {
+            throw new Error('End time must be after start time');
+          }
+        }
+
         await updateGig(editedGig);
         setIsEditing(false);
         setEditedGig(null);
@@ -190,6 +221,7 @@ export function GigDetails() {
   const openInGoogleMaps = (location: string) => {
     if (!location) return;
     const encodedLocation = encodeURIComponent(location);
+    //https://www.google.com/maps/search/?api=1&query=${encodedLocation}`
     window.open(`https://www.google.com/maps/dir/Theaterkerk+Bemmel,+Markt+5,+6681+AE+Bemmel/${encodedLocation}`, '_blank');
   };
 
@@ -219,6 +251,7 @@ export function GigDetails() {
                   className="text-3xl font-bold text-gray-900 w-full border-b border-gray-300 focus:outline-none focus:border-indigo-500"
                   value={editedGig?.name}
                   onChange={(e) => setEditedGig(prev => prev ? { ...prev, name: e.target.value } : null)}
+                  disabled={isPastGig}
                 />
               ) : (
                 <h1 className="text-3xl font-bold text-gray-900">{gig.name}</h1>
@@ -293,6 +326,7 @@ export function GigDetails() {
                       className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
                       value={editedGig?.date}
                       onChange={(e) => setEditedGig(prev => prev ? { ...prev, date: e.target.value } : null)}
+                      disabled={isPastGig}
                     />
                   ) : (
                     <span>{new Date(gig.date).toLocaleDateString()}</span>
@@ -303,35 +337,41 @@ export function GigDetails() {
                   <Clock className="w-5 h-5 mr-3" />
                   {isEditing ? (
                     <div className="flex items-center space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="mr-2"
-                          checked={editedGig?.isWholeDay}
-                          onChange={(e) => setEditedGig(prev => prev ? {
-                            ...prev,
-                            isWholeDay: e.target.checked,
-                            startTime: e.target.checked ? null : prev.startTime,
-                            endTime: e.target.checked ? null : prev.endTime,
-                          } : null)}
-                        />
-                        All Day
-                      </label>
-                      {!editedGig?.isWholeDay && (
+                      {isPastGig ? (
+                        <span>{formatTime()}</span>
+                      ) : (
                         <>
-                          <input
-                            type="time"
-                            className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
-                            value={editedGig?.startTime || ''}
-                            onChange={(e) => setEditedGig(prev => prev ? { ...prev, startTime: e.target.value } : null)}
-                          />
-                          <span>-</span>
-                          <input
-                            type="time"
-                            className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
-                            value={editedGig?.endTime || ''}
-                            onChange={(e) => setEditedGig(prev => prev ? { ...prev, endTime: e.target.value } : null)}
-                          />
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              className="mr-2"
+                              checked={editedGig?.isWholeDay}
+                              onChange={(e) => setEditedGig(prev => prev ? {
+                                ...prev,
+                                isWholeDay: e.target.checked,
+                                startTime: e.target.checked ? null : prev.startTime,
+                                endTime: e.target.checked ? null : prev.endTime,
+                              } : null)}
+                            />
+                            All Day
+                          </label>
+                          {!editedGig?.isWholeDay && (
+                            <>
+                              <input
+                                type="time"
+                                className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                                value={editedGig?.startTime || ''}
+                                onChange={(e) => setEditedGig(prev => prev ? { ...prev, startTime: e.target.value } : null)}
+                              />
+                              <span>-</span>
+                              <input
+                                type="time"
+                                className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                                value={editedGig?.endTime || ''}
+                                onChange={(e) => setEditedGig(prev => prev ? { ...prev, endTime: e.target.value } : null)}
+                              />
+                            </>
+                          )}
                         </>
                       )}
                     </div>
@@ -368,11 +408,13 @@ export function GigDetails() {
                     </>
                   ) : (
                     <>
-                      <MapPin 
-                        className="w-5 h-5 mr-3 cursor-pointer hover:text-indigo-600"
-                        onClick={() => gig.location && openInGoogleMaps(gig.location)}
+                      <span 
                         title="Open in Google Maps"
-                      />
+                        className="cursor-pointer hover:text-indigo-600"
+                        onClick={() => gig.location && openInGoogleMaps(gig.location)}
+                      >
+                        <MapPin className="w-5 h-5 mr-3" />
+                      </span>
                       <span>
                         {gig.location}
                         {gig.distance && (

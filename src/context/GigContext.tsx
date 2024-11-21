@@ -129,49 +129,32 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateGig = async (updatedGig: Gig) => {
-    if (!user?.emailVerified) {
-      throw new Error('Email verification required');
-    }
-
     try {
-      const { id, ...gigData } = updatedGig;
+      // Get the original gig
+      const originalGig = gigs.find(g => g.id === updatedGig.id);
+      if (!originalGig) throw new Error('Gig not found');
 
-      // Only validate full gig data if not just updating availability
-      const isAvailabilityUpdate = Object.keys(gigData).length === 1 && 'memberAvailability' in gigData;
-      if (!isAvailabilityUpdate) {
-        // Find the original gig to compare dates
-        const originalGig = gigs.find(g => g.id === id);
-        if (!originalGig) {
-          throw new Error('Gig not found');
+      // Only validate date if it's being changed
+      if (updatedGig.date !== originalGig.date) {
+        const gigDate = new Date(updatedGig.date);
+        gigDate.setHours(23, 59, 59, 999);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (gigDate < today) {
+          throw new Error('Cannot change gig date to a past date');
         }
-        validateGigData(gigData, originalGig);
       }
 
-      // Ensure proper structure for member availability
-      if (gigData.memberAvailability && user.uid in gigData.memberAvailability) {
-        const userAvailability = gigData.memberAvailability[user.uid];
-        gigData.memberAvailability[user.uid] = {
-          status: userAvailability.status || 'tentative',
-          note: userAvailability.note || '',
-          canDrive: typeof userAvailability.canDrive === 'boolean' ? userAvailability.canDrive : false,
-        };
-      }
-
-      // Clean up data before update
-      const cleanedData = {
-        ...gigData,
-        name: gigData.name?.trim(),
-        description: gigData.description?.trim() || null,
-        startTime: gigData.isWholeDay ? null : gigData.startTime || null,
-        endTime: gigData.isWholeDay ? null : gigData.endTime || null,
-        pay: gigData.pay || null,
-      };
-
-      const gigRef = doc(db, 'gigs', id);
-      await updateDoc(gigRef, cleanedData);
+      const gigRef = doc(db, 'gigs', updatedGig.id);
+      await updateDoc(gigRef, updatedGig);
+      
+      setGigs(prev => prev.map(gig => 
+        gig.id === updatedGig.id ? updatedGig : gig
+      ));
     } catch (error) {
       console.error('Error updating gig:', error);
-      throw error instanceof Error ? error : new Error('Failed to update gig');
+      throw error;
     }
   };
 
