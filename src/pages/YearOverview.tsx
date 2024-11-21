@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGigs } from '../context/GigContext';
-import { ArrowLeft, ArrowUpDown } from 'lucide-react';
+import { ArrowLeft, ArrowUpDown, X } from 'lucide-react';
 import { useBand } from '../context/BandContext';
 import { useState } from 'react';
 
@@ -53,15 +53,19 @@ export function YearOverview() {
   console.log('Member Stats:', memberStats);
 
   type SortField = 'name' | 'available' | 'totalDistance';
-  const [sortField, setSortField] = useState<SortField>('name');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortField, setSortField] = useState<SortField>('available');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   const sortedMemberStats = [...memberStats].sort((a, b) => {
     const direction = sortDirection === 'asc' ? 1 : -1;
     if (sortField === 'name') {
       return direction * a.member.name.localeCompare(b.member.name);
     }
-    return direction * (a.stats[sortField] - b.stats[sortField]);
+    const primarySort = direction * (a.stats[sortField] - b.stats[sortField]);
+    if (primarySort === 0 && sortField === 'available') {
+      return -1 * (a.stats.totalDistance - b.stats.totalDistance);
+    }
+    return primarySort;
   });
 
   const handleSort = (field: SortField) => {
@@ -71,6 +75,25 @@ export function YearOverview() {
       setSortField(field);
       setSortDirection('asc');
     }
+  };
+
+  const [selectedMember, setSelectedMember] = useState<{
+    member: { id: string; name: string };
+    gigs: Array<{ title: string; venue: string; distance: number }>;
+  } | null>(null);
+
+  const getDriverGigs = (memberId: string) => {
+    return yearGigs
+      .filter(gig => 
+        gig.status !== 'declined' && 
+        gig.memberAvailability?.[memberId]?.status === 'available' &&
+        gig.memberAvailability?.[memberId]?.canDrive === true
+      )
+      .map(gig => ({
+        title: gig.name,
+        venue: gig.location || 'No location',
+        distance: Number(gig.distance) || 0
+      }));
   };
 
   return (
@@ -158,13 +181,65 @@ export function YearOverview() {
                   <td className="px-6 py-4 font-medium">{member.name}</td>
                   <td className="px-6 py-4 text-green-600">{stats.available}</td>
                   <td className="px-6 py-4 border-l text-indigo-600">
-                    {stats.totalDistance.toLocaleString()} km
+                    <button
+                      onClick={() => setSelectedMember({
+                        member,
+                        gigs: getDriverGigs(member.id)
+                      })}
+                      className="hover:underline focus:outline-none"
+                    >
+                      {stats.totalDistance.toLocaleString()} km
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+
+        {selectedMember && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+              <div className="p-6 border-b flex justify-between items-center">
+                <h3 className="text-xl font-semibold">
+                  Driving Details for {selectedMember.member.name}
+                </h3>
+                <button
+                  onClick={() => setSelectedMember(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-6 overflow-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="px-4 py-2 text-left">Title</th>
+                      <th className="px-4 py-2 text-left">Location</th>
+                      <th className="px-4 py-2 text-right">Distance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedMember.gigs.map((gig, index) => (
+                      <tr key={index} className="border-b">
+                        <td className="px-4 py-2">{gig.title}</td>
+                        <td className="px-4 py-2">{gig.venue}</td>
+                        <td className="px-4 py-2 text-right">{gig.distance.toLocaleString()} km</td>
+                      </tr>
+                    ))}
+                    <tr className="font-semibold">
+                      <td className="px-4 py-2" colSpan={2}>Total</td>
+                      <td className="px-4 py-2 text-right">
+                        {selectedMember.gigs.reduce((sum, gig) => sum + gig.distance, 0).toLocaleString()} km
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
