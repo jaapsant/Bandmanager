@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGigs } from '../context/GigContext';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowUpDown } from 'lucide-react';
 import { useBand } from '../context/BandContext';
+import { useState } from 'react';
 
 export function YearOverview() {
   const { year } = useParams();
@@ -29,6 +30,7 @@ export function YearOverview() {
     const memberName = bandMembers.find(m => m.id === memberId)?.name || memberId;
 
     const memberGigs = yearGigs.filter(gig => 
+      gig.status !== 'declined' && 
       gig.memberAvailability?.[memberId]?.status !== undefined
     );
 
@@ -38,15 +40,10 @@ export function YearOverview() {
         available: memberGigs.filter(gig => 
           gig.memberAvailability?.[memberId]?.status === 'available'
         ).length,
-        unavailable: memberGigs.filter(gig => 
-          gig.memberAvailability?.[memberId]?.status === 'unavailable'
-        ).length,
-        tentative: memberGigs.filter(gig => 
-          gig.memberAvailability?.[memberId]?.status === 'tentative'
-        ).length,
         totalDistance: memberGigs.reduce((sum, gig) => {
-          const isAvailable = gig.memberAvailability?.[memberId]?.status === 'available';
-          return sum + (isAvailable ? (Number(gig.distance) || 0) : 0);
+          const isAvailableAndDriving = gig.memberAvailability?.[memberId]?.status === 'available' 
+            && gig.memberAvailability?.[memberId]?.canDrive === true;
+          return sum + (isAvailableAndDriving ? (Number(gig.distance) || 0) : 0);
         }, 0)
       }
     };
@@ -54,6 +51,27 @@ export function YearOverview() {
 
   console.log('Year Gigs:', yearGigs);
   console.log('Member Stats:', memberStats);
+
+  type SortField = 'name' | 'available' | 'totalDistance';
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  const sortedMemberStats = [...memberStats].sort((a, b) => {
+    const direction = sortDirection === 'asc' ? 1 : -1;
+    if (sortField === 'name') {
+      return direction * a.member.name.localeCompare(b.member.name);
+    }
+    return direction * (a.stats[sortField] - b.stats[sortField]);
+  });
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -104,32 +122,48 @@ export function YearOverview() {
         </div>
 
         <h2 className="text-2xl font-bold text-gray-900 mb-6 mt-12">Band Member Statistics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {memberStats?.map(({ member, stats }) => (
-            <div key={member.id} className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">{member.name}</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Available:</span>
-                  <span className="font-medium text-green-600">{stats.available}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Unavailable:</span>
-                  <span className="font-medium text-red-600">{stats.unavailable}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Tentative:</span>
-                  <span className="font-medium text-yellow-600">{stats.tentative}</span>
-                </div>
-                <div className="flex justify-between pt-2 border-t">
-                  <span className="text-gray-600">Total Distance:</span>
-                  <span className="font-medium text-indigo-600">
+        <div className="overflow-x-auto">
+          <table className="w-full bg-white rounded-lg shadow">
+            <thead>
+              <tr className="border-b">
+                <th className="px-6 py-3 text-left">
+                  <button 
+                    className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
+                    onClick={() => handleSort('name')}
+                  >
+                    Name <ArrowUpDown className="h-4 w-4" />
+                  </button>
+                </th>
+                <th className="px-6 py-3 text-left">
+                  <button 
+                    className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
+                    onClick={() => handleSort('available')}
+                  >
+                    Gigs Played <ArrowUpDown className="h-4 w-4" />
+                  </button>
+                </th>
+                <th className="px-6 py-3 text-left border-l">
+                  <button 
+                    className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
+                    onClick={() => handleSort('totalDistance')}
+                  >
+                    Distance Driven <ArrowUpDown className="h-4 w-4" />
+                  </button>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedMemberStats.map(({ member, stats }) => (
+                <tr key={member.id} className="border-b hover:bg-gray-50">
+                  <td className="px-6 py-4 font-medium">{member.name}</td>
+                  <td className="px-6 py-4 text-green-600">{stats.available}</td>
+                  <td className="px-6 py-4 border-l text-indigo-600">
                     {stats.totalDistance.toLocaleString()} km
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
