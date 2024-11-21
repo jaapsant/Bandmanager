@@ -187,6 +187,12 @@ export function GigDetails() {
 
   const isPastGig = new Date(gig.date) < new Date();
 
+  const openInGoogleMaps = (location: string) => {
+    if (!location) return;
+    const encodedLocation = encodeURIComponent(location);
+    window.open(`https://www.google.com/maps/dir/Theaterkerk+Bemmel,+Markt+5,+6681+AE+Bemmel/${encodedLocation}`, '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -335,38 +341,47 @@ export function GigDetails() {
                 </div>
                 
                 <div className="flex items-center text-gray-600">
-                  <MapPin className="w-5 h-5 mr-3" />
                   {isEditing ? (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
-                        value={editedGig?.location || ''}
-                        onChange={(e) => setEditedGig(prev => prev ? { ...prev, location: e.target.value } : null)}
-                        placeholder="Enter location"
-                      />
-                      <input
-                        type="number"
-                        className="w-20 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
-                        value={editedGig?.distance || ''}
-                        onChange={(e) => setEditedGig(prev => prev ? { 
-                          ...prev, 
-                          distance: e.target.value ? parseFloat(e.target.value) : null 
-                        } : null)}
-                        placeholder="km"
-                        min="0"
-                        step="0.1"
-                      />
-                    </div>
+                    <>
+                      <MapPin className="w-5 h-5 mr-3" />
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                          value={editedGig?.location || ''}
+                          onChange={(e) => setEditedGig(prev => prev ? { ...prev, location: e.target.value } : null)}
+                          placeholder="Enter location"
+                        />
+                        <input
+                          type="number"
+                          className="w-20 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                          value={editedGig?.distance || ''}
+                          onChange={(e) => setEditedGig(prev => prev ? { 
+                            ...prev, 
+                            distance: e.target.value ? parseFloat(e.target.value) : null 
+                          } : null)}
+                          placeholder="km"
+                          min="0"
+                          step="0.1"
+                        />
+                      </div>
+                    </>
                   ) : (
-                    <span>
-                      {gig.location}
-                      {gig.distance && (
-                        <span className="text-gray-400 ml-2">
-                          ({gig.distance} km)
-                        </span>
-                      )}
-                    </span>
+                    <>
+                      <MapPin 
+                        className="w-5 h-5 mr-3 cursor-pointer hover:text-indigo-600"
+                        onClick={() => gig.location && openInGoogleMaps(gig.location)}
+                        title="Open in Google Maps"
+                      />
+                      <span>
+                        {gig.location}
+                        {gig.distance && (
+                          <span className="text-gray-400 ml-2">
+                            ({gig.distance} km)
+                          </span>
+                        )}
+                      </span>
+                    </>
                   )}
                 </div>
 
