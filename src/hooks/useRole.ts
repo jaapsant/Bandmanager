@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export function useRole() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [roles, setRoles] = useState<{
     admin?: boolean;
     bandManager?: boolean;
@@ -24,14 +26,14 @@ export function useRole() {
         const roleDoc = await getDoc(doc(db, 'roles', user.uid));
         setRoles(roleDoc.data() || {});
       } catch (error) {
-        console.error('Error fetching roles:', error);
+        console.error(t('hooks.useRole.errors.fetchFailed'), error);
         setRoles({});
       }
       setLoading(false);
     };
 
     fetchRoles();
-  }, [user]);
+  }, [user, t]);
 
   return { roles, loading };
 }

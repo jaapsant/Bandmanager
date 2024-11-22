@@ -4,12 +4,14 @@ import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useBand } from '../context/BandContext';
 import { getAuth, updatePassword } from 'firebase/auth';
+import { useTranslation } from 'react-i18next';
 
 export function Profile() {
   const navigate = useNavigate();
   const { user, updateDisplayName } = useAuth();
   const { instruments: unsortedInstruments, bandMembers, updateMemberInstrument, updateMemberName } = useBand();
   const auth = getAuth();
+  const { t } = useTranslation();
 
   // Sort instruments alphabetically
   const instruments = [...unsortedInstruments].sort((a, b) => a.localeCompare(b));
@@ -49,15 +51,14 @@ export function Profile() {
     setLoading(true);
 
     try {
-      // Update both Firebase Auth profile and band member name
       await Promise.all([
         updateDisplayName(name),
         updateMemberName(auth.currentUser.uid, name)
       ]);
 
-      setSuccess('Name updated successfully');
+      setSuccess(t('profile.messages.success.nameUpdate'));
     } catch (error) {
-      setError('Failed to update name');
+      setError(t('profile.messages.error.nameUpdate'));
     } finally {
       setLoading(false);
     }
@@ -73,9 +74,9 @@ export function Profile() {
 
     try {
       await updateMemberInstrument(user.uid, selectedInstrument);
-      setSuccess('Instrument updated successfully');
+      setSuccess(t('profile.messages.success.instrumentUpdate'));
     } catch (error) {
-      setError('Failed to update instrument');
+      setError(t('profile.messages.error.instrumentUpdate'));
     } finally {
       setLoading(false);
     }
@@ -86,7 +87,7 @@ export function Profile() {
     if (!auth.currentUser) return;
 
     if (newPassword !== confirmPassword) {
-      setError('New passwords do not match');
+      setError(t('profile.messages.error.passwordMismatch'));
       return;
     }
 
@@ -96,12 +97,12 @@ export function Profile() {
 
     try {
       await updatePassword(auth.currentUser, newPassword);
-      setSuccess('Password updated successfully');
+      setSuccess(t('profile.messages.success.passwordUpdate'));
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error) {
-      setError('Failed to update password. Please sign in again if it has been a while.');
+      setError(t('profile.messages.error.passwordUpdate'));
     } finally {
       setLoading(false);
     }
@@ -115,7 +116,7 @@ export function Profile() {
           className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
-          Back to Gigs
+          {t('profile.navigation.backToGigs')}
         </button>
 
         <div className="space-y-6">
@@ -133,11 +134,13 @@ export function Profile() {
 
           {/* Update Name */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Update Profile Name</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              {t('profile.sections.name.title')}
+            </h2>
             <form onSubmit={handleUpdateName} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Display Name
+                  {t('profile.sections.name.label')}
                 </label>
                 <input
                   type="text"
@@ -153,7 +156,7 @@ export function Profile() {
                   disabled={loading}
                   className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
                 >
-                  Update Name
+                  {t('profile.sections.name.button')}
                 </button>
               </div>
             </form>
@@ -161,11 +164,13 @@ export function Profile() {
 
           {/* Update Instrument */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Update Instrument</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              {t('profile.sections.instrument.title')}
+            </h2>
             <form onSubmit={handleUpdateInstrument} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Your Instrument
+                  {t('profile.sections.instrument.label')}
                 </label>
                 <select
                   required
@@ -173,7 +178,7 @@ export function Profile() {
                   value={selectedInstrument}
                   onChange={(e) => setSelectedInstrument(e.target.value)}
                 >
-                  <option value="">Select an instrument</option>
+                  <option value="">{t('profile.sections.instrument.placeholder')}</option>
                   {instruments.map(instrument => (
                     <option key={instrument} value={instrument}>
                       {instrument}
@@ -187,7 +192,7 @@ export function Profile() {
                   disabled={loading}
                   className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
                 >
-                  Update Instrument
+                  {t('profile.sections.instrument.button')}
                 </button>
               </div>
             </form>
@@ -195,11 +200,13 @@ export function Profile() {
 
           {/* Update Password */}
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Change Password</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              {t('profile.sections.password.title')}
+            </h2>
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Current Password
+                  {t('profile.sections.password.currentPassword')}
                 </label>
                 <input
                   type="password"
@@ -211,7 +218,7 @@ export function Profile() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  New Password
+                  {t('profile.sections.password.newPassword')}
                 </label>
                 <input
                   type="password"
@@ -223,7 +230,7 @@ export function Profile() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm New Password
+                  {t('profile.sections.password.confirmPassword')}
                 </label>
                 <input
                   type="password"
@@ -239,7 +246,7 @@ export function Profile() {
                   disabled={loading}
                   className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
                 >
-                  Update Password
+                  {t('profile.sections.password.button')}
                 </button>
               </div>
             </form>

@@ -25,26 +25,30 @@ interface DeleteConfirmationProps {
 }
 
 function DeleteConfirmation({ user, onConfirm, onCancel }: DeleteConfirmationProps) {
+  const { t } = useTranslation();
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Delete User Account</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          {t('userRoles.deleteModal.title')}
+        </h3>
         <p className="text-gray-600 mb-6">
-          Are you sure you want to delete the account for <span className="font-semibold">{user.email}</span>? 
-          This action cannot be undone.
+          {t('userRoles.deleteModal.message')} <span className="font-semibold">{user.email}</span>? 
+          {t('userRoles.deleteModal.warning')}
         </p>
         <div className="flex justify-end space-x-4">
           <button
             onClick={onCancel}
             className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
           >
-            Cancel
+            {t('userRoles.deleteModal.cancelButton')}
           </button>
           <button
             onClick={onConfirm}
             className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
           >
-            Delete Account
+            {t('userRoles.deleteModal.deleteButton')}
           </button>
         </div>
       </div>
@@ -109,7 +113,7 @@ export function UserRoles() {
       if (role === 'admin' && !enabled) {
         const adminCount = users.filter(u => u.admin && u.uid !== uid).length;
         if (adminCount === 0) {
-          throw new Error('Cannot remove the last admin');
+          throw new Error(t('userRoles.errors.lastAdmin'));
         }
       }
 
@@ -120,10 +124,9 @@ export function UserRoles() {
         user.uid === uid ? { ...user, [role]: enabled } : user
       ));
 
-      setSuccessMessage(`Role updated successfully`);
+      setSuccessMessage(t('userRoles.success.roleUpdate'));
     } catch (err) {
-      console.error('Error updating role:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update role');
+      setError(err instanceof Error ? err.message : t('userRoles.errors.updateRole'));
     }
   };
 
@@ -136,13 +139,13 @@ export function UserRoles() {
       if (userToDelete.admin) {
         const adminCount = users.filter(u => u.admin && u.uid !== userToDelete.uid).length;
         if (adminCount === 0) {
-          throw new Error('Cannot delete the last admin account');
+          throw new Error(t('userRoles.errors.lastAdmin'));
         }
       }
 
       // Don't allow self-deletion
       if (userToDelete.uid === user?.uid) {
-        throw new Error('You cannot delete your own account');
+        throw new Error(t('userRoles.errors.selfDelete'));
       }
 
       // Delete user documents
@@ -154,10 +157,9 @@ export function UserRoles() {
 
       // Update local state
       setUsers(users.filter(u => u.uid !== userToDelete.uid));
-      setSuccessMessage('User account deleted successfully');
+      setSuccessMessage(t('userRoles.success.userDelete'));
     } catch (error) {
-      console.error('Error deleting user:', error);
-      setError(error instanceof Error ? error.message : 'Failed to delete user account');
+      setError(error instanceof Error ? error.message : t('userRoles.errors.deleteUser'));
     } finally {
       setUserToDelete(null);
     }
@@ -168,13 +170,17 @@ export function UserRoles() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-md text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-          <p className="text-gray-600 mb-4">You don't have permission to access this page.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {t('userRoles.accessDenied.title')}
+          </h2>
+          <p className="text-gray-600 mb-4">
+            {t('userRoles.accessDenied.message')}
+          </p>
           <button
             onClick={() => navigate('/gigs')}
             className="text-indigo-600 hover:text-indigo-500"
           >
-            Return to Gigs
+            {t('userRoles.accessDenied.returnButton')}
           </button>
         </div>
       </div>
@@ -190,7 +196,7 @@ export function UserRoles() {
             className="flex items-center text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Gigs
+            {t('userRoles.backToGigs')}
           </button>
           <LanguageSwitcher />
         </div>
@@ -221,19 +227,19 @@ export function UserRoles() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      User
+                      {t('userRoles.tableHeaders.user')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Admin
+                      {t('userRoles.tableHeaders.admin')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Band Manager
+                      {t('userRoles.tableHeaders.bandManager')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Band Member
+                      {t('userRoles.tableHeaders.bandMember')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      {t('userRoles.tableHeaders.actions')}
                     </th>
                   </tr>
                 </thead>

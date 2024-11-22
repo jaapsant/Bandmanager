@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowUpDown, X } from 'lucide-react';
 import { useBand } from '../context/BandContext';
 import { useState } from 'react';
 import { useRole } from '../hooks/useRole';
+import { useTranslation } from 'react-i18next';
 
 export function YearOverview() {
   const { year } = useParams();
@@ -11,6 +12,7 @@ export function YearOverview() {
   const navigate = useNavigate();
   const { bandMembers } = useBand();
   const { roles } = useRole();
+  const { t } = useTranslation();
 
   const yearGigs = gigs.filter(
     gig => new Date(gig.date).getFullYear().toString() === year
@@ -98,7 +100,7 @@ export function YearOverview() {
       )
       .map(gig => ({
         title: gig.name,
-        venue: gig.location || 'No location',
+        venue: gig.location || t('yearOverview.drivingDetails.table.noLocation'),
         distance: Number(gig.distance) || 0
       }));
   };
@@ -112,51 +114,53 @@ export function YearOverview() {
             className="flex items-center text-gray-600 hover:text-indigo-600"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Gig History
+            {t('yearOverview.backButton')}
           </button>
         </div>
 
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          {year} Year Overview
+          {t('yearOverview.title')}{ year }
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Total Gigs</h3>
+            <h3 className="text-lg font-medium text-gray-900">{t('yearOverview.stats.totalGigs')}</h3>
             <p className="text-3xl font-bold text-indigo-600">{stats.totalGigs}</p>
           </div>
           
           <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Completed Gigs</h3>
+            <h3 className="text-lg font-medium text-gray-900">{t('yearOverview.stats.completedGigs')}</h3>
             <p className="text-3xl font-bold text-green-600">{stats.completedGigs}</p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Cancelled Gigs</h3>
+            <h3 className="text-lg font-medium text-gray-900">{t('yearOverview.stats.cancelledGigs')}</h3>
             <p className="text-3xl font-bold text-red-600">{stats.cancelledGigs}</p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Total Pay</h3>
+            <h3 className="text-lg font-medium text-gray-900">{t('yearOverview.stats.totalPay')}</h3>
             <p className="text-3xl font-bold text-indigo-600">
               €{stats.completedPay.toLocaleString()}
             </p>
             {year === new Date().getFullYear().toString() && (
               <p className="text-sm text-gray-500 mt-1">
-                Confirmed: €{stats.confirmedPay.toLocaleString()}
+                {t('yearOverview.stats.confirmedPay')}: €{stats.confirmedPay.toLocaleString()}
               </p>
             )}
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Total Distance</h3>
+            <h3 className="text-lg font-medium text-gray-900">{t('yearOverview.stats.totalDistance')}</h3>
             <p className="text-3xl font-bold text-indigo-600">
               {stats.totalDistance.toLocaleString()} km
             </p>
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 mt-12">Band Member Statistics</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 mt-12">
+          {t('yearOverview.bandMembers.title')}
+        </h2>
         <div className="overflow-x-auto">
           <table className="w-full bg-white rounded-lg shadow">
             <thead>
@@ -166,7 +170,7 @@ export function YearOverview() {
                     className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
                     onClick={() => handleSort('name')}
                   >
-                    Name <ArrowUpDown className="h-4 w-4" />
+                    {t('yearOverview.bandMembers.table.name')} <ArrowUpDown className="h-4 w-4" />
                   </button>
                 </th>
                 {(roles.admin || roles.bandManager) && (
@@ -175,7 +179,7 @@ export function YearOverview() {
                       className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
                       onClick={() => handleSort('available')}
                     >
-                      Gigs Played <ArrowUpDown className="h-4 w-4" />
+                      {t('yearOverview.bandMembers.table.gigsPlayed')} <ArrowUpDown className="h-4 w-4" />
                     </button>
                   </th>
                 )}
@@ -184,7 +188,7 @@ export function YearOverview() {
                     className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
                     onClick={() => handleSort('totalDistance')}
                   >
-                    Distance Driven <ArrowUpDown className="h-4 w-4" />
+                    {t('yearOverview.bandMembers.table.distanceDriven')} <ArrowUpDown className="h-4 w-4" />
                   </button>
                 </th>
               </tr>
@@ -218,7 +222,7 @@ export function YearOverview() {
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
               <div className="p-6 border-b flex justify-between items-center">
                 <h3 className="text-xl font-semibold">
-                  Driving Details for {selectedMember.member.name}
+                  {t('yearOverview.drivingDetails.title')}{selectedMember.member.name }
                 </h3>
                 <button
                   onClick={() => setSelectedMember(null)}
@@ -231,9 +235,9 @@ export function YearOverview() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="px-4 py-2 text-left">Title</th>
-                      <th className="px-4 py-2 text-left">Location</th>
-                      <th className="px-4 py-2 text-right">Distance</th>
+                      <th className="px-4 py-2 text-left">{t('yearOverview.drivingDetails.table.title')}</th>
+                      <th className="px-4 py-2 text-left">{t('yearOverview.drivingDetails.table.location')}</th>
+                      <th className="px-4 py-2 text-right">{t('yearOverview.drivingDetails.table.distance')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -245,7 +249,7 @@ export function YearOverview() {
                       </tr>
                     ))}
                     <tr className="font-semibold">
-                      <td className="px-4 py-2" colSpan={2}>Total</td>
+                      <td className="px-4 py-2" colSpan={2}>{t('yearOverview.drivingDetails.table.total')}</td>
                       <td className="px-4 py-2 text-right">
                         {selectedMember.gigs.reduce((sum, gig) => sum + gig.distance, 0).toLocaleString()} km
                       </td>

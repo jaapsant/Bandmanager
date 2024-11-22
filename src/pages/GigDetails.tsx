@@ -10,8 +10,10 @@ import { useGigs } from '../context/GigContext';
 import { useBand } from '../context/BandContext';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from '../hooks/useRole';
+import { useTranslation } from 'react-i18next';
 
 export function GigDetails() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { gigs, updateGig, deleteGig } = useGigs();
@@ -28,8 +30,8 @@ export function GigDetails() {
   const [error, setError] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  if (!gig) return <div>Gig not found</div>;
-  if (!user) return <div>Please sign in</div>;
+  if (!gig) return <div>{t('gigDetails.errors.notFound')}</div>;
+  if (!user) return <div>{t('gigDetails.errors.signIn')}</div>;
 
   const handleEdit = () => {
     setEditedGig(gig);
@@ -45,34 +47,31 @@ export function GigDetails() {
   const handleSave = async () => {
     if (editedGig) {
       try {
-        // Validate required fields
         if (!editedGig.name?.trim() || !editedGig.date) {
-          throw new Error('Name and date are required');
+          throw new Error(t('gigDetails.errors.requiredFields'));
         }
 
         if (!user) {
-          throw new Error('You must be logged in to edit a gig');
+          throw new Error(t('gigDetails.errors.loginRequired'));
         }
 
-        // Only validate date if it's being changed
         if (editedGig.date !== gig.date) {
           const gigDate = new Date(editedGig.date);
-          gigDate.setHours(23, 59, 59, 999); // End of the selected day
+          gigDate.setHours(23, 59, 59, 999);
           const today = new Date();
-          today.setHours(0, 0, 0, 0); // Start of today
+          today.setHours(0, 0, 0, 0);
 
           if (gigDate < today) {
-            throw new Error('Cannot set date to the past');
+            throw new Error(t('gigDetails.errors.pastDate'));
           }
         }
 
-        // Validate time range if not whole day event
         if (!editedGig.isWholeDay && editedGig.startTime && editedGig.endTime) {
           const [startHours, startMinutes] = editedGig.startTime.split(':').map(Number);
           const [endHours, endMinutes] = editedGig.endTime.split(':').map(Number);
           
           if (startHours > endHours || (startHours === endHours && startMinutes >= endMinutes)) {
-            throw new Error('End time must be after start time');
+            throw new Error(t('gigDetails.errors.timeRange'));
           }
         }
 
@@ -81,7 +80,7 @@ export function GigDetails() {
         setEditedGig(null);
         setError('');
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to update gig');
+        setError(err instanceof Error ? err.message : t('gigDetails.errors.updateFailed'));
       }
     }
   };
@@ -163,7 +162,7 @@ export function GigDetails() {
 
   const formatTime = () => {
     if (gig.isWholeDay) {
-      return "All Day";
+      return t('gigDetails.time.allDay');
     }
     if (gig.startTime && gig.endTime) {
       return `${gig.startTime} - ${gig.endTime}`;
@@ -281,7 +280,7 @@ export function GigDetails() {
           className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
-          Back to Gigs
+          {t('common.backToGigs')}
         </button>
 
         {error && (
@@ -493,14 +492,14 @@ export function GigDetails() {
 
               {(gig.description || isEditing) && (
                 <div className="mt-6">
-                  <h3 className="text-lg font-semibold mb-2">Description</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t('gigDetails.sections.description')}</h3>
                   {isEditing ? (
                     <textarea
                       className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       value={editedGig?.description || ''}
                       onChange={(e) => setEditedGig(prev => prev ? { ...prev, description: e.target.value } : null)}
                       rows={4}
-                      placeholder="Enter gig description"
+                      placeholder={t('gigDetails.sections.descriptionPlaceholder')}
                     />
                   ) : (
                     <p className="text-gray-600">{gig.description}</p>
@@ -511,7 +510,7 @@ export function GigDetails() {
               {/* Band Availability Overview */}
               <div className="mt-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Band Availability</h3>
+                  <h3 className="text-lg font-semibold">{t('gigDetails.sections.bandAvailability')}</h3>
                   {totalDrivers > 0 && (
                     <div className="flex items-center text-blue-600 bg-blue-50 px-2 py-1 rounded">
                       <Car className="w-4 h-4" />
@@ -658,20 +657,20 @@ export function GigDetails() {
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full">
-            <h3 className="text-lg font-semibold mb-4">Delete Gig</h3>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete this gig? This action cannot be undone.</p>
+            <h3 className="text-lg font-semibold mb-4">{t('gigDetails.deleteModal.title')}</h3>
+            <p className="text-gray-600 mb-6">{t('gigDetails.deleteModal.message')}</p>
             <div className="flex justify-end space-x-4">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 className="px-4 py-2 text-gray-600 hover:text-gray-800"
               >
-                Cancel
+                {t('gigDetails.deleteModal.cancel')}
               </button>
               <button
                 onClick={handleDelete}
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
-                Delete
+                {t('gigDetails.deleteModal.confirm')}
               </button>
             </div>
           </div>

@@ -9,6 +9,7 @@ import { useRole } from '../hooks/useRole';
 import { DraggableMember } from '../components/DraggableMember';
 import { DroppableInstrument } from '../components/DroppableInstrument';
 import { BandMember } from '../types';
+import { useTranslation } from 'react-i18next';
 
 export function BandMembers() {
   const navigate = useNavigate();
@@ -23,8 +24,10 @@ export function BandMembers() {
     loading,
   } = useBand();
 
+  const { t } = useTranslation();
+
   // Sort instruments alphabetically
-  const instruments = ['Unassigned', ...unsortedInstruments.sort((a, b) => a.localeCompare(b))];
+  const instruments = [t('bandMembers.instruments.unassigned'), ...unsortedInstruments.sort((a, b) => a.localeCompare(b))];
 
   const [showInstrumentForm, setShowInstrumentForm] = useState(false);
   const [newInstrument, setNewInstrument] = useState('');
@@ -56,7 +59,7 @@ export function BandMembers() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-gray-500">{t('bandMembers.loading')}</div>
       </div>
     );
   }
@@ -93,11 +96,11 @@ export function BandMembers() {
       setSuccess('');
       await updateMemberInstrument(
         memberId, 
-        newInstrument === 'Unassigned' ? '' : newInstrument
+        newInstrument === t('bandMembers.instruments.unassigned') ? '' : newInstrument
       );
-      setSuccess('Member instrument updated successfully');
+      setSuccess(t('bandMembers.messages.success.updateInstrument'));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update member instrument');
+      setError(err instanceof Error ? err.message : t('bandMembers.messages.error.updateInstrument'));
     }
   };
 
@@ -110,9 +113,9 @@ export function BandMembers() {
         await addInstrument(newInstrument);
         setNewInstrument('');
         setShowInstrumentForm(false);
-        setSuccess('Instrument added successfully');
+        setSuccess(t('bandMembers.messages.success.addInstrument'));
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to add instrument');
+        setError(err instanceof Error ? err.message : t('bandMembers.messages.error.addInstrument'));
       }
     }
   };
@@ -122,7 +125,7 @@ export function BandMembers() {
     
     const hasMembers = membersByInstrument[instrument]?.length > 0;
     if (hasMembers) {
-      setError('Cannot remove an instrument that has members assigned to it');
+      setError(t('bandMembers.messages.error.removeInstrument.hasMembers'));
       return;
     }
 
@@ -130,9 +133,9 @@ export function BandMembers() {
       setError('');
       setSuccess('');
       await removeInstrument(instrument);
-      setSuccess('Instrument removed successfully');
+      setSuccess(t('bandMembers.messages.success.removeInstrument'));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to remove instrument');
+      setError(err instanceof Error ? err.message : t('bandMembers.messages.error.removeInstrument.failed'));
     }
   };
 
@@ -144,7 +147,7 @@ export function BandMembers() {
           className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
-          Back to Gigs
+          {t('bandMembers.navigation.backToGigs')}
         </button>
 
         {error && (
@@ -163,7 +166,7 @@ export function BandMembers() {
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
               <Users className="w-6 h-6 text-indigo-600 mr-2" />
-              <h1 className="text-2xl font-bold text-gray-900">Band Members</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t('bandMembers.title')}</h1>
             </div>
             {canManageBand && user?.emailVerified && (
               <button
@@ -171,7 +174,7 @@ export function BandMembers() {
                 className="bg-white text-gray-600 px-4 py-2 rounded-md flex items-center hover:bg-gray-50 border border-gray-300"
               >
                 <Music className="w-5 h-5 mr-2" />
-                Add Instrument
+                {t('bandMembers.instruments.addButton')}
               </button>
             )}
           </div>
@@ -180,7 +183,7 @@ export function BandMembers() {
             <form onSubmit={handleInstrumentSubmit} className="mb-6 bg-gray-50 p-4 rounded-lg">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Instrument Name
+                  {t('bandMembers.instruments.form.title')}
                 </label>
                 <input
                   type="text"
@@ -188,7 +191,7 @@ export function BandMembers() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   value={newInstrument}
                   onChange={(e) => setNewInstrument(e.target.value)}
-                  placeholder="e.g., Piano"
+                  placeholder={t('bandMembers.instruments.form.placeholder')}
                 />
               </div>
               <div className="mt-4 flex justify-end space-x-3">
@@ -197,13 +200,13 @@ export function BandMembers() {
                   onClick={() => setShowInstrumentForm(false)}
                   className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                 >
-                  Cancel
+                  {t('bandMembers.instruments.form.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
                 >
-                  Add Instrument
+                  {t('bandMembers.instruments.form.submit')}
                 </button>
               </div>
             </form>
@@ -227,7 +230,7 @@ export function BandMembers() {
                       <button
                         onClick={() => handleRemoveInstrument(instrument)}
                         className="p-1 text-gray-400 hover:text-red-500"
-                        title="Remove instrument"
+                        title={t('bandMembers.instruments.removeButton')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

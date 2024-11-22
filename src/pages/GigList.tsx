@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useRole } from '../hooks/useRole';
 import { Gig } from '../types';
 import { statusOptions } from '../data';
+import { useTranslation } from 'react-i18next';
 
 // Add this type for grouped gigs
 type GroupedGigs = {
@@ -22,6 +23,7 @@ export function GigList() {
   const [showHistory, setShowHistory] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid');
   const [expandedYears, setExpandedYears] = useState<{ [year: string]: boolean }>({});
+  const { t } = useTranslation();
 
   const canManageGigs = roles.admin || roles.bandManager;
 
@@ -34,7 +36,7 @@ export function GigList() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Loading gigs...</div>
+        <div className="text-gray-500">{t('gigList.loading')}</div>
       </div>
     );
   }
@@ -101,9 +103,9 @@ export function GigList() {
                 {gig.status === 'completed' ? 'Completed' : statusOptions.find(s => s.value === gig.status)?.label}
               </span>
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td className="px-6 py-4 whitespace-nowrap">
               {gig.isWholeDay ? (
-                'All Day'
+                t('gigList.table.allDay')
               ) : (
                 gig.startTime && gig.endTime ? `${gig.startTime} - ${gig.endTime}` : ''
               )}
@@ -123,7 +125,7 @@ export function GigList() {
                 ) : (
                   <span className="flex items-center text-yellow-600 text-sm">
                     <AlertCircle className="w-4 h-4 mr-1" />
-                    Needed
+                    {t('gigList.table.needed')}
                   </span>
                 )}
               </td>
@@ -167,20 +169,20 @@ export function GigList() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
+                      {t('gigList.table.date')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Gig
+                      {t('gigList.table.gig')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
+                      {t('gigList.table.status')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Time
+                      {t('gigList.table.time')}
                     </th>
                     {!showHistory && (
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Your Status
+                        {t('gigList.table.yourStatus')}
                       </th>
                     )}
                   </tr>
@@ -233,7 +235,7 @@ export function GigList() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {showHistory ? 'Gig History' : 'Upcoming Gigs'}
+            {showHistory ? t('gigList.title.history') : t('gigList.title.upcoming')}
           </h1>
           <div className="flex space-x-4">
             {!showHistory && (
@@ -247,7 +249,7 @@ export function GigList() {
                   } rounded-l-md flex items-center`}
                 >
                   <LayoutGrid className="w-4 h-4 mr-2" />
-                  Grid
+                  {t('gigList.viewMode.grid')}
                 </button>
                 <button
                   onClick={() => setViewMode('compact')}
@@ -258,7 +260,7 @@ export function GigList() {
                   } rounded-r-md flex items-center`}
                 >
                   <List className="w-4 h-4 mr-2" />
-                  Compact
+                  {t('gigList.viewMode.compact')}
                 </button>
               </div>
             )}
@@ -269,12 +271,12 @@ export function GigList() {
               {showHistory ? (
                 <>
                   <Calendar className="w-5 h-5 mr-2" />
-                  Show Upcoming
+                  {t('gigList.buttons.showUpcoming')}
                 </>
               ) : (
                 <>
                   <History className="w-5 h-5 mr-2" />
-                  Show History
+                  {t('gigList.buttons.showHistory')}
                 </>
               )}
             </button>
@@ -283,7 +285,7 @@ export function GigList() {
               className="bg-white text-gray-600 px-4 py-2 rounded-md flex items-center hover:bg-gray-50 border border-gray-300"
             >
               <Users className="w-5 h-5 mr-2" />
-              Band Members
+              {t('gigList.buttons.bandMembers')}
             </button>
             {canManageGigs && user?.emailVerified && !showHistory && (
               <button
@@ -291,7 +293,7 @@ export function GigList() {
                 className="bg-indigo-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-indigo-700 transition-colors"
               >
                 <Plus className="w-5 h-5 mr-2" />
-                New Gig
+                {t('gigList.buttons.newGig')}
               </button>
             )}
           </div>

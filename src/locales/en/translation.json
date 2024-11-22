@@ -1,18 +1,339 @@
 {
   "userRoles": {
     "title": "User Roles",
-    "members": "Members",
-    "admins": "Administrators"
+    "backToGigs": "Back to Gigs",
+    "accessDenied": {
+      "title": "Access Denied",
+      "message": "You don't have permission to access this page.",
+      "returnButton": "Return to Gigs"
+    },
+    "loading": "Loading users...",
+    "deleteModal": {
+      "title": "Delete User Account",
+      "message": "Are you sure you want to delete the account for",
+      "warning": "This action cannot be undone.",
+      "cancelButton": "Cancel",
+      "deleteButton": "Delete Account"
+    },
+    "tableHeaders": {
+      "user": "User",
+      "admin": "Admin",
+      "bandManager": "Band Manager",
+      "bandMember": "Band Member",
+      "actions": "Actions"
+    },
+    "errors": {
+      "lastAdmin": "Cannot delete the last admin account",
+      "selfDelete": "You cannot delete your own account",
+      "permissionDenied": "You do not have permission to manage user roles",
+      "updateRole": "Failed to update role",
+      "deleteUser": "Failed to delete user account"
+    },
+    "success": {
+      "roleUpdate": "Role updated successfully",
+      "userDelete": "User account deleted successfully"
+    }
   },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "backToGigs": "Back to Gigs"
   },
   "gigs": {
     "available": "Available",
     "unavailable": "Unavailable",
     "maybe": "Maybe"
+  },
+  "gigList": {
+    "loading": "Loading gigs...",
+    "title": {
+      "upcoming": "Upcoming Gigs",
+      "history": "Gig History"
+    },
+    "viewMode": {
+      "grid": "Grid",
+      "compact": "Compact"
+    },
+    "buttons": {
+      "showUpcoming": "Show Upcoming",
+      "showHistory": "Show History",
+      "bandMembers": "Band Members",
+      "newGig": "New Gig"
+    },
+    "table": {
+      "date": "Date",
+      "gig": "Gig",
+      "status": "Status",
+      "time": "Time",
+      "yourStatus": "Your Status",
+      "allDay": "All Day",
+      "needed": "Needed",
+      "distance": "km",
+      "noGigs": {
+        "upcoming": "No upcoming gigs found",
+        "past": "No past gigs found"
+      }
+    },
+    "status": {
+      "completed": "Completed"
+    }
+  },
+  "yearOverview": {
+    "backButton": "Back to Gig History",
+    "title": "Year Overview ",
+    "stats": {
+      "totalGigs": "Total Gigs",
+      "completedGigs": "Completed",
+      "cancelledGigs": "Cancelled",
+      "totalPay": "Total Pay",
+      "confirmedPay": "Confirmed",
+      "totalDistance": "Total Distance"
+    },
+    "bandMembers": {
+      "title": "Band Member Statistics",
+      "table": {
+        "name": "Name",
+        "gigsPlayed": "Gigs Played",
+        "distanceDriven": "Distance Driven"
+      }
+    },
+    "drivingDetails": {
+      "title": "Driving Details for ",
+      "table": {
+        "title": "Title",
+        "location": "Location",
+        "distance": "Distance",
+        "total": "Total",
+        "noLocation": "No location"
+      }
+    }
+  },
+  "gigDetails": {
+    "errors": {
+      "notFound": "Gig not found",
+      "signIn": "Please sign in",
+      "requiredFields": "Name and date are required",
+      "loginRequired": "You must be logged in to edit a gig",
+      "pastDate": "Cannot set date to the past",
+      "timeRange": "End time must be after start time",
+      "updateFailed": "Failed to update gig",
+      "emailVerification": "Email verification required to update availability",
+      "updateAvailability": "Failed to update availability",
+      "updateNote": "Failed to update note",
+      "drivingStatus": "Email verification required to update driving status"
+    },
+    "time": {
+      "allDay": "All Day"
+    },
+    "sections": {
+      "description": "Description",
+      "descriptionPlaceholder": "Enter gig description",
+      "bandAvailability": "Band Availability",
+      "yourAvailability": "Your Availability",
+      "notePlaceholder": "Add a note about your availability...",
+      "bandMembers": "Band Members"
+    },
+    "status": {
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "tentative": "Tentative",
+      "canDrive": "Available to drive"
+    },
+    "deleteModal": {
+      "title": "Delete Gig",
+      "message": "Are you sure you want to delete this gig? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "actions": {
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "addToCalendar": "Add to Calendar"
+    }
+  },
+  "bandMembers": {
+    "loading": "Loading...",
+    "title": "Band Members",
+    "navigation": {
+      "backToGigs": "Back to Gigs"
+    },
+    "instruments": {
+      "unassigned": "Unassigned",
+      "addButton": "Add Instrument",
+      "form": {
+        "title": "Instrument Name",
+        "placeholder": "e.g., Piano",
+        "cancel": "Cancel",
+        "submit": "Add Instrument"
+      },
+      "removeButton": "Remove instrument"
+    },
+    "messages": {
+      "error": {
+        "updateInstrument": "Failed to update member instrument",
+        "addInstrument": "Failed to add instrument",
+        "removeInstrument": {
+          "hasMembers": "Cannot remove an instrument that has members assigned to it",
+          "failed": "Failed to remove instrument"
+        }
+      },
+      "success": {
+        "updateInstrument": "Member instrument updated successfully",
+        "addInstrument": "Instrument added successfully",
+        "removeInstrument": "Instrument removed successfully"
+      }
+    }
+  },
+  "newGig": {
+    "navigation": {
+      "backToGigs": "Back to Gigs"
+    },
+    "title": "Add New Gig",
+    "form": {
+      "name": {
+        "label": "Gig Name",
+        "placeholder": "Enter gig name"
+      },
+      "location": {
+        "label": "Location",
+        "placeholder": "Enter venue or location"
+      },
+      "distance": {
+        "label": "Distance (km)",
+        "placeholder": "km"
+      },
+      "date": {
+        "label": "Date"
+      },
+      "wholeDay": {
+        "label": "Whole Day Event",
+        "checkbox": "This is a whole day event"
+      },
+      "time": {
+        "start": "Start Time",
+        "end": "End Time"
+      },
+      "pay": {
+        "label": "Pay (€)"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter description"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "create": "Create Gig"
+      }
+    },
+    "errors": {
+      "requiredFields": "Name and date are required",
+      "loginRequired": "You must be logged in to create a gig",
+      "pastDate": "Cannot create gigs in the past",
+      "timeRange": "End time must be after start time",
+      "createFailed": "Failed to create gig. Please try again."
+    }
+  },
+  "profile": {
+    "navigation": {
+      "backToGigs": "Back to Gigs"
+    },
+    "messages": {
+      "error": {
+        "nameUpdate": "Failed to update name",
+        "instrumentUpdate": "Failed to update instrument",
+        "passwordMismatch": "New passwords do not match",
+        "passwordUpdate": "Failed to update password. Please sign in again if it has been a while."
+      },
+      "success": {
+        "nameUpdate": "Name updated successfully",
+        "instrumentUpdate": "Instrument updated successfully",
+        "passwordUpdate": "Password updated successfully"
+      }
+    },
+    "sections": {
+      "name": {
+        "title": "Update Profile Name",
+        "label": "Display Name",
+        "button": "Update Name"
+      },
+      "instrument": {
+        "title": "Update Instrument",
+        "label": "Your Instrument",
+        "placeholder": "Select an instrument",
+        "button": "Update Instrument"
+      },
+      "password": {
+        "title": "Change Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm New Password",
+        "button": "Update Password"
+      }
+    }
+  },
+  "signIn": {
+    "title": "Sign in to your account",
+    "createAccount": {
+      "prefix": "Or",
+      "link": "create a new account"
+    },
+    "form": {
+      "email": {
+        "label": "Email address"
+      },
+      "password": {
+        "label": "Password"
+      },
+      "submit": {
+        "loading": "Signing in...",
+        "default": "Sign in"
+      }
+    },
+    "errors": {
+      "default": "Failed to sign in. Please check your credentials."
+    }
+  },
+  "signUp": {
+    "title": "Create your account",
+    "signIn": {
+      "prefix": "Or",
+      "link": "sign in to your account"
+    },
+    "verification": {
+      "title": "Verify Your Email",
+      "message": "We've sent a verification link to your email address. Please check your inbox and click the link to verify your account.",
+      "continueButton": "Continue to App"
+    },
+    "form": {
+      "name": {
+        "label": "Full name"
+      },
+      "email": {
+        "label": "Email address"
+      },
+      "password": {
+        "label": "Password"
+      },
+      "submit": {
+        "loading": "Creating account...",
+        "default": "Create account"
+      }
+    },
+    "errors": {
+      "emailInUse": "This email address is already registered. Please sign in instead.",
+      "default": "Failed to create an account. Please try again.",
+      "signInLink": "Sign in"
+    }
+  },
+  "hooks": {
+    "useRole": {
+      "errors": {
+        "fetchFailed": "Error fetching roles"
+      }
+    }
   }
 } 

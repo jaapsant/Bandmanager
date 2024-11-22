@@ -4,11 +4,13 @@ import { ArrowLeft } from 'lucide-react';
 import { Gig } from '../types';
 import { useGigs } from '../context/GigContext';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export function NewGig() {
   const navigate = useNavigate();
   const { addGig } = useGigs();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [error, setError] = useState('');
   const [formData, setFormData] = useState<Partial<Gig>>({
     name: '',
@@ -27,36 +29,32 @@ export function NewGig() {
     setError('');
     
     try {
-      // Validate required fields
       if (!formData.name?.trim() || !formData.date) {
-        throw new Error('Name and date are required');
+        throw new Error(t('newGig.errors.requiredFields'));
       }
 
       if (!user) {
-        throw new Error('You must be logged in to create a gig');
+        throw new Error(t('newGig.errors.loginRequired'));
       }
 
-      // Validate date is not in the past
       const gigDate = new Date(formData.date);
-      gigDate.setHours(23, 59, 59, 999); // End of the selected day
+      gigDate.setHours(23, 59, 59, 999);
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Start of today
+      today.setHours(0, 0, 0, 0);
 
       if (gigDate < today) {
-        throw new Error('Cannot create gigs in the past');
+        throw new Error(t('newGig.errors.pastDate'));
       }
 
-      // Validate time range if not whole day event
       if (!formData.isWholeDay && formData.startTime && formData.endTime) {
         const [startHours, startMinutes] = formData.startTime.split(':').map(Number);
         const [endHours, endMinutes] = formData.endTime.split(':').map(Number);
         
         if (startHours > endHours || (startHours === endHours && startMinutes >= endMinutes)) {
-          throw new Error('End time must be after start time');
+          throw new Error(t('newGig.errors.timeRange'));
         }
       }
 
-      // Prepare gig data, removing undefined values
       const gigData: Omit<Gig, 'id'> = {
         name: formData.name.trim(),
         date: formData.date,
@@ -76,11 +74,10 @@ export function NewGig() {
       navigate('/gigs');
     } catch (error) {
       console.error('Error creating gig:', error);
-      setError(error instanceof Error ? error.message : 'Failed to create gig. Please try again.');
+      setError(error instanceof Error ? error.message : t('newGig.errors.createFailed'));
     }
   };
 
-  // Get today's date in YYYY-MM-DD format for min date attribute
   const today = new Date().toISOString().split('T')[0];
 
   return (
@@ -91,11 +88,11 @@ export function NewGig() {
           className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
-          Back to Gigs
+          {t('newGig.navigation.backToGigs')}
         </button>
 
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Add New Gig</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-6">{t('newGig.title')}</h1>
 
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
@@ -107,11 +104,12 @@ export function NewGig() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Gig Name
+                  {t('newGig.form.name.label')}
                 </label>
                 <input
                   type="text"
                   required
+                  placeholder={t('newGig.form.name.placeholder')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   value={formData.name || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
@@ -121,39 +119,39 @@ export function NewGig() {
               <div className="md:col-span-2 grid grid-cols-4 gap-6">
                 <div className="col-span-3">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Location
+                    {t('newGig.form.location.label')}
                   </label>
                   <input
                     type="text"
+                    placeholder={t('newGig.form.location.placeholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     value={formData.location || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                    placeholder="Enter venue or location"
                   />
                 </div>
 
                 <div className="col-span-1">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Distance (km)
+                    {t('newGig.form.distance.label')}
                   </label>
                   <input
                     type="number"
                     min="0"
                     step="0.1"
+                    placeholder={t('newGig.form.distance.placeholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     value={formData.distance || ''}
                     onChange={(e) => setFormData(prev => ({ 
                       ...prev, 
                       distance: e.target.value ? parseFloat(e.target.value) : null 
                     }))}
-                    placeholder="km"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date
+                  {t('newGig.form.date.label')}
                 </label>
                 <input
                   type="date"
@@ -167,7 +165,7 @@ export function NewGig() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Whole Day Event
+                  {t('newGig.form.wholeDay.label')}
                 </label>
                 <div className="flex items-center mt-2">
                   <input
@@ -183,7 +181,7 @@ export function NewGig() {
                     }))}
                   />
                   <label htmlFor="isWholeDay" className="ml-2 block text-sm text-gray-700">
-                    This is a whole day event
+                    {t('newGig.form.wholeDay.checkbox')}
                   </label>
                 </div>
               </div>
@@ -192,7 +190,7 @@ export function NewGig() {
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Start Time
+                      {t('newGig.form.time.start')}
                     </label>
                     <input
                       type="time"
@@ -205,7 +203,7 @@ export function NewGig() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      End Time
+                      {t('newGig.form.time.end')}
                     </label>
                     <input
                       type="time"
@@ -220,7 +218,7 @@ export function NewGig() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Pay (€)
+                  {t('newGig.form.pay.label')}
                 </label>
                 <input
                   type="number"
@@ -235,7 +233,7 @@ export function NewGig() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
+                {t('newGig.form.description.label')}
               </label>
               <textarea
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -251,13 +249,13 @@ export function NewGig() {
                 onClick={() => navigate('/gigs')}
                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               >
-                Cancel
+                {t('newGig.form.buttons.cancel')}
               </button>
               <button
                 type="submit"
                 className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
               >
-                Create Gig
+                {t('newGig.form.buttons.create')}
               </button>
             </div>
           </form>

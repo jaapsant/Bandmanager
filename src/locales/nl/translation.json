@@ -3,7 +3,8 @@
     "save": "Opslaan",
     "cancel": "Annuleren",
     "edit": "Bewerken",
-    "delete": "Verwijderen"
+    "delete": "Verwijderen",
+    "backToGigs": "Terug naar Optredens"
   },
   "gigs": {
     "available": "Beschikbaar",
@@ -12,7 +13,327 @@
   },
   "userRoles": {
     "title": "Gebruikersrollen",
-    "members": "Leden",
-    "admins": "Beheerders"
+    "backToGigs": "Terug naar Optredens",
+    "accessDenied": {
+      "title": "Toegang Geweigerd",
+      "message": "Je hebt geen toegang tot deze pagina.",
+      "returnButton": "Terug naar Optredens"
+    },
+    "loading": "Gebruikers laden...",
+    "deleteModal": {
+      "title": "Gebruikersaccount Verwijderen",
+      "message": "Weet je zeker dat je het account wilt verwijderen van",
+      "warning": "Deze actie kan niet ongedaan worden gemaakt.",
+      "cancelButton": "Annuleren",
+      "deleteButton": "Account Verwijderen"
+    },
+    "tableHeaders": {
+      "user": "Gebruiker",
+      "admin": "Beheerder",
+      "bandManager": "Bandleider",
+      "bandMember": "Bandlid",
+      "actions": "Acties"
+    },
+    "errors": {
+      "lastAdmin": "Kan de laatste beheerder niet verwijderen",
+      "selfDelete": "Je kunt je eigen account niet verwijderen",
+      "permissionDenied": "Je hebt geen rechten om gebruikersrollen te beheren",
+      "updateRole": "Rol bijwerken mislukt",
+      "deleteUser": "Gebruiker verwijderen mislukt"
+    },
+    "success": {
+      "roleUpdate": "Rol succesvol bijgewerkt",
+      "userDelete": "Gebruikersaccount succesvol verwijderd"
+    }
+  },
+  "gigList": {
+    "loading": "Optredens laden...",
+    "title": {
+      "upcoming": "Aankomende Optredens",
+      "history": "Optreden Geschiedenis"
+    },
+    "viewMode": {
+      "grid": "Raster",
+      "compact": "Compact"
+    },
+    "buttons": {
+      "showUpcoming": "Toon Aankomend",
+      "showHistory": "Toon Geschiedenis",
+      "bandMembers": "Bandleden",
+      "newGig": "Nieuw Optreden"
+    },
+    "table": {
+      "date": "Datum",
+      "gig": "Optreden",
+      "status": "Status",
+      "time": "Tijd",
+      "yourStatus": "Jouw Status",
+      "allDay": "Hele Dag",
+      "needed": "Nodig",
+      "distance": "km",
+      "noGigs": {
+        "upcoming": "Geen aankomende optredens gevonden",
+        "past": "Geen eerdere optredens gevonden"
+      }
+    },
+    "status": {
+      "completed": "Voltooid"
+    }
+  },
+  "yearOverview": {
+    "backButton": "Terug naar Optreden Geschiedenis",
+    "title": "Jaaroverzicht ",
+    "stats": {
+      "totalGigs": "Totaal Optredens",
+      "completedGigs": "Voltooid",
+      "cancelledGigs": "Geannuleerd",
+      "totalPay": "Totaal Verdiend",
+      "confirmedPay": "Bevestigd",
+      "totalDistance": "Totale Afstand"
+    },
+    "bandMembers": {
+      "title": "Bandleden Statistieken",
+      "table": {
+        "name": "Naam",
+        "gigsPlayed": "Gespeelde Optredens",
+        "distanceDriven": "Gereden Afstand"
+      }
+    },
+    "drivingDetails": {
+      "title": "Rijdetails voor ",
+      "table": {
+        "title": "Titel",
+        "location": "Locatie",
+        "distance": "Afstand",
+        "total": "Totaal",
+        "noLocation": "Geen locatie"
+      }
+    }
+  },
+  "gigDetails": {
+    "errors": {
+      "notFound": "Optreden niet gevonden",
+      "signIn": "Log in alstublieft",
+      "requiredFields": "Naam en datum zijn verplicht",
+      "loginRequired": "Je moet ingelogd zijn om een optreden te bewerken",
+      "pastDate": "Kan geen datum in het verleden instellen",
+      "timeRange": "Eindtijd moet na starttijd zijn",
+      "updateFailed": "Bijwerken optreden mislukt",
+      "emailVerification": "E-mailverificatie vereist om beschikbaarheid bij te werken",
+      "updateAvailability": "Bijwerken beschikbaarheid mislukt",
+      "updateNote": "Bijwerken notitie mislukt",
+      "drivingStatus": "E-mailverificatie vereist om rijstatus bij te werken"
+    },
+    "time": {
+      "allDay": "Hele Dag"
+    },
+    "sections": {
+      "description": "Beschrijving",
+      "descriptionPlaceholder": "Voer optredenbeschrijving in",
+      "bandAvailability": "Band Beschikbaarheid",
+      "yourAvailability": "Jouw Beschikbaarheid",
+      "notePlaceholder": "Voeg een notitie toe over je beschikbaarheid...",
+      "bandMembers": "Bandleden"
+    },
+    "status": {
+      "available": "Beschikbaar",
+      "unavailable": "Niet Beschikbaar",
+      "tentative": "Misschien",
+      "canDrive": "Kan rijden"
+    },
+    "deleteModal": {
+      "title": "Optreden Verwijderen",
+      "message": "Weet je zeker dat je dit optreden wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+      "cancel": "Annuleren",
+      "confirm": "Verwijderen"
+    },
+    "actions": {
+      "edit": "Bewerken",
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "delete": "Verwijderen",
+      "addToCalendar": "Toevoegen aan Agenda"
+    }
+  },
+  "bandMembers": {
+    "loading": "Laden...",
+    "title": "Bandleden",
+    "navigation": {
+      "backToGigs": "Terug naar Optredens"
+    },
+    "instruments": {
+      "unassigned": "Niet Toegewezen",
+      "addButton": "Instrument Toevoegen",
+      "form": {
+        "title": "Instrument Naam",
+        "placeholder": "bijv. Piano",
+        "cancel": "Annuleren",
+        "submit": "Instrument Toevoegen"
+      },
+      "removeButton": "Instrument verwijderen"
+    },
+    "messages": {
+      "error": {
+        "updateInstrument": "Bijwerken van instrument mislukt",
+        "addInstrument": "Toevoegen van instrument mislukt",
+        "removeInstrument": {
+          "hasMembers": "Kan geen instrument verwijderen dat aan leden is toegewezen",
+          "failed": "Verwijderen van instrument mislukt"
+        }
+      },
+      "success": {
+        "updateInstrument": "Instrument succesvol bijgewerkt",
+        "addInstrument": "Instrument succesvol toegevoegd",
+        "removeInstrument": "Instrument succesvol verwijderd"
+      }
+    }
+  },
+  "newGig": {
+    "navigation": {
+      "backToGigs": "Terug naar Optredens"
+    },
+    "title": "Nieuw Optreden Toevoegen",
+    "form": {
+      "name": {
+        "label": "Optreden Naam",
+        "placeholder": "Voer naam in"
+      },
+      "location": {
+        "label": "Locatie",
+        "placeholder": "Voer locatie of zaal in"
+      },
+      "distance": {
+        "label": "Afstand (km)",
+        "placeholder": "km"
+      },
+      "date": {
+        "label": "Datum"
+      },
+      "wholeDay": {
+        "label": "Hele Dag Evenement",
+        "checkbox": "Dit is een hele dag evenement"
+      },
+      "time": {
+        "start": "Starttijd",
+        "end": "Eindtijd"
+      },
+      "pay": {
+        "label": "Vergoeding (€)"
+      },
+      "description": {
+        "label": "Beschrijving",
+        "placeholder": "Voer beschrijving in"
+      },
+      "buttons": {
+        "cancel": "Annuleren",
+        "create": "Optreden Aanmaken"
+      }
+    },
+    "errors": {
+      "requiredFields": "Naam en datum zijn verplicht",
+      "loginRequired": "Je moet ingelogd zijn om een optreden aan te maken",
+      "pastDate": "Kan geen optredens in het verleden aanmaken",
+      "timeRange": "Eindtijd moet na starttijd zijn",
+      "createFailed": "Aanmaken van optreden mislukt. Probeer het opnieuw."
+    }
+  },
+  "profile": {
+    "navigation": {
+      "backToGigs": "Terug naar Optredens"
+    },
+    "messages": {
+      "error": {
+        "nameUpdate": "Naam bijwerken mislukt",
+        "instrumentUpdate": "Instrument bijwerken mislukt",
+        "passwordMismatch": "Nieuwe wachtwoorden komen niet overeen",
+        "passwordUpdate": "Wachtwoord bijwerken mislukt. Log opnieuw in als het al een tijdje geleden is."
+      },
+      "success": {
+        "nameUpdate": "Naam succesvol bijgewerkt",
+        "instrumentUpdate": "Instrument succesvol bijgewerkt",
+        "passwordUpdate": "Wachtwoord succesvol bijgewerkt"
+      }
+    },
+    "sections": {
+      "name": {
+        "title": "Profielnaam Bijwerken",
+        "label": "Weergavenaam",
+        "button": "Naam Bijwerken"
+      },
+      "instrument": {
+        "title": "Instrument Bijwerken",
+        "label": "Jouw Instrument",
+        "placeholder": "Selecteer een instrument",
+        "button": "Instrument Bijwerken"
+      },
+      "password": {
+        "title": "Wachtwoord Wijzigen",
+        "currentPassword": "Huidig Wachtwoord",
+        "newPassword": "Nieuw Wachtwoord",
+        "confirmPassword": "Bevestig Nieuw Wachtwoord",
+        "button": "Wachtwoord Bijwerken"
+      }
+    }
+  },
+  "signIn": {
+    "title": "Log in op je account",
+    "createAccount": {
+      "prefix": "Of",
+      "link": "maak een nieuw account aan"
+    },
+    "form": {
+      "email": {
+        "label": "E-mailadres"
+      },
+      "password": {
+        "label": "Wachtwoord"
+      },
+      "submit": {
+        "loading": "Inloggen...",
+        "default": "Inloggen"
+      }
+    },
+    "errors": {
+      "default": "Inloggen mislukt. Controleer je gegevens."
+    }
+  },
+  "signUp": {
+    "title": "Maak je account aan",
+    "signIn": {
+      "prefix": "Of",
+      "link": "log in op je account"
+    },
+    "verification": {
+      "title": "Verifieer je E-mail",
+      "message": "We hebben een verificatielink naar je e-mailadres gestuurd. Controleer je inbox en klik op de link om je account te verifiëren.",
+      "continueButton": "Ga naar App"
+    },
+    "form": {
+      "name": {
+        "label": "Volledige naam"
+      },
+      "email": {
+        "label": "E-mailadres"
+      },
+      "password": {
+        "label": "Wachtwoord"
+      },
+      "submit": {
+        "loading": "Account aanmaken...",
+        "default": "Account aanmaken"
+      }
+    },
+    "errors": {
+      "emailInUse": "Dit e-mailadres is al geregistreerd. Log in plaats daarvan in.",
+      "default": "Account aanmaken mislukt. Probeer het opnieuw.",
+      "signInLink": "Inloggen"
+    }
+  },
+  "hooks": {
+    "useRole": {
+      "errors": {
+        "fetchFailed": "Fout bij ophalen van rollen"
+      }
+    }
   }
 } 
