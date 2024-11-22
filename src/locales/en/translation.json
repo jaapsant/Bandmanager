@@ -39,12 +39,31 @@
     "cancel": "Cancel",
     "edit": "Edit",
     "delete": "Delete",
-    "backToGigs": "Back to Gigs"
+    "backToGigs": "Back to Gigs",
+    "loading": "Loading..."
   },
   "gigs": {
     "available": "Available",
     "unavailable": "Unavailable",
-    "maybe": "Maybe"
+    "maybe": "Maybe",
+    "status": {
+      "completed": "Completed",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled"
+    },
+    "time": {
+      "allDay": "All Day"
+    },
+    "availability": {
+      "setAvailability": "Set availability"
+    },
+    "location": {
+      "distance": "({distance} km)"
+    },
+    "pay": {
+      "amount": "€{amount}"
+    }
   },
   "gigList": {
     "loading": "Loading gigs...",
@@ -385,7 +404,35 @@
       "verificationEmailFailed": "Failed to send verification email. Please try again later.",
       "signInRequired": "You must be signed in to update your profile.",
       "updateDisplayNameFailed": "Failed to update display name. Please try again.",
-      "useAuthHook": "useAuth must be used within an AuthProvider"
+      "useAuthHook": "useAuth must be used within an AuthProvider",
+      "signOutError": "Error signing out:"
+    },
+    "signOut": "Sign Out"
+  },
+  "privateRoute": {
+    "accessPending": {
+      "title": "Access Pending",
+      "message": "Your account is awaiting role assignment. Please contact an administrator for access."
+    },
+    "emailVerification": {
+      "title": "Email Verification Required",
+      "message": "Please verify your email address to access this feature. Check your inbox for the verification link.",
+      "returnToGigs": "Return to Gigs List"
     }
+  },
+  "header": {
+    "title": "Alarmfase 3",
+    "menu": {
+      "profileSettings": "Profile Settings",
+      "manageRoles": "Manage Roles",
+      "signOut": "Sign Out"
+    }
+  },
+  "emailVerification": {
+    "message": "Please verify your email address to access all features.",
+    "success": "Verification email sent! Please check your inbox.",
+    "error": "Failed to send verification email. Please try again later.",
+    "sending": "Sending...",
+    "resend": "Resend verification email"
   }
 } 

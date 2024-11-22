@@ -4,7 +4,8 @@
     "cancel": "Annuleren",
     "edit": "Bewerken",
     "delete": "Verwijderen",
-    "backToGigs": "Terug naar Optredens"
+    "backToGigs": "Terug naar Optredens",
+    "loading": "Laden..."
   },
   "gigs": {
     "available": "Beschikbaar",
@@ -385,7 +386,57 @@
       "verificationEmailFailed": "Kon verificatie-e-mail niet verzenden. Probeer het later opnieuw.",
       "signInRequired": "Je moet ingelogd zijn om je profiel bij te werken.",
       "updateDisplayNameFailed": "Kon weergavenaam niet bijwerken. Probeer het opnieuw.",
-      "useAuthHook": "useAuth moet binnen een AuthProvider worden gebruikt"
+      "useAuthHook": "useAuth moet binnen een AuthProvider worden gebruikt",
+      "signOut": "Uitloggen",
+      "errors": {
+        "signOutError": "Fout bij uitloggen:"
+      }
     }
+  },
+  "privateRoute": {
+    "accessPending": {
+      "title": "Toegang in Afwachting",
+      "message": "Je account wacht op roltoewijzing. Neem contact op met een beheerder voor toegang."
+    },
+    "emailVerification": {
+      "title": "E-mailverificatie Vereist",
+      "message": "Verifieer je e-mailadres om deze functie te gebruiken. Controleer je inbox voor de verificatielink.",
+      "returnToGigs": "Terug naar Optredenlijst"
+    }
+  },
+  "header": {
+    "title": "Alarmfase 3",
+    "menu": {
+      "profileSettings": "Profielinstellingen",
+      "manageRoles": "Beheer Rollen",
+      "signOut": "Uitloggen"
+    }
+  },
+  "gig": {
+    "status": {
+      "completed": "Afgerond",
+      "pending": "In afwachting",
+      "confirmed": "Bevestigd",
+      "cancelled": "Geannuleerd"
+    },
+    "time": {
+      "allDay": "Hele dag"
+    },
+    "availability": {
+      "setAvailability": "Beschikbaarheid instellen"
+    },
+    "location": {
+      "distance": "({distance} km)"
+    },
+    "pay": {
+      "amount": "€{amount}"
+    }
+  },
+  "emailVerification": {
+    "message": "Verifieer je e-mailadres om toegang te krijgen tot alle functies.",
+    "success": "Verificatie-e-mail verzonden! Controleer je inbox.",
+    "error": "Kon verificatie-e-mail niet verzenden. Probeer het later opnieuw.",
+    "sending": "Verzenden...",
+    "resend": "Verificatie-e-mail opnieuw verzenden"
   }
 } 

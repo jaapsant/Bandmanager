@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom';
 import { Music, User, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from '../hooks/useRole';
+import { useTranslation } from 'react-i18next';
 
 export function Header() {
   const { user, signOut } = useAuth();
   const { roles } = useRole();
+  const { t } = useTranslation();
 
   return (
     <header className="bg-white shadow">
@@ -13,7 +15,7 @@ export function Header() {
         <div className="flex justify-between items-center h-16">
           <Link to="/gigs" className="flex items-center text-indigo-600">
             <Music className="w-8 h-8" />
-            <span className="ml-2 text-lg font-semibold">Alarmfase 3</span>
+            <span className="ml-2 text-lg font-semibold">{t('header.title')}</span>
           </Link>
 
           <div className="relative group">
@@ -26,7 +28,7 @@ export function Header() {
                 to="/profile"
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
-                Profile Settings
+                {t('header.menu.profileSettings')}
               </Link>
               {roles.admin && (
                 <Link
@@ -34,14 +36,14 @@ export function Header() {
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   <Shield className="w-4 h-4 mr-2" />
-                  Manage Roles
+                  {t('header.menu.manageRoles')}
                 </Link>
               )}
               <button
                 onClick={() => signOut()}
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
-                Sign Out
+                {t('header.menu.signOut')}
               </button>
             </div>
           </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from '../hooks/useRole';
+import { useTranslation } from 'react-i18next';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -12,13 +13,14 @@ export function PrivateRoute({
   children, 
   requireVerification = false,
 }: PrivateRouteProps) {
+  const { t } = useTranslation();
   const { user, loading: authLoading, signOut } = useAuth();
   const { roles, loading: rolesLoading } = useRole();
 
   if (authLoading || rolesLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-gray-500">{t('common.loading')}</div>
       </div>
     );
   }
@@ -34,7 +36,7 @@ export function PrivateRoute({
       try {
         await signOut();
       } catch (error) {
-        console.error('Error signing out:', error);
+        console.error(t('auth.errors.signOutError'), error);
       }
     };
 
@@ -42,15 +44,17 @@ export function PrivateRoute({
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Pending</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {t('privateRoute.accessPending.title')}
+            </h2>
             <p className="text-gray-600 mb-6">
-              Your account is awaiting role assignment. Please contact an administrator for access.
+              {t('privateRoute.accessPending.message')}
             </p>
             <button
               onClick={handleSignOut}
               className="text-indigo-600 hover:text-indigo-500"
             >
-              Sign Out
+              {t('auth.signOut')}
             </button>
           </div>
         </div>
@@ -63,15 +67,17 @@ export function PrivateRoute({
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Email Verification Required</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {t('privateRoute.emailVerification.title')}
+            </h2>
             <p className="text-gray-600 mb-6">
-              Please verify your email address to access this feature. Check your inbox for the verification link.
+              {t('privateRoute.emailVerification.message')}
             </p>
             <Link
               to="/gigs"
               className="text-indigo-600 hover:text-indigo-500"
             >
-              Return to Gigs List
+              {t('privateRoute.emailVerification.returnToGigs')}
             </Link>
           </div>
         </div>

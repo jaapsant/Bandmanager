@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AvailabilityOverview } from './AvailabilityOverview';
 import { useAuth } from '../context/AuthContext';
 import { AddToCalendar } from './AddToCalendar';
+import { useTranslation } from 'react-i18next';
 
 interface GigCardProps {
   gig: Gig;
@@ -13,11 +14,12 @@ interface GigCardProps {
 export function GigCard({ gig }: GigCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const isPastGig = new Date(gig.date) < new Date();
 
   const status = gig.status === 'completed' 
-    ? { value: 'completed', label: 'Completed', color: 'bg-blue-100 text-blue-800' }
+    ? { value: 'completed', label: t('gig.status.completed'), color: 'bg-blue-100 text-blue-800' }
     : statusOptions.find((s) => s.value === gig.status);
 
   const hasUserAvailability = user && gig.memberAvailability[user.uid]?.status;
@@ -32,7 +34,7 @@ export function GigCard({ gig }: GigCardProps) {
 
   const formatTime = () => {
     if (gig.isWholeDay) {
-      return "All Day";
+      return t('gig.time.allDay');
     }
     if (gig.startTime && gig.endTime) {
       return `${gig.startTime} - ${gig.endTime}`;
@@ -58,7 +60,7 @@ export function GigCard({ gig }: GigCardProps) {
               onClick={(e) => e.stopPropagation()}
             >
               <AlertCircle className="w-3 h-3 mr-1" />
-              Set availability
+              {t('gig.availability.setAvailability')}
             </span>
           )}
           <span className={`px-3 py-1 rounded-full text-sm ${status?.color}`}>
@@ -90,7 +92,7 @@ export function GigCard({ gig }: GigCardProps) {
               {gig.location}
               {gig.distance && (
                 <span className="text-gray-400 ml-2">
-                  ({gig.distance} km)
+                  {t('gig.location.distance', { distance: gig.distance })}
                 </span>
               )}
             </span>
@@ -99,7 +101,7 @@ export function GigCard({ gig }: GigCardProps) {
         
         {gig.pay && (
           <div className="text-gray-600">
-            <span className="font-medium">€{gig.pay}</span>
+            <span className="font-medium">{t('gig.pay.amount', { amount: gig.pay })}</span>
           </div>
         )}
       </div>

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export function EmailVerificationBanner() {
   const { user, sendVerificationEmail } = useAuth();
+  const { t } = useTranslation();
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -18,9 +20,9 @@ export function EmailVerificationBanner() {
 
     try {
       await sendVerificationEmail();
-      setSuccess('Verification email sent! Please check your inbox.');
+      setSuccess(t('emailVerification.success'));
     } catch (error) {
-      setError('Failed to send verification email. Please try again later.');
+      setError(t('emailVerification.error'));
     } finally {
       setSending(false);
     }
@@ -32,7 +34,7 @@ export function EmailVerificationBanner() {
         <div className="flex items-center justify-between flex-wrap">
           <div className="w-0 flex-1 flex items-center">
             <p className="text-yellow-700">
-              <span>Please verify your email address to access all features. </span>
+              <span>{t('emailVerification.message')} </span>
               {error && <span className="text-red-600 ml-2">{error}</span>}
               {success && <span className="text-green-600 ml-2">{success}</span>}
             </p>
@@ -43,7 +45,7 @@ export function EmailVerificationBanner() {
               disabled={sending}
               className="ml-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50"
             >
-              {sending ? 'Sending...' : 'Resend verification email'}
+              {sending ? t('emailVerification.sending') : t('emailVerification.resend')}
             </button>
           </div>
         </div>
