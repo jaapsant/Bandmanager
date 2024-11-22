@@ -335,5 +335,57 @@
         "fetchFailed": "Error fetching roles"
       }
     }
+  },
+  "gigContext": {
+    "errors": {
+      "useGigsHook": "useGigs must be used within a GigProvider",
+      "fetchGigs": "Error fetching gigs:",
+      "addGig": "Failed to create gig",
+      "validation": {
+        "nameRequired": "Gig name is required",
+        "dateRequired": "Gig date is required",
+        "pastDate": "Cannot set gig date in the past",
+        "changePastDate": "Cannot change gig date to a past date",
+        "timeRange": "End time must be after start time",
+        "emailVerification": "Email verification required",
+        "gigNotFound": "Gig not found",
+        "deleteFailed": "Failed to delete gig"
+      }
+    }
+  },
+  "bandContext": {
+    "errors": {
+      "emailVerificationRequired": "Email verification required",
+      "insufficientPermissions": "Insufficient permissions",
+      "adminManagerOnly": "Only admins and band managers can perform this action",
+      "cannotRemoveSelf": "You cannot remove yourself from the band",
+      "failedToRemoveMember": "Failed to remove band member",
+      "updateOwnInstrumentOnly": "You can only update your own instrument",
+      "failedToUpdateInstrument": "Failed to update instrument",
+      "instrumentInUse": "Cannot remove an instrument that is currently in use",
+      "failedToRemoveInstrument": "Failed to remove instrument",
+      "useBandHook": "useBand must be used within a BandProvider"
+    }
+  },
+  "auth": {
+    "errors": {
+      "emailInUse": "This email is already registered.",
+      "invalidEmail": "Invalid email address.",
+      "emailPasswordDisabled": "Email/password accounts are not enabled.",
+      "weakPassword": "Password must be at least 6 characters long.",
+      "invalidCredentials": "Invalid email or password. Please check your credentials and try again.",
+      "accountDisabled": "This account has been disabled. Please contact support.",
+      "userNotFound": "No account found with this email address.",
+      "tooManyRequests": "Too many failed login attempts. Please try again later.",
+      "networkError": "Network error. Please check your internet connection and try again.",
+      "unexpected": "An unexpected error occurred. Please try again.",
+      "notSignedIn": "No user is currently signed in.",
+      "alreadyVerified": "Email is already verified.",
+      "verificationEmailLimit": "Please wait a few minutes before requesting another verification email.",
+      "verificationEmailFailed": "Failed to send verification email. Please try again later.",
+      "signInRequired": "You must be signed in to update your profile.",
+      "updateDisplayNameFailed": "Failed to update display name. Please try again.",
+      "useAuthHook": "useAuth must be used within an AuthProvider"
+    }
   }
 } 

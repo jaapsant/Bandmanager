@@ -4,6 +4,8 @@ import { db } from '../lib/firebase';
 import { BandMember } from '../types';
 import { useAuth } from './AuthContext';
 import { useRole } from '../hooks/useRole';
+import { useTranslation } from 'react-i18next';
+
 
 interface BandContextType {
   bandMembers: BandMember[];
@@ -26,6 +28,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { roles } = useRole();
+  const { t } = useTranslation();
 
   // Listen for band members changes
   useEffect(() => {
@@ -96,19 +99,19 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
 
   const checkPermission = () => {
     if (!user?.emailVerified) {
-      throw new Error('Email verification required');
+      throw new Error(t('bandContext.errors.emailVerificationRequired'));
     }
     if (!roles.admin && !roles.bandManager && !roles.bandMember) {
-      throw new Error('Insufficient permissions');
+      throw new Error(t('bandContext.errors.insufficientPermissions'));
     }
   };
 
   const checkAdminOrManagerPermission = () => {
     if (!user?.emailVerified) {
-      throw new Error('Email verification required');
+      throw new Error(t('bandContext.errors.emailVerificationRequired'));
     }
     if (!roles.admin && !roles.bandManager) {
-      throw new Error('Only admins and band managers can perform this action');
+      throw new Error(t('bandContext.errors.adminManagerOnly'));
     }
   };
 
@@ -126,7 +129,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error) {
       console.error('Error adding band member:', error);
-      throw new Error('Failed to add band member');
+      throw new Error(t('bandContext.errors.failedToAddMember'));
     }
   };
 
@@ -135,7 +138,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
 
     try {
       if (memberId === user?.uid) {
-        throw new Error('You cannot remove yourself from the band');
+        throw new Error(t('bandContext.errors.cannotRemoveSelf'));
       }
 
       const memberDoc = doc(db, 'bandMembers', memberId);
@@ -145,7 +148,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('Failed to remove band member');
+      throw new Error(t('bandContext.errors.failedToRemoveMember'));
     }
   };
 
@@ -153,9 +156,8 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
     checkPermission();
 
     try {
-      // Only allow users to update their own instrument unless they're admin/manager
       if (memberId !== user?.uid && !roles.admin && !roles.bandManager) {
-        throw new Error('You can only update your own instrument');
+        throw new Error(t('bandContext.errors.updateOwnInstrumentOnly'));
       }
 
       const memberDoc = doc(db, 'bandMembers', memberId);
@@ -176,7 +178,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('Failed to update instrument');
+      throw new Error(t('bandContext.errors.failedToUpdateInstrument'));
     }
   };
 
@@ -184,9 +186,8 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
     checkPermission();
 
     try {
-      // Only allow users to update their own name unless they're admin/manager
       if (memberId !== user?.uid && !roles.admin && !roles.bandManager) {
-        throw new Error('You can only update your own name');
+        throw new Error(t('bandContext.errors.updateOwnNameOnly'));
       }
 
       const memberDoc = doc(db, 'bandMembers', memberId);
@@ -207,7 +208,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('Failed to update name');
+      throw new Error(t('bandContext.errors.failedToUpdateName'));
     }
   };
 
@@ -222,7 +223,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('Error adding instrument:', error);
-      throw new Error('Failed to add instrument');
+      throw new Error(t('bandContext.errors.failedToAddInstrument'));
     }
   };
 
@@ -231,7 +232,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
 
     try {
       if (isInstrumentInUse(instrument)) {
-        throw new Error('Cannot remove an instrument that is currently in use');
+        throw new Error(t('bandContext.errors.instrumentInUse'));
       }
 
       const instrumentsRef = collection(db, 'instruments');
@@ -245,7 +246,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('Failed to remove instrument');
+      throw new Error(t('bandContext.errors.failedToRemoveInstrument'));
     }
   };
 

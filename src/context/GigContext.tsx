@@ -3,6 +3,7 @@ import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, order
 import { db } from '../lib/firebase';
 import { Gig } from '../types';
 import { useAuth } from './AuthContext';
+import { useTranslation } from 'react-i18next';
 
 interface GigContextType {
   gigs: Gig[];
@@ -18,6 +19,7 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
   const [gigs, setGigs] = useState<Gig[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
@@ -48,7 +50,7 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
         setGigs(gigsData);
         setLoading(false);
       }, (error) => {
-        console.error('Error fetching gigs:', error);
+        console.error(t('gigContext.errors.fetchGigs'), error);
         setLoading(false);
       });
     } else {
@@ -61,15 +63,15 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
         unsubscribe();
       }
     };
-  }, [user]);
+  }, [user, t]);
 
   const validateGigData = (gigData: Partial<Gig>, originalGig?: Gig) => {
     if (!gigData.name?.trim()) {
-      throw new Error('Gig name is required');
+      throw new Error(t('gigContext.errors.validation.nameRequired'));
     }
 
     if (!gigData.date) {
-      throw new Error('Gig date is required');
+      throw new Error(t('gigContext.errors.validation.dateRequired'));
     }
 
     const gigDate = new Date(gigData.date);
@@ -77,15 +79,13 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // When updating a gig, only allow date changes to future dates
-    // unless it's the same date as the original gig
     if (originalGig) {
       const originalDate = new Date(originalGig.date);
       if (gigDate.getTime() !== originalDate.getTime() && gigDate < today) {
-        throw new Error('Cannot change gig date to a past date');
+        throw new Error(t('gigContext.errors.validation.changePastDate'));
       }
     } else if (gigDate < today) {
-      throw new Error('Cannot set gig date in the past');
+      throw new Error(t('gigContext.errors.validation.pastDate'));
     }
 
     if (!gigData.isWholeDay && gigData.startTime && gigData.endTime) {
@@ -93,7 +93,7 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
       const [endHours, endMinutes] = gigData.endTime.split(':').map(Number);
       
       if (startHours > endHours || (startHours === endHours && startMinutes >= endMinutes)) {
-        throw new Error('End time must be after start time');
+        throw new Error(t('gigContext.errors.validation.timeRange'));
       }
     }
 
@@ -102,7 +102,7 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
 
   const addGig = async (newGig: Omit<Gig, 'id'>) => {
     if (!user?.emailVerified) {
-      throw new Error('Email verification required');
+      throw new Error(t('gigContext.errors.validation.emailVerification'));
     }
 
     try {
@@ -126,17 +126,15 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
       await addDoc(collection(db, 'gigs'), gigData);
     } catch (error) {
       console.error('Error adding gig:', error);
-      throw error instanceof Error ? error : new Error('Failed to create gig');
+      throw error instanceof Error ? error : new Error(t('gigContext.errors.addGig'));
     }
   };
 
   const updateGig = async (updatedGig: Gig) => {
     try {
-      // Get the original gig
       const originalGig = gigs.find(g => g.id === updatedGig.id);
-      if (!originalGig) throw new Error('Gig not found');
+      if (!originalGig) throw new Error(t('gigContext.errors.validation.gigNotFound'));
 
-      // Only validate date if it's being changed
       if (updatedGig.date !== originalGig.date) {
         const gigDate = new Date(updatedGig.date);
         gigDate.setHours(23, 59, 59, 999);
@@ -144,7 +142,7 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
         today.setHours(0, 0, 0, 0);
 
         if (gigDate < today) {
-          throw new Error('Cannot change gig date to a past date');
+          throw new Error(t('gigContext.errors.validation.changePastDate'));
         }
       }
 
@@ -162,7 +160,7 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
 
   const deleteGig = async (gigId: string) => {
     if (!user?.emailVerified) {
-      throw new Error('Email verification required');
+      throw new Error(t('gigContext.errors.validation.emailVerification'));
     }
 
     try {
@@ -170,7 +168,7 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
       await deleteDoc(gigRef);
     } catch (error) {
       console.error('Error deleting gig:', error);
-      throw error instanceof Error ? error : new Error('Failed to delete gig');
+      throw error instanceof Error ? error : new Error(t('gigContext.errors.validation.deleteFailed'));
     }
   };
 
@@ -183,8 +181,9 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
 
 export function useGigs() {
   const context = useContext(GigContext);
+  const { t } = useTranslation();
   if (context === null) {
-    throw new Error('useGigs must be used within a GigProvider');
+    throw new Error(t('gigContext.errors.useGigsHook'));
   }
   return context;
 }

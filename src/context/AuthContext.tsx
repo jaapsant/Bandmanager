@@ -13,6 +13,7 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { User } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface AuthContextType {
   user: User | null;
@@ -27,34 +28,37 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function getAuthErrorMessage(error: AuthError): string {
+  const { t } = useTranslation();
+  
   switch (error.code) {
     case 'auth/email-already-in-use':
-      return 'This email is already registered.';
+      return t('auth.errors.emailInUse');
     case 'auth/invalid-email':
-      return 'Invalid email address.';
+      return t('auth.errors.invalidEmail');
     case 'auth/operation-not-allowed':
-      return 'Email/password accounts are not enabled.';
+      return t('auth.errors.emailPasswordDisabled');
     case 'auth/weak-password':
-      return 'Password must be at least 6 characters long.';
+      return t('auth.errors.weakPassword');
     case 'auth/invalid-credential':
-      return 'Invalid email or password. Please check your credentials and try again.';
+      return t('auth.errors.invalidCredentials');
     case 'auth/user-disabled':
-      return 'This account has been disabled. Please contact support.';
+      return t('auth.errors.accountDisabled');
     case 'auth/user-not-found':
-      return 'No account found with this email address.';
+      return t('auth.errors.userNotFound');
     case 'auth/wrong-password':
-      return 'Invalid email or password. Please check your credentials and try again.';
+      return t('auth.errors.invalidCredentials');
     case 'auth/too-many-requests':
-      return 'Too many failed login attempts. Please try again later.';
+      return t('auth.errors.tooManyRequests');
     case 'auth/network-request-failed':
-      return 'Network error. Please check your internet connection and try again.';
+      return t('auth.errors.networkError');
     default:
       console.error('Unhandled auth error:', error);
-      return 'An unexpected error occurred. Please try again.';
+      return t('auth.errors.unexpected');
   }
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const auth = getAuth();
@@ -130,11 +134,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const sendVerificationEmail = async () => {
     if (!auth.currentUser) {
-      throw new Error('No user is currently signed in.');
+      throw new Error(t('auth.errors.notSignedIn'));
     }
 
     if (auth.currentUser.emailVerified) {
-      throw new Error('Email is already verified.');
+      throw new Error(t('auth.errors.alreadyVerified'));
     }
 
     try {
@@ -142,15 +146,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error sending verification email:', error);
       if ((error as AuthError).code === 'auth/too-many-requests') {
-        throw new Error('Please wait a few minutes before requesting another verification email.');
+        throw new Error(t('auth.errors.verificationEmailLimit'));
       }
-      throw new Error('Failed to send verification email. Please try again later.');
+      throw new Error(t('auth.errors.verificationEmailFailed'));
     }
   };
 
   const updateDisplayName = async (name: string) => {
     if (!auth.currentUser) {
-      throw new Error('You must be signed in to update your profile.');
+      throw new Error(t('auth.errors.signInRequired'));
     }
 
     try {
@@ -158,7 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(prev => prev ? { ...prev, displayName: name } : null);
     } catch (error) {
       console.error('Error updating display name:', error);
-      throw new Error('Failed to update display name. Please try again.');
+      throw new Error(t('auth.errors.updateDisplayNameFailed'));
     }
   };
 
@@ -181,8 +185,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+  const { t } = useTranslation();
+  
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error(t('auth.errors.useAuthHook'));
   }
   return context;
 }

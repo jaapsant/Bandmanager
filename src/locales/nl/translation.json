@@ -335,5 +335,57 @@
         "fetchFailed": "Fout bij ophalen van rollen"
       }
     }
+  },
+  "gigContext": {
+    "errors": {
+      "useGigsHook": "useGigs moet binnen een GigProvider gebruikt worden",
+      "fetchGigs": "Fout bij ophalen optredens:",
+      "addGig": "Optreden aanmaken mislukt",
+      "validation": {
+        "nameRequired": "Naam van optreden is verplicht",
+        "dateRequired": "Datum van optreden is verplicht",
+        "pastDate": "Kan geen optreden in het verleden plannen",
+        "changePastDate": "Kan de datum niet naar het verleden wijzigen",
+        "timeRange": "Eindtijd moet na starttijd zijn",
+        "emailVerification": "E-mailverificatie vereist",
+        "gigNotFound": "Optreden niet gevonden",
+        "deleteFailed": "Optreden verwijderen mislukt"
+      }
+    }
+  },
+  "bandContext": {
+    "errors": {
+      "emailVerificationRequired": "E-mailverificatie vereist",
+      "insufficientPermissions": "Onvoldoende rechten",
+      "adminManagerOnly": "Alleen beheerders en bandmanagers kunnen deze actie uitvoeren",
+      "cannotRemoveSelf": "Je kunt jezelf niet uit de band verwijderen",
+      "failedToRemoveMember": "Kon bandlid niet verwijderen",
+      "updateOwnInstrumentOnly": "Je kunt alleen je eigen instrument bijwerken",
+      "failedToUpdateInstrument": "Kon instrument niet bijwerken",
+      "instrumentInUse": "Kan een instrument dat in gebruik is niet verwijderen",
+      "failedToRemoveInstrument": "Kon instrument niet verwijderen",
+      "useBandHook": "useBand moet binnen een BandProvider worden gebruikt"
+    }
+  },
+  "auth": {
+    "errors": {
+      "emailInUse": "Dit e-mailadres is al geregistreerd.",
+      "invalidEmail": "Ongeldig e-mailadres.",
+      "emailPasswordDisabled": "E-mail/wachtwoord accounts zijn niet ingeschakeld.",
+      "weakPassword": "Wachtwoord moet minimaal 6 tekens lang zijn.",
+      "invalidCredentials": "Ongeldige e-mail of wachtwoord. Controleer je gegevens en probeer het opnieuw.",
+      "accountDisabled": "Dit account is uitgeschakeld. Neem contact op met support.",
+      "userNotFound": "Geen account gevonden met dit e-mailadres.",
+      "tooManyRequests": "Te veel mislukte inlogpogingen. Probeer het later opnieuw.",
+      "networkError": "Netwerkfout. Controleer je internetverbinding en probeer het opnieuw.",
+      "unexpected": "Er is een onverwachte fout opgetreden. Probeer het opnieuw.",
+      "notSignedIn": "Er is momenteel geen gebruiker ingelogd.",
+      "alreadyVerified": "E-mail is al geverifieerd.",
+      "verificationEmailLimit": "Wacht een paar minuten voordat je een nieuwe verificatie-e-mail aanvraagt.",
+      "verificationEmailFailed": "Kon verificatie-e-mail niet verzenden. Probeer het later opnieuw.",
+      "signInRequired": "Je moet ingelogd zijn om je profiel bij te werken.",
+      "updateDisplayNameFailed": "Kon weergavenaam niet bijwerken. Probeer het opnieuw.",
+      "useAuthHook": "useAuth moet binnen een AuthProvider worden gebruikt"
+    }
   }
 } 
