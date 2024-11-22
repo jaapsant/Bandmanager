@@ -1,0 +1,18 @@
+{
+  "userRoles": {
+    "title": "User Roles",
+    "members": "Members",
+    "admins": "Administrators"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "gigs": {
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "maybe": "Maybe"
+  }
+} 

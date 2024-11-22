@@ -6,6 +6,8 @@ import { getAuth, deleteUser } from 'firebase/auth';
 import { db } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from '../hooks/useRole';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
 interface UserRole {
   uid: string;
@@ -59,6 +61,7 @@ export function UserRoles() {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [userToDelete, setUserToDelete] = useState<UserRole | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -181,18 +184,21 @@ export function UserRoles() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <button
-          onClick={() => navigate('/gigs')}
-          className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
-        >
-          <ArrowLeft className="w-5 h-5 mr-2" />
-          Back to Gigs
-        </button>
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={() => navigate('/gigs')}
+            className="flex items-center text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back to Gigs
+          </button>
+          <LanguageSwitcher />
+        </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center mb-6">
             <Shield className="w-6 h-6 text-indigo-600 mr-2" />
-            <h1 className="text-2xl font-bold text-gray-900">User Role Management</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('userRoles.title')}</h1>
           </div>
 
           {error && (

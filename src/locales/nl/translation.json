@@ -1,0 +1,18 @@
+{
+  "common": {
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "edit": "Bewerken",
+    "delete": "Verwijderen"
+  },
+  "gigs": {
+    "available": "Beschikbaar",
+    "unavailable": "Niet beschikbaar",
+    "maybe": "Misschien"
+  },
+  "userRoles": {
+    "title": "Gebruikersrollen",
+    "members": "Leden",
+    "admins": "Beheerders"
+  }
+} 

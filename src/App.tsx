@@ -16,6 +16,7 @@ import { PrivateRoute } from './components/PrivateRoute';
 import { Header } from './components/Header';
 import { EmailVerificationBanner } from './components/EmailVerificationBanner';
 import { YearOverview } from './pages/YearOverview';
+import './i18n';
 
 function AuthenticatedApp({ children }: { children: React.ReactNode }) {
   return (
