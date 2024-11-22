@@ -485,7 +485,7 @@ export function GigDetails() {
                       placeholder="Enter pay amount"
                     />
                   ) : (
-                    gig.pay && <span>€{gig.pay}</span>
+                    gig.pay && <span>{gig.pay},-</span>
                   )}
                 </div>
               </div>

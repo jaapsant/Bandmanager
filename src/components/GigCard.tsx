@@ -1,4 +1,4 @@
-import { Calendar, Clock, AlertCircle, Car, MapPin } from 'lucide-react';
+import { Calendar, Clock, AlertCircle, Car, MapPin, Euro } from 'lucide-react';
 import { Gig } from '../types';
 import { statusOptions } from '../data';
 import { Link, useNavigate } from 'react-router-dom';
@@ -92,7 +92,7 @@ export function GigCard({ gig }: GigCardProps) {
               {gig.location}
               {gig.distance && (
                 <span className="text-gray-400 ml-2">
-                  {t('gig.location.distance', { distance: gig.distance })}
+                 ({gig.distance} km)
                 </span>
               )}
             </span>
@@ -100,8 +100,9 @@ export function GigCard({ gig }: GigCardProps) {
         )}
         
         {gig.pay && (
-          <div className="text-gray-600">
-            <span className="font-medium">{t('gig.pay.amount', { amount: gig.pay })}</span>
+          <div className="flex items-center text-gray-600 ">
+            <Euro className="w-4 h-4 mr-2" />
+            <span>{gig.pay},-</span>
           </div>
         )}
       </div>

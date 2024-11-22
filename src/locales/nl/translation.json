@@ -429,7 +429,7 @@
       "distance": "({distance} km)"
     },
     "pay": {
-      "amount": "€{amount}"
+      "amount": "€"
     }
   },
   "emailVerification": {
