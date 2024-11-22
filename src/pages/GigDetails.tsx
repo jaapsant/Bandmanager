@@ -86,7 +86,7 @@ export function GigDetails() {
     }
   };
 
-  const updateAvailability = async (status: 'available' | 'unavailable' | 'tentative', canDrive?: boolean) => {
+  const updateAvailability = async (status: 'available' | 'unavailable' | 'tentative', canDrive: boolean | null) => {
     if (!user?.emailVerified) {
       setError('Email verification required to update availability');
       return;
@@ -100,7 +100,7 @@ export function GigDetails() {
           ...currentAvailability,
           status,
           note: currentAvailability.note || '',
-          canDrive: typeof canDrive === 'boolean' ? canDrive : currentAvailability.canDrive,
+          canDrive: canDrive !== null ? canDrive : currentAvailability.canDrive || null,
         },
       };
 
@@ -532,7 +532,7 @@ export function GigDetails() {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => updateAvailability('available', gig.memberAvailability[user.uid]?.canDrive)}
+                        onClick={() => updateAvailability('available', gig.memberAvailability[user.uid]?.canDrive ?? null)}
                         className={`p-2 rounded-full hover:bg-green-100 ${
                           gig.memberAvailability[user.uid]?.status === 'available' ? 'bg-green-100' : ''
                         }`}
@@ -541,7 +541,7 @@ export function GigDetails() {
                         <AvailabilityStatus status="available" />
                       </button>
                       <button
-                        onClick={() => updateAvailability('unavailable', gig.memberAvailability[user.uid]?.canDrive)}
+                        onClick={() => updateAvailability('unavailable', gig.memberAvailability[user.uid]?.canDrive ?? null)}
                         className={`p-2 rounded-full hover:bg-red-100 ${
                           gig.memberAvailability[user.uid]?.status === 'unavailable' ? 'bg-red-100' : ''
                         }`}
@@ -550,7 +550,7 @@ export function GigDetails() {
                         <AvailabilityStatus status="unavailable" />
                       </button>
                       <button
-                        onClick={() => updateAvailability('tentative', gig.memberAvailability[user.uid]?.canDrive)}
+                        onClick={() => updateAvailability('tentative', gig.memberAvailability[user.uid]?.canDrive ?? null)}
                         className={`p-2 rounded-full hover:bg-yellow-100 ${
                           gig.memberAvailability[user.uid]?.status === 'tentative' ? 'bg-yellow-100' : ''
                         }`}

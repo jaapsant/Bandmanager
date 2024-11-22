@@ -2,7 +2,7 @@ import { Check, X, HelpCircle } from 'lucide-react';
 import { BandMember } from '../types';
 
 interface AvailabilityStatusProps {
-  status?: BandMember['availability']['status'];
+  status?: NonNullable<BandMember['availability']>['status'];
   size?: 'sm' | 'md';
 }
 

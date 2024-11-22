@@ -135,7 +135,7 @@ export function GigList() {
 
     const renderTable = (gigsToRender: Gig[], yearHeader?: string) => {
       const currentYear = new Date().getFullYear().toString();
-      const isExpanded = expandedYears[yearHeader] ?? (yearHeader >= currentYear - 1);
+      const isExpanded = expandedYears[yearHeader || ''] ?? (yearHeader ? Number(yearHeader) >= Number(currentYear) - 1 : true);
       
       return (
         <>

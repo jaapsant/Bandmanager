@@ -23,13 +23,13 @@ export interface Gig {
   endTime: string | null;
   isWholeDay: boolean;
   status: GigStatus['value'];
-  location?: string;
+  location: string | null;
   pay?: number | null;
   description?: string | null;
   memberAvailability: Record<string, {
     status: 'available' | 'unavailable' | 'tentative';
     note?: string;
-    canDrive?: boolean;
+    canDrive?: boolean | null;
   }>;
   createdBy: string;
   distance: number | null;

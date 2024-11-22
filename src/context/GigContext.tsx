@@ -12,7 +12,7 @@ interface GigContextType {
   loading: boolean;
 }
 
-const GigContext = createContext<GigContextType | undefined>(undefined);
+const GigContext = createContext<GigContextType | null>(null);
 
 export function GigProvider({ children }: { children: React.ReactNode }) {
   const [gigs, setGigs] = useState<Gig[]>([]);
@@ -115,10 +115,12 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
         memberAvailability: newGig.memberAvailability || {},
         status: newGig.status || 'pending',
         isWholeDay: newGig.isWholeDay || false,
-        startTime: newGig.isWholeDay ? null : newGig.startTime || null,
-        endTime: newGig.isWholeDay ? null : newGig.endTime || null,
+        startTime: newGig.isWholeDay ? null : (newGig.startTime || null),
+        endTime: newGig.isWholeDay ? null : (newGig.endTime || null),
         pay: newGig.pay || null,
         description: newGig.description?.trim() || null,
+        location: newGig.location?.trim() || null,
+        distance: newGig.distance || null,
       };
 
       await addDoc(collection(db, 'gigs'), gigData);
@@ -181,7 +183,7 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
 
 export function useGigs() {
   const context = useContext(GigContext);
-  if (context === undefined) {
+  if (context === null) {
     throw new Error('useGigs must be used within a GigProvider');
   }
   return context;
