@@ -526,7 +526,7 @@ export function GigDetails() {
               {/* Your Availability Section */}
               {!isPastGig && (
                 <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4">Your Availability</h3>
+                <h3 className="text-lg font-semibold mb-4">{t('gigDetails.sections.yourAvailability')}</h3>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex space-x-2">
@@ -572,7 +572,7 @@ export function GigDetails() {
                   </div>
                   <textarea
                     className="w-full mt-2 p-2 text-sm border rounded-md"
-                    placeholder="Add a note about your availability..."
+                    placeholder={t('gigDetails.sections.notePlaceholder')}
                     value={gig.memberAvailability[user.uid]?.note || ''}
                     onChange={(e) => updateNote(e.target.value)}
                     rows={3}
@@ -583,7 +583,7 @@ export function GigDetails() {
 
               {/* Other Band Members Section */}
               <div>
-                <h3 className="text-lg font-semibold mb-4">Band Members</h3>
+                <h3 className="text-lg font-semibold mb-4">{t('gigDetails.sections.bandMembers')}</h3>
                 <div className="space-y-6">
                   {sortedInstruments.map((instrument) => (
                     <div key={instrument} className="bg-gray-50 p-4 rounded-lg">
