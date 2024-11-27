@@ -12,25 +12,33 @@ import { AuthProvider } from './context/AuthContext';
 import { GigProvider } from './context/GigContext';
 import { BandProvider } from './context/BandContext';
 import { MemberProvider } from './context/MemberContext';
-import { PrivateRoute } from './components/PrivateRoute';
+import { PrivateRouteWrapper } from './components/PrivateRouteWrapper';
 import { Header } from './components/Header';
 import { EmailVerificationBanner } from './components/EmailVerificationBanner';
 import { YearOverview } from './pages/YearOverview';
 import './i18n';
 
-function AuthenticatedApp({ children }: { children: React.ReactNode }) {
-  return (
-    <MemberProvider>
-      <GigProvider>
-        <BandProvider>
-          <Header />
-          <EmailVerificationBanner />
-          {children}
-        </BandProvider>
-      </GigProvider>
-    </MemberProvider>
-  );
-}
+const AuthenticatedApp = ({ children }: { children: React.ReactNode }) => (
+  <MemberProvider>
+    <GigProvider>
+      <BandProvider>
+        <Header />
+        <EmailVerificationBanner />
+        {children}
+      </BandProvider>
+    </GigProvider>
+  </MemberProvider>
+);
+
+const PrivateRouteWrapperWithApp = ({
+  element,
+  requireVerification,
+}: {
+  element: JSX.Element;
+  requireVerification?: boolean;
+}) => (
+  <PrivateRouteWrapper element={<AuthenticatedApp>{element}</AuthenticatedApp>} requireVerification={requireVerification} />
+);
 
 function App() {
   return (
@@ -41,83 +49,35 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route
             path="/"
-            element={
-              <PrivateRoute>
-                <AuthenticatedApp>
-                  <Navigate to="/gigs" replace />
-                </AuthenticatedApp>
-              </PrivateRoute>
-            }
+            element={<PrivateRouteWrapperWithApp element={<Navigate to="/gigs" replace />} />}
           />
           <Route
             path="/gigs"
-            element={
-              <PrivateRoute>
-                <AuthenticatedApp>
-                  <GigList />
-                </AuthenticatedApp>
-              </PrivateRoute>
-            }
+            element={<PrivateRouteWrapperWithApp element={<GigList />} />}
           />
           <Route
             path="/gigs/new"
-            element={
-              <PrivateRoute requireVerification>
-                <AuthenticatedApp>
-                  <NewGig />
-                </AuthenticatedApp>
-              </PrivateRoute>
-            }
+            element={<PrivateRouteWrapperWithApp element={<NewGig />} requireVerification={true} />}
           />
           <Route
             path="/gig/:id"
-            element={
-              <PrivateRoute>
-                <AuthenticatedApp>
-                  <GigDetails />
-                </AuthenticatedApp>
-              </PrivateRoute>
-            }
+            element={<PrivateRouteWrapperWithApp element={<GigDetails />} />}
           />
           <Route
             path="/band-members"
-            element={
-              <PrivateRoute>
-                <AuthenticatedApp>
-                  <BandMembers />
-                </AuthenticatedApp>
-              </PrivateRoute>
-            }
+            element={<PrivateRouteWrapperWithApp element={<BandMembers />} />}
           />
           <Route
             path="/profile"
-            element={
-              <PrivateRoute>
-                <AuthenticatedApp>
-                  <Profile />
-                </AuthenticatedApp>
-              </PrivateRoute>
-            }
+            element={<PrivateRouteWrapperWithApp element={<Profile />} />}
           />
           <Route
             path="/user-roles"
-            element={
-              <PrivateRoute>
-                <AuthenticatedApp>
-                  <UserRoles />
-                </AuthenticatedApp>
-              </PrivateRoute>
-            }
+            element={<PrivateRouteWrapperWithApp element={<UserRoles />} />}
           />
           <Route
             path="/year-overview/:year"
-            element={
-              <PrivateRoute>
-                <AuthenticatedApp>
-                  <YearOverview />
-                </AuthenticatedApp>
-              </PrivateRoute>
-            }
+            element={<PrivateRouteWrapperWithApp element={<YearOverview />} />}
           />
         </Routes>
       </BrowserRouter>
