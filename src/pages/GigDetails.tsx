@@ -623,58 +623,65 @@ export function GigDetails() {
                       <h4 className="font-medium text-gray-900 mb-3">{instrument}</h4>
                       <div className="space-y-3">
                         {membersByInstrument[instrument].map((member) => (
-                          <div key={member.id} className="flex items-center justify-between text-sm">
-                            <span className="text-gray-700">{member.name}</span>
-                            <div className="flex items-center space-x-2">
-                              {(canEditGig && isPastGig) ? (
-                                <>
-                                  <div className="flex space-x-1">
-                                    <button
-                                      onClick={() => updateMemberAvailability(member.id, 'available')}
-                                      className={`p-1 rounded-full hover:bg-green-100 ${
-                                        gig.memberAvailability[member.id]?.status === 'available' ? 'bg-green-100' : ''
-                                      }`}
-                                    >
-                                      <AvailabilityStatus status="available" size="sm" />
-                                    </button>
-                                    <button
-                                      onClick={() => updateMemberAvailability(member.id, 'unavailable')}
-                                      className={`p-1 rounded-full hover:bg-red-100 ${
-                                        gig.memberAvailability[member.id]?.status === 'unavailable' ? 'bg-red-100' : ''
-                                      }`}
-                                    >
-                                      <AvailabilityStatus status="unavailable" size="sm" />
-                                    </button>
-                                    <button
-                                      onClick={() => updateMemberAvailability(member.id, 'tentative')}
-                                      className={`p-1 rounded-full hover:bg-yellow-100 ${
-                                        gig.memberAvailability[member.id]?.status === 'tentative' ? 'bg-yellow-100' : ''
-                                      }`}
-                                    >
-                                      <AvailabilityStatus status="tentative" size="sm" />
-                                    </button>
-                                  </div>
-                                  {gig.memberAvailability[member.id]?.status === 'available' && (
-                                    <button
-                                      onClick={() => toggleMemberDriving(member.id)}
-                                      className={`p-1 rounded-full hover:bg-blue-100 ${
-                                        gig.memberAvailability[member.id]?.canDrive ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
-                                      }`}
-                                    >
-                                      <Car className="w-4 h-4" />
-                                    </button>
-                                  )}
-                                </>
-                              ) : (
-                                <>
-                                  <AvailabilityStatus status={gig.memberAvailability[member.id]?.status} size="sm" />
-                                  {gig.memberAvailability[member.id]?.status === 'available' && 
-                                   gig.memberAvailability[member.id]?.canDrive && (
-                                    <Car className="w-4 h-4 text-blue-600" />
-                                  )}
-                                </>
-                              )}
+                          <div key={member.id} className="flex flex-col space-y-1">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-700">{member.name}</span>
+                              <div className="flex items-center space-x-2">
+                                {(canEditGig && isPastGig) ? (
+                                  <>
+                                    <div className="flex space-x-1">
+                                      <button
+                                        onClick={() => updateMemberAvailability(member.id, 'available')}
+                                        className={`p-1 rounded-full hover:bg-green-100 ${
+                                          gig.memberAvailability[member.id]?.status === 'available' ? 'bg-green-100' : ''
+                                        }`}
+                                      >
+                                        <AvailabilityStatus status="available" size="sm" />
+                                      </button>
+                                      <button
+                                        onClick={() => updateMemberAvailability(member.id, 'unavailable')}
+                                        className={`p-1 rounded-full hover:bg-red-100 ${
+                                          gig.memberAvailability[member.id]?.status === 'unavailable' ? 'bg-red-100' : ''
+                                        }`}
+                                      >
+                                        <AvailabilityStatus status="unavailable" size="sm" />
+                                      </button>
+                                      <button
+                                        onClick={() => updateMemberAvailability(member.id, 'tentative')}
+                                        className={`p-1 rounded-full hover:bg-yellow-100 ${
+                                          gig.memberAvailability[member.id]?.status === 'tentative' ? 'bg-yellow-100' : ''
+                                        }`}
+                                      >
+                                        <AvailabilityStatus status="tentative" size="sm" />
+                                      </button>
+                                    </div>
+                                    {gig.memberAvailability[member.id]?.status === 'available' && (
+                                      <button
+                                        onClick={() => toggleMemberDriving(member.id)}
+                                        className={`p-1 rounded-full hover:bg-blue-100 ${
+                                          gig.memberAvailability[member.id]?.canDrive ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
+                                        }`}
+                                      >
+                                        <Car className="w-4 h-4" />
+                                      </button>
+                                    )}
+                                  </>
+                                ) : (
+                                  <>
+                                    <AvailabilityStatus status={gig.memberAvailability[member.id]?.status} size="sm" />
+                                    {gig.memberAvailability[member.id]?.status === 'available' && 
+                                     gig.memberAvailability[member.id]?.canDrive && (
+                                      <Car className="w-4 h-4 text-blue-600" />
+                                    )}
+                                  </>
+                                )}
+                              </div>
                             </div>
+                            {gig.memberAvailability[member.id]?.note && (
+                              <p className="text-sm text-gray-500 italic ml-4">
+                                {gig.memberAvailability[member.id].note}
+                              </p>
+                            )}
                           </div>
                         ))}
                       </div>
