@@ -111,7 +111,7 @@ export function YearOverview() {
         <div className="mb-8">
           <button
             onClick={() => navigate('/gigs', { state: { showHistory: true } })}
-            className="flex items-center text-gray-600 hover:text-indigo-600"
+            className="flex items-center text-gray-600 hover:text-red-600"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             {t('yearOverview.backButton')}
@@ -125,7 +125,7 @@ export function YearOverview() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900">{t('yearOverview.stats.totalGigs')}</h3>
-            <p className="text-3xl font-bold text-indigo-600">{stats.totalGigs}</p>
+            <p className="text-3xl font-bold text-red-600">{stats.totalGigs}</p>
           </div>
           
           <div className="bg-white rounded-lg shadow p-6">
@@ -140,7 +140,7 @@ export function YearOverview() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900">{t('yearOverview.stats.totalPay')}</h3>
-            <p className="text-3xl font-bold text-indigo-600">
+            <p className="text-3xl font-bold text-red-600">
               €{stats.completedPay.toLocaleString()}
             </p>
             {year === new Date().getFullYear().toString() && (
@@ -152,7 +152,7 @@ export function YearOverview() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900">{t('yearOverview.stats.totalDistance')}</h3>
-            <p className="text-3xl font-bold text-indigo-600">
+            <p className="text-3xl font-bold text-red-600">
               {stats.totalDistance.toLocaleString()} km
             </p>
           </div>
@@ -167,7 +167,7 @@ export function YearOverview() {
               <tr className="border-b">
                 <th className="px-6 py-3 text-left">
                   <button 
-                    className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
+                    className="flex items-center gap-1 font-semibold text-gray-900 hover:text-red-600"
                     onClick={() => handleSort('name')}
                   >
                     {t('yearOverview.bandMembers.table.name')} <ArrowUpDown className="h-4 w-4" />
@@ -176,7 +176,7 @@ export function YearOverview() {
                 {(roles.admin || roles.bandManager) && (
                   <th className="px-6 py-3 text-left">
                     <button 
-                      className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
+                      className="flex items-center gap-1 font-semibold text-gray-900 hover:text-red-600"
                       onClick={() => handleSort('available')}
                     >
                       {t('yearOverview.bandMembers.table.gigsPlayed')} <ArrowUpDown className="h-4 w-4" />
@@ -185,7 +185,7 @@ export function YearOverview() {
                 )}
                 <th className="px-6 py-3 text-left border-l">
                   <button 
-                    className="flex items-center gap-1 font-semibold text-gray-900 hover:text-indigo-600"
+                    className="flex items-center gap-1 font-semibold text-gray-900 hover:text-red-600"
                     onClick={() => handleSort('totalDistance')}
                   >
                     {t('yearOverview.bandMembers.table.distanceDriven')} <ArrowUpDown className="h-4 w-4" />
@@ -200,7 +200,7 @@ export function YearOverview() {
                   {(roles.admin || roles.bandManager) && (
                     <td className="px-6 py-4 text-green-600">{stats.available}</td>
                   )}
-                  <td className="px-6 py-4 border-l text-indigo-600">
+                  <td className="px-6 py-4 border-l text-red-600">
                     <button
                       onClick={() => setSelectedMember({
                         member,

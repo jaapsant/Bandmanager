@@ -156,7 +156,7 @@ export function GigList() {
               </div>
               <button
                 onClick={() => navigate(`/year-overview/${yearHeader}`)}
-                className="ml-4 text-gray-500 hover:text-indigo-600"
+                className="ml-4 text-gray-500 hover:text-red-600"
                 title="View Year Overview"
               >
                 <BarChart3 className="w-5 h-5" />
@@ -244,7 +244,7 @@ export function GigList() {
                   onClick={() => setViewMode('grid')}
                   className={`px-4 py-2 text-sm font-medium border ${
                     viewMode === 'grid'
-                      ? 'bg-indigo-50 text-indigo-600 border-indigo-200'
+                      ? 'bg-red-50 text-red-600 border-red-200'
                       : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
                   } rounded-l-md flex items-center`}
                 >
@@ -255,7 +255,7 @@ export function GigList() {
                   onClick={() => setViewMode('compact')}
                   className={`px-4 py-2 text-sm font-medium border-t border-b border-r ${
                     viewMode === 'compact'
-                      ? 'bg-indigo-50 text-indigo-600 border-indigo-200'
+                      ? 'bg-red-50 text-red-600 border-red-200'
                       : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
                   } rounded-r-md flex items-center`}
                 >
@@ -290,7 +290,7 @@ export function GigList() {
             {canManageGigs && user?.emailVerified && !showHistory && (
               <button
                 onClick={() => navigate('/gigs/new')}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-indigo-700 transition-colors"
+                className="bg-red-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-red-700 transition-colors"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 {t('gigList.buttons.newGig')}

@@ -49,7 +49,7 @@ export function SignUp() {
             </p>
             <button
               onClick={() => navigate('/gigs')}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
             >
               {t('signUp.verification.continueButton')}
             </button>
@@ -63,14 +63,14 @@ export function SignUp() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <Music className="w-12 h-12 text-indigo-600" />
+          <Music className="w-12 h-12 text-red-600" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           {t('signUp.title')}
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           {t('signUp.signIn.prefix')}{' '}
-          <Link to="/signin" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <Link to="/signin" className="font-medium text-red-600 hover:text-red-500">
             {t('signUp.signIn.link')}
           </Link>
         </p>
@@ -85,7 +85,7 @@ export function SignUp() {
                 {error === t('signUp.errors.emailInUse') && (
                   <Link 
                     to="/signin" 
-                    className="text-sm font-medium text-indigo-600 hover:text-indigo-500 whitespace-nowrap ml-4"
+                    className="text-sm font-medium text-red-600 hover:text-red-500 whitespace-nowrap ml-4"
                   >
                     {t('signUp.errors.signInLink')}
                   </Link>
@@ -104,7 +104,7 @@ export function SignUp() {
                   type="text"
                   autoComplete="name"
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -122,7 +122,7 @@ export function SignUp() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -140,7 +140,7 @@ export function SignUp() {
                   type="password"
                   autoComplete="new-password"
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -151,7 +151,7 @@ export function SignUp() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
               >
                 {loading ? t('signUp.form.submit.loading') : t('signUp.form.submit.default')}
               </button>

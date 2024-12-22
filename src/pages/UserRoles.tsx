@@ -178,7 +178,7 @@ export function UserRoles() {
           </p>
           <button
             onClick={() => navigate('/gigs')}
-            className="text-indigo-600 hover:text-indigo-500"
+            className="text-red-600 hover:text-red-500"
           >
             {t('userRoles.accessDenied.returnButton')}
           </button>
@@ -203,7 +203,7 @@ export function UserRoles() {
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center mb-6">
-            <Shield className="w-6 h-6 text-indigo-600 mr-2" />
+            <Shield className="w-6 h-6 text-red-600 mr-2" />
             <h1 className="text-2xl font-bold text-gray-900">{t('userRoles.title')}</h1>
           </div>
 
@@ -260,7 +260,7 @@ export function UserRoles() {
                         <label className="inline-flex items-center">
                           <input
                             type="checkbox"
-                            className="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                            className="form-checkbox h-4 w-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
                             checked={user.admin || false}
                             onChange={(e) => handleRoleChange(user.uid, 'admin', e.target.checked)}
                           />
@@ -270,7 +270,7 @@ export function UserRoles() {
                         <label className="inline-flex items-center">
                           <input
                             type="checkbox"
-                            className="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                            className="form-checkbox h-4 w-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
                             checked={user.bandManager || false}
                             onChange={(e) => handleRoleChange(user.uid, 'bandManager', e.target.checked)}
                           />
@@ -280,7 +280,7 @@ export function UserRoles() {
                         <label className="inline-flex items-center">
                           <input
                             type="checkbox"
-                            className="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                            className="form-checkbox h-4 w-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
                             checked={user.bandMember || false}
                             onChange={(e) => handleRoleChange(user.uid, 'bandMember', e.target.checked)}
                           />

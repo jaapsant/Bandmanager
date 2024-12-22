@@ -165,7 +165,7 @@ export function BandMembers() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
-              <Users className="w-6 h-6 text-indigo-600 mr-2" />
+              <Users className="w-6 h-6 text-red-600 mr-2" />
               <h1 className="text-2xl font-bold text-gray-900">{t('bandMembers.title')}</h1>
             </div>
             {canManageBand && user?.emailVerified && (
@@ -188,7 +188,7 @@ export function BandMembers() {
                 <input
                   type="text"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                   value={newInstrument}
                   onChange={(e) => setNewInstrument(e.target.value)}
                   placeholder={t('bandMembers.instruments.form.placeholder')}
@@ -204,7 +204,7 @@ export function BandMembers() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                 >
                   {t('bandMembers.instruments.form.submit')}
                 </button>

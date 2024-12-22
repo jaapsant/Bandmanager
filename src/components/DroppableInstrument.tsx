@@ -26,7 +26,7 @@ export function DroppableInstrument({
     <div
       ref={setNodeRef}
       className={`bg-gray-50 rounded-lg p-4 ${
-        isOver && active ? 'ring-2 ring-indigo-500 ring-opacity-50 bg-indigo-50' : ''
+        isOver && active ? 'ring-2 ring-red-500 ring-opacity-50 bg-red-50' : ''
       }`}
     >
       <div className="flex items-center justify-between mb-3">

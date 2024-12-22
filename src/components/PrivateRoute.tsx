@@ -52,7 +52,7 @@ export function PrivateRoute({
             </p>
             <button
               onClick={handleSignOut}
-              className="text-indigo-600 hover:text-indigo-500"
+              className="text-red-600 hover:text-red-500"
             >
               {t('auth.signOut')}
             </button>
@@ -75,7 +75,7 @@ export function PrivateRoute({
             </p>
             <Link
               to="/gigs"
-              className="text-indigo-600 hover:text-indigo-500"
+              className="text-red-600 hover:text-red-500"
             >
               {t('privateRoute.emailVerification.returnToGigs')}
             </Link>

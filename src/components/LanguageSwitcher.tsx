@@ -39,7 +39,7 @@ export function LanguageSwitcher() {
         disabled={loading || i18n.language === 'nl'}
         className={`px-3 py-1 rounded ${
           i18n.language === 'nl' 
-            ? 'bg-indigo-600 text-white' 
+            ? 'bg-red-600 text-white' 
             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
         }`}
       >
@@ -50,7 +50,7 @@ export function LanguageSwitcher() {
         disabled={loading || i18n.language === 'en'}
         className={`px-3 py-1 rounded ${
           i18n.language === 'en' 
-            ? 'bg-indigo-600 text-white' 
+            ? 'bg-red-600 text-white' 
             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
         }`}
       >

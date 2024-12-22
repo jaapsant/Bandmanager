@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, Euro, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2 } from 'lucide-react';
+import { Calendar, Clock, Euro, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2, Mail } from 'lucide-react';
 import { statusOptions } from '../data';
 import { AvailabilityStatus } from '../components/AvailabilityStatus';
 import { AvailabilityOverview } from '../components/AvailabilityOverview';
@@ -11,6 +11,7 @@ import { useBand } from '../context/BandContext';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from '../hooks/useRole';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-hot-toast';
 
 export function GigDetails() {
   const { t } = useTranslation();
@@ -272,6 +273,31 @@ export function GigDetails() {
     }
   };
 
+  const handleSendEmail = async () => {
+    try {
+      const recipients = ['example@example.com']; // Replace with actual recipients
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          gig,
+          recipients,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+
+      toast.success('Email sent successfully');
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      toast.error('Failed to send email');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -295,7 +321,7 @@ export function GigDetails() {
               {isEditing ? (
                 <input
                   type="text"
-                  className="text-3xl font-bold text-gray-900 w-full border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                  className="text-3xl font-bold text-gray-900 w-full border-b border-gray-300 focus:outline-none focus:border-red-500"
                   value={editedGig?.name}
                   onChange={(e) => setEditedGig(prev => prev ? { ...prev, name: e.target.value } : null)}
                   disabled={isPastGig}
@@ -330,9 +356,16 @@ export function GigDetails() {
                 <>
                   <button
                     onClick={handleEdit}
-                    className="p-2 text-gray-400 hover:text-indigo-600 rounded-full hover:bg-gray-100"
+                    className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
                   >
                     <Edit2 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={handleSendEmail}
+                    className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
+                    title="Email band members"
+                  >
+                    <Mail className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
@@ -370,7 +403,7 @@ export function GigDetails() {
                   {isEditing ? (
                     <input
                       type="date"
-                      className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                      className="border-b border-gray-300 focus:outline-none focus:border-red-500"
                       value={editedGig?.date}
                       onChange={(e) => setEditedGig(prev => prev ? { ...prev, date: e.target.value } : null)}
                       disabled={isPastGig}
@@ -406,14 +439,14 @@ export function GigDetails() {
                             <>
                               <input
                                 type="time"
-                                className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                                className="border-b border-gray-300 focus:outline-none focus:border-red-500"
                                 value={editedGig?.startTime || ''}
                                 onChange={(e) => setEditedGig(prev => prev ? { ...prev, startTime: e.target.value } : null)}
                               />
                               <span>-</span>
                               <input
                                 type="time"
-                                className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                                className="border-b border-gray-300 focus:outline-none focus:border-red-500"
                                 value={editedGig?.endTime || ''}
                                 onChange={(e) => setEditedGig(prev => prev ? { ...prev, endTime: e.target.value } : null)}
                               />
@@ -434,14 +467,14 @@ export function GigDetails() {
                       <div className="flex items-center gap-2">
                         <input
                           type="text"
-                          className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                          className="border-b border-gray-300 focus:outline-none focus:border-red-500"
                           value={editedGig?.location || ''}
                           onChange={(e) => setEditedGig(prev => prev ? { ...prev, location: e.target.value } : null)}
                           placeholder="Enter location"
                         />
                         <input
                           type="number"
-                          className="w-20 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                          className="w-20 border-b border-gray-300 focus:outline-none focus:border-red-500"
                           value={editedGig?.distance || ''}
                           onChange={(e) => setEditedGig(prev => prev ? { 
                             ...prev, 
@@ -457,7 +490,7 @@ export function GigDetails() {
                     <>
                       <span 
                         title="Open in Google Maps"
-                        className="cursor-pointer hover:text-indigo-600"
+                        className="cursor-pointer hover:text-red-600"
                         onClick={() => gig.location && openInGoogleMaps(gig.location)}
                       >
                         <MapPin className="w-5 h-5 mr-3" />
@@ -479,7 +512,7 @@ export function GigDetails() {
                   {isEditing ? (
                     <input
                       type="number"
-                      className="border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                      className="border-b border-gray-300 focus:outline-none focus:border-red-500"
                       value={editedGig?.pay || ''}
                       onChange={(e) => setEditedGig(prev => prev ? { ...prev, pay: e.target.value ? parseFloat(e.target.value) : null } : null)}
                       placeholder="Enter pay amount"
@@ -495,7 +528,7 @@ export function GigDetails() {
                   <h3 className="text-lg font-semibold mb-2">{t('gigDetails.sections.description')}</h3>
                   {isEditing ? (
                     <textarea
-                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                       value={editedGig?.description || ''}
                       onChange={(e) => setEditedGig(prev => prev ? { ...prev, description: e.target.value } : null)}
                       rows={4}

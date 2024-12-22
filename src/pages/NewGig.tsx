@@ -110,7 +110,7 @@ export function NewGig() {
                   type="text"
                   required
                   placeholder={t('newGig.form.name.placeholder')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                   value={formData.name || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 />
@@ -124,7 +124,7 @@ export function NewGig() {
                   <input
                     type="text"
                     placeholder={t('newGig.form.location.placeholder')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                     value={formData.location || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
                   />
@@ -139,7 +139,7 @@ export function NewGig() {
                     min="0"
                     step="0.1"
                     placeholder={t('newGig.form.distance.placeholder')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                     value={formData.distance || ''}
                     onChange={(e) => setFormData(prev => ({ 
                       ...prev, 
@@ -157,7 +157,7 @@ export function NewGig() {
                   type="date"
                   required
                   min={today}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                   value={formData.date || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
                 />
@@ -171,7 +171,7 @@ export function NewGig() {
                   <input
                     type="checkbox"
                     id="isWholeDay"
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                     checked={formData.isWholeDay}
                     onChange={(e) => setFormData(prev => ({ 
                       ...prev, 
@@ -195,7 +195,7 @@ export function NewGig() {
                     <input
                       type="time"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                       value={formData.startTime || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
                     />
@@ -208,7 +208,7 @@ export function NewGig() {
                     <input
                       type="time"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                       value={formData.endTime || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
                     />
@@ -224,7 +224,7 @@ export function NewGig() {
                   type="number"
                   min="0"
                   step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                   value={formData.pay || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, pay: e.target.value ? parseFloat(e.target.value) : null }))}
                 />
@@ -236,7 +236,7 @@ export function NewGig() {
                 {t('newGig.form.description.label')}
               </label>
               <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 rows={4}
                 value={formData.description || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -253,7 +253,7 @@ export function NewGig() {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
               >
                 {t('newGig.form.buttons.create')}
               </button>

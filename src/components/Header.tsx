@@ -13,7 +13,7 @@ export function Header() {
     <header className="bg-white shadow">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/gigs" className="flex items-center text-indigo-600">
+          <Link to="/gigs" className="flex items-center text-red-600">
             <Music className="w-8 h-8" />
             <span className="ml-2 text-lg font-semibold">{t('header.title')}</span>
           </Link>
