@@ -1,3 +1,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Add these responsive utilities */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Make text smaller on mobile */
+  h1 {
+    font-size: 1.5rem !important;
+  }
+
+  h2 {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Ensure buttons don't overflow */
+button {
+  white-space: nowrap;
+}
+
+/* Ensure all main containers have proper padding */
+.main-content {
+  padding: 1rem;
+  max-width: 100%;
+  overflow-x: hidden;
+}
