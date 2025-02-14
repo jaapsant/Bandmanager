@@ -1,6 +1,6 @@
 import { Calendar, Clock, AlertCircle, Car, MapPin, Euro } from 'lucide-react';
 import { Gig } from '../types';
-import { statusOptions } from '../data';
+import { useStatusOptions } from '../data';
 import { Link, useNavigate } from 'react-router-dom';
 import { AvailabilityOverview } from './AvailabilityOverview';
 import { useAuth } from '../context/AuthContext';
@@ -17,6 +17,8 @@ export function GigCard({ gig }: GigCardProps) {
   const { t } = useTranslation();
 
   const isPastGig = new Date(gig.date) < new Date();
+
+  const statusOptions = useStatusOptions();
 
   const status = gig.status === 'completed' 
     ? { value: 'completed', label: t('gig.status.completed'), color: 'bg-blue-100 text-blue-800' }

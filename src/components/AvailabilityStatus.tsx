@@ -14,7 +14,7 @@ export function AvailabilityStatus({ status, size = 'md' }: AvailabilityStatusPr
       return <Check className={`${sizeClasses} text-green-500`} />;
     case 'unavailable':
       return <X className={`${sizeClasses} text-red-500`} />;
-    case 'tentative':
+    case 'maybe':
       return <HelpCircle className={`${sizeClasses} text-yellow-500`} />;
     default:
       return <div className={`${sizeClasses} rounded-full bg-gray-200`} />;

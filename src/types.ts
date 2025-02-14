@@ -4,12 +4,17 @@ export interface GigStatus {
   color: string;
 }
 
+export type AvailabilityStatus = {
+  value: 'available' | 'unavailable' | 'maybe';
+  label: 'gigs.available' | 'gigs.unavailable' | 'gigs.maybe';
+}
+
 export interface BandMember {
   id: string;
   name: string;
   instrument: string;
   availability?: {
-    status: 'available' | 'unavailable' | 'tentative';
+    status: AvailabilityStatus['value'];
     note?: string;
   };
   canDrive?: boolean;
@@ -27,7 +32,7 @@ export interface Gig {
   pay?: number | null;
   description?: string | null;
   memberAvailability: Record<string, {
-    status: 'available' | 'unavailable' | 'tentative';
+    status: AvailabilityStatus['value'];
     note?: string;
     canDrive?: boolean | null;
   }>;

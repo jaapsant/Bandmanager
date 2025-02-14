@@ -6,7 +6,7 @@ import { useGigs } from '../context/GigContext';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from '../hooks/useRole';
 import { Gig } from '../types';
-import { statusOptions } from '../data';
+import { useStatusOptions } from '../data';
 import { useTranslation } from 'react-i18next';
 import { Menu } from '@headlessui/react';
 import { Menu as MenuIcon } from 'lucide-react';
@@ -17,6 +17,7 @@ type GroupedGigs = {
 };
 
 export function GigList() {
+  const statusOptions = useStatusOptions();
   const navigate = useNavigate();
   const location = useLocation();
   const { gigs, loading } = useGigs();

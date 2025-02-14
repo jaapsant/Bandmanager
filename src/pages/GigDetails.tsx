@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, Clock, Euro, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2, Mail } from 'lucide-react';
-import { statusOptions } from '../data';
+import { useStatusOptions } from '../data';
 import { AvailabilityStatus } from '../components/AvailabilityStatus';
 import { AvailabilityOverview } from '../components/AvailabilityOverview';
 import { AddToCalendar } from '../components/AddToCalendar';
@@ -15,6 +15,7 @@ import { toast } from 'react-hot-toast';
 
 export function GigDetails() {
   const { t } = useTranslation();
+  const statusOptions = useStatusOptions();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { gigs, updateGig, deleteGig } = useGigs();
@@ -86,7 +87,7 @@ export function GigDetails() {
     }
   };
 
-  const updateAvailability = async (status: 'available' | 'unavailable' | 'tentative', canDrive: boolean | null) => {
+  const updateAvailability = async (status: 'available' | 'unavailable' | 'maybe', canDrive: boolean | null) => {
     if (!user?.emailVerified) {
       setError('Email verification required to update availability');
       return;
@@ -129,7 +130,7 @@ export function GigDetails() {
         ...gig.memberAvailability,
         [user.uid]: {
           ...currentAvailability,
-          status: currentAvailability.status || 'tentative',
+          status: currentAvailability.status || 'maybe',
           note,
           canDrive: currentAvailability.canDrive || false,
         },
@@ -156,7 +157,7 @@ export function GigDetails() {
 
     const currentAvailability = gig.memberAvailability[user.uid] || {};
     await updateAvailability(
-      currentAvailability.status || 'tentative',
+      currentAvailability.status || 'maybe',
       !currentAvailability.canDrive
     );
   };
@@ -225,7 +226,7 @@ export function GigDetails() {
     window.open(`https://www.google.com/maps/dir/Theaterkerk+Bemmel,+Markt+5,+6681+AE+Bemmel/${encodedLocation}`, '_blank');
   };
 
-  const updateMemberAvailability = async (memberId: string, status: 'available' | 'unavailable' | 'tentative') => {
+  const updateMemberAvailability = async (memberId: string, status: 'available' | 'unavailable' | 'maybe') => {
     try {
       const currentAvailability = gig.memberAvailability[memberId] || {};
       const updatedAvailability = {
@@ -256,7 +257,7 @@ export function GigDetails() {
         ...gig.memberAvailability,
         [memberId]: {
           ...currentAvailability,
-          status: currentAvailability.status || 'tentative',
+          status: currentAvailability.status || 'maybe',
           note: currentAvailability.note || '',
           canDrive: !currentAvailability.canDrive,
         },
@@ -323,7 +324,7 @@ export function GigDetails() {
                   type="text"
                   className="text-3xl font-bold text-gray-900 w-full border-b border-gray-300 focus:outline-none focus:border-red-500"
                   value={editedGig?.name}
-                  onChange={(e) => setEditedGig(prev => prev ? { ...prev, name: e.target.value } : null)}
+                  onChange={(e) => setEditedGig((prev: Gig | null) => prev ? { ...prev, name: e.target.value } : null)}
                   disabled={isPastGig}
                 />
               ) : (
@@ -335,7 +336,7 @@ export function GigDetails() {
                 <select
                   className={`px-4 py-2 rounded-full text-sm ${statusOptions.find(s => s.value === editedGig?.status)?.color}`}
                   value={editedGig?.status}
-                  onChange={(e) => setEditedGig(prev => prev ? { ...prev, status: e.target.value as Gig['status'] } : null)}
+                  onChange={(e) => setEditedGig((prev: Gig | null) => prev ? { ...prev, status: e.target.value as Gig['status'] } : null)}
                 >
                   {statusOptions.map(status => (
                     <option key={status.value} value={status.value}>
@@ -360,13 +361,13 @@ export function GigDetails() {
                   >
                     <Edit2 className="w-5 h-5" />
                   </button>
-                  <button
+                 {/*  <button
                     onClick={handleSendEmail}
                     className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
                     title="Email band members"
                   >
                     <Mail className="w-5 h-5" />
-                  </button>
+                  </button> */}
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
                     className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
@@ -405,7 +406,7 @@ export function GigDetails() {
                       type="date"
                       className="border-b border-gray-300 focus:outline-none focus:border-red-500"
                       value={editedGig?.date}
-                      onChange={(e) => setEditedGig(prev => prev ? { ...prev, date: e.target.value } : null)}
+                      onChange={(e) => setEditedGig((prev: Gig | null) => prev ? { ...prev, date: e.target.value } : null)}
                       disabled={isPastGig}
                     />
                   ) : (
@@ -426,7 +427,7 @@ export function GigDetails() {
                               type="checkbox"
                               className="mr-2"
                               checked={editedGig?.isWholeDay}
-                              onChange={(e) => setEditedGig(prev => prev ? {
+                              onChange={(e) => setEditedGig((prev: Gig | null) => prev ? {
                                 ...prev,
                                 isWholeDay: e.target.checked,
                                 startTime: e.target.checked ? null : prev.startTime,
@@ -441,14 +442,14 @@ export function GigDetails() {
                                 type="time"
                                 className="border-b border-gray-300 focus:outline-none focus:border-red-500"
                                 value={editedGig?.startTime || ''}
-                                onChange={(e) => setEditedGig(prev => prev ? { ...prev, startTime: e.target.value } : null)}
+                                onChange={(e) => setEditedGig((prev: Gig | null) => prev ? { ...prev, startTime: e.target.value } : null)}
                               />
                               <span>-</span>
                               <input
                                 type="time"
                                 className="border-b border-gray-300 focus:outline-none focus:border-red-500"
                                 value={editedGig?.endTime || ''}
-                                onChange={(e) => setEditedGig(prev => prev ? { ...prev, endTime: e.target.value } : null)}
+                                onChange={(e) => setEditedGig((prev: Gig | null) => prev ? { ...prev, endTime: e.target.value } : null)}
                               />
                             </>
                           )}
@@ -469,14 +470,14 @@ export function GigDetails() {
                           type="text"
                           className="border-b border-gray-300 focus:outline-none focus:border-red-500"
                           value={editedGig?.location || ''}
-                          onChange={(e) => setEditedGig(prev => prev ? { ...prev, location: e.target.value } : null)}
+                          onChange={(e) => setEditedGig((prev: Gig | null) => prev ? { ...prev, location: e.target.value } : null)}
                           placeholder="Enter location"
                         />
                         <input
                           type="number"
                           className="w-20 border-b border-gray-300 focus:outline-none focus:border-red-500"
                           value={editedGig?.distance || ''}
-                          onChange={(e) => setEditedGig(prev => prev ? { 
+                          onChange={(e) => setEditedGig((prev: Gig | null) => prev ? { 
                             ...prev, 
                             distance: e.target.value ? parseFloat(e.target.value) : null 
                           } : null)}
@@ -514,7 +515,7 @@ export function GigDetails() {
                       type="number"
                       className="border-b border-gray-300 focus:outline-none focus:border-red-500"
                       value={editedGig?.pay || ''}
-                      onChange={(e) => setEditedGig(prev => prev ? { ...prev, pay: e.target.value ? parseFloat(e.target.value) : null } : null)}
+                      onChange={(e) => setEditedGig((prev: Gig | null) => prev ? { ...prev, pay: e.target.value ? parseFloat(e.target.value) : null } : null)}
                       placeholder="Enter pay amount"
                     />
                   ) : (
@@ -530,7 +531,7 @@ export function GigDetails() {
                     <textarea
                       className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                       value={editedGig?.description || ''}
-                      onChange={(e) => setEditedGig(prev => prev ? { ...prev, description: e.target.value } : null)}
+                      onChange={(e) => setEditedGig((prev: Gig | null) => prev ? { ...prev, description: e.target.value } : null)}
                       rows={4}
                       placeholder={t('gigDetails.sections.descriptionPlaceholder')}
                     />
@@ -568,7 +569,7 @@ export function GigDetails() {
                         className={`p-2 rounded-full hover:bg-green-100 ${
                           gig.memberAvailability[user.uid]?.status === 'available' ? 'bg-green-100' : ''
                         }`}
-                        title="Available"
+                        title={t('gigs.available')}
                       >
                         <AvailabilityStatus status="available" />
                       </button>
@@ -577,18 +578,18 @@ export function GigDetails() {
                         className={`p-2 rounded-full hover:bg-red-100 ${
                           gig.memberAvailability[user.uid]?.status === 'unavailable' ? 'bg-red-100' : ''
                         }`}
-                        title="Unavailable"
+                        title={t('gigs.unavailable')}
                       >
                         <AvailabilityStatus status="unavailable" />
                       </button>
                       <button
-                        onClick={() => updateAvailability('tentative', gig.memberAvailability[user.uid]?.canDrive ?? null)}
+                        onClick={() => updateAvailability('maybe', gig.memberAvailability[user.uid]?.canDrive ?? null)}
                         className={`p-2 rounded-full hover:bg-yellow-100 ${
-                          gig.memberAvailability[user.uid]?.status === 'tentative' ? 'bg-yellow-100' : ''
+                          gig.memberAvailability[user.uid]?.status === 'maybe' ? 'bg-yellow-100' : ''
                         }`}
-                        title="Tentative"
+                        title={t('gigs.maybe')}
                       >
-                        <AvailabilityStatus status="tentative" />
+                        <AvailabilityStatus status="maybe" />
                       </button>
                     </div>
                     {gig.memberAvailability[user.uid]?.status === 'available' && (
@@ -597,7 +598,7 @@ export function GigDetails() {
                         className={`p-2 rounded-full hover:bg-blue-100 ${
                           gig.memberAvailability[user.uid]?.canDrive ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
                         }`}
-                        title="Available to drive"
+                        title='Chauffeur'
                       >
                         <Car className="w-5 h-5" />
                       </button>
@@ -647,12 +648,12 @@ export function GigDetails() {
                                         <AvailabilityStatus status="unavailable" size="sm" />
                                       </button>
                                       <button
-                                        onClick={() => updateMemberAvailability(member.id, 'tentative')}
+                                        onClick={() => updateMemberAvailability(member.id, 'maybe')}
                                         className={`p-1 rounded-full hover:bg-yellow-100 ${
-                                          gig.memberAvailability[member.id]?.status === 'tentative' ? 'bg-yellow-100' : ''
+                                          gig.memberAvailability[member.id]?.status === 'maybe' ? 'bg-yellow-100' : ''
                                         }`}
                                       >
-                                        <AvailabilityStatus status="tentative" size="sm" />
+                                        <AvailabilityStatus status="maybe" size="sm" />
                                       </button>
                                     </div>
                                     {gig.memberAvailability[member.id]?.status === 'available' && (

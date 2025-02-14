@@ -10,7 +10,13 @@
   "gigs": {
     "available": "Beschikbaar",
     "unavailable": "Niet beschikbaar",
-    "maybe": "Misschien"
+    "maybe": "Misschien",
+    "status": {
+      "completed": "Afgerond",
+      "pending": "In afwachting",
+      "confirmed": "Bevestigd",
+      "cancelled": "Geannuleerd"
+    }
   },
   "userRoles": {
     "title": "Gebruikersrollen",
@@ -412,13 +418,7 @@
       "signOut": "Uitloggen"
     }
   },
-  "gig": {
-    "status": {
-      "completed": "Afgerond",
-      "pending": "In afwachting",
-      "confirmed": "Bevestigd",
-      "cancelled": "Geannuleerd"
-    },
+  "gig":{
     "time": {
       "allDay": "Hele dag"
     },
@@ -430,8 +430,7 @@
     },
     "pay": {
       "amount": "€"
-    }
-  },
+    }},
   "emailVerification": {
     "message": "Verifieer je e-mailadres om toegang te krijgen tot alle functies.",
     "success": "Verificatie-e-mail verzonden! Controleer je inbox.",

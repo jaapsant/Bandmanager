@@ -31,21 +31,21 @@ export function AvailabilityOverview({ memberAvailability, compact = false }: Av
     acc[member.instrument].total++;
     if (availability?.status === 'available') {
       acc[member.instrument].available++;
-    } else if (availability?.status === 'tentative') {
+    } else if (availability?.status === 'maybe') {
       acc[member.instrument].tentative++;
     }
     
     return acc;
   }, {});
 
-  const getCombinedStatus = (stats: { total: number; available: number; tentative: number }) => {
+  const getCombinedStatus = (stats: { total: number; available: number; tentative: number }): 'available' | 'unavailable' | 'maybe' => {
     const availablePercentage = (stats.available / stats.total) * 100;
     const tentativePercentage = (stats.tentative / stats.total) * 100;
     
     if (availablePercentage > 50) {
       return 'available';
     } else if (availablePercentage + tentativePercentage > 30) {
-      return 'tentative';
+      return 'maybe';
     }
     return 'unavailable';
   };
