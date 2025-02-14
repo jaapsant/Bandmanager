@@ -78,7 +78,7 @@ export function AddToCalendar({ gig }: AddToCalendarProps) {
             >
               Outlook Calendar
             </button>
-            <button
+{/*             <button
               onClick={() => {
                 downloadIcs();
                 setIsOpen(false);
@@ -86,7 +86,7 @@ export function AddToCalendar({ gig }: AddToCalendarProps) {
               className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
             >
               Download .ics file
-            </button>
+            </button> */}
           </div>
         </div>
       )}
