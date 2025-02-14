@@ -6,6 +6,7 @@ import { AvailabilityOverview } from './AvailabilityOverview';
 import { useAuth } from '../context/AuthContext';
 import { AddToCalendar } from './AddToCalendar';
 import { useTranslation } from 'react-i18next';
+import { AvailabilityStatus } from './AvailabilityStatus';
 
 interface GigCardProps {
   gig: Gig;
@@ -56,13 +57,20 @@ export function GigCard({ gig }: GigCardProps) {
           <h3 className="text-xl font-semibold text-gray-900">{gig.name}</h3>
         </Link>
         <div className="flex items-center space-x-2">
-          {!hasUserAvailability && !isPastGig && (
+          {!hasUserAvailability && !isPastGig ? (
             <span 
               className="flex items-center text-yellow-600 text-xs bg-yellow-50 px-2 py-1 rounded"
               onClick={(e) => e.stopPropagation()}
             >
               <AlertCircle className="w-3 h-3 mr-1" />
               {t('gig.availability.setAvailability')}
+            </span>
+          ) : hasUserAvailability && (
+            <span 
+              className="flex items-center px-2 py-1 rounded"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <AvailabilityStatus status={gig.memberAvailability[user.uid].status} />
             </span>
           )}
           <span className={`px-3 py-1 rounded-full text-sm ${status?.color}`}>
