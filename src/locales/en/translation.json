@@ -50,7 +50,8 @@
       "completed": "Completed",
       "pending": "Pending",
       "confirmed": "Confirmed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "declined": "Declined"
     },
     "time": {
       "allDay": "All Day"

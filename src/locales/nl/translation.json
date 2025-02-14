@@ -15,7 +15,8 @@
       "completed": "Afgerond",
       "pending": "In afwachting",
       "confirmed": "Bevestigd",
-      "cancelled": "Geannuleerd"
+      "cancelled": "Geannuleerd",
+      "declined": "Afgewezen"
     }
   },
   "userRoles": {
