@@ -20,24 +20,37 @@ export interface BandMember {
   canDrive?: boolean;
 }
 
+export interface MemberAvailability {
+  status: AvailabilityStatus['value'];
+  note?: string;
+  canDrive?: boolean;
+  dateAvailability?: {
+    [date: string]: {
+      status: AvailabilityStatus['value'];
+      note?: string;
+      canDrive?: boolean;
+    };
+  };
+}
+
 export interface Gig {
   id: string;
   name: string;
   date: string;
   startTime: string | null;
   endTime: string | null;
+  status: GigStatus;
   isWholeDay: boolean;
-  status: GigStatus['value'];
+  isMultiDay: boolean;
+  dates: string[];
   location: string | null;
-  pay?: number | null;
-  description?: string | null;
-  memberAvailability: Record<string, {
-    status: AvailabilityStatus['value'];
-    note?: string;
-    canDrive?: boolean | null;
-  }>;
-  createdBy: string;
   distance: number | null;
+  pay: number | null;
+  description: string | null;
+  memberAvailability: {
+    [userId: string]: MemberAvailability;
+  };
+  createdBy: string;
 }
 
 export interface User {

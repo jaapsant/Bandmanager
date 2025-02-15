@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, Euro, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2, Mail } from 'lucide-react';
+import { Calendar, Clock, Euro, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2, Mail, Plus } from 'lucide-react';
 import { useStatusOptions } from '../data';
 import { AvailabilityStatus } from '../components/AvailabilityStatus';
 import { AvailabilityOverview } from '../components/AvailabilityOverview';
@@ -12,6 +12,9 @@ import { useAuth } from '../context/AuthContext';
 import { useRole } from '../hooks/useRole';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
+import { MultiDateAvailability } from '../components/MultiDateAvailability';
+import { MultiDateBandAvailability } from '../components/MultiDateBandAvailability';
+import { MultiDateAvailabilityOverview } from '../components/MultiDateAvailabilityOverview';
 
 export function GigDetails() {
   const { t } = useTranslation();
@@ -57,14 +60,24 @@ export function GigDetails() {
           throw new Error(t('gigDetails.errors.loginRequired'));
         }
 
-        if (editedGig.date !== gig.date) {
-          const gigDate = new Date(editedGig.date);
-          gigDate.setHours(23, 59, 59, 999);
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
+        // Validate all dates if it's a multi-day gig
+        if (editedGig.isMultiDay) {
+          const allDates = [editedGig.date, ...editedGig.dates].filter(Boolean);
+          
+          // Check for empty dates
+          if (editedGig.dates.some(date => !date)) {
+            throw new Error(t('gigDetails.errors.emptyDates'));
+          }
 
-          if (gigDate < today) {
-            throw new Error(t('gigDetails.errors.pastDate'));
+          for (const date of allDates) {
+            const checkDate = new Date(date);
+            checkDate.setHours(0, 0, 0, 0);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (checkDate < today) {
+              throw new Error(t('gigDetails.errors.pastDate'));
+            }
           }
         }
 
@@ -84,6 +97,87 @@ export function GigDetails() {
       } catch (err) {
         setError(err instanceof Error ? err.message : t('gigDetails.errors.updateFailed'));
       }
+    }
+  };
+
+  const handleUpdateAvailability = async (date: string, status: AvailabilityStatus['value'], note?: string) => {
+    if (!user) return;
+    
+    try {
+      const currentAvailability = gig.memberAvailability[user.uid] || {
+        status: 'maybe',
+        dateAvailability: {}
+      };
+
+      const updatedAvailability = {
+        ...currentAvailability,
+        dateAvailability: {
+          ...currentAvailability.dateAvailability,
+          [date]: {
+            status,
+            note: note || currentAvailability.dateAvailability?.[date]?.note || '',
+            canDrive: currentAvailability.dateAvailability?.[date]?.canDrive || false
+          }
+        }
+      };
+
+      // Set the main status based on the most common status across dates
+      const statuses = Object.values(updatedAvailability.dateAvailability).map(a => a.status);
+      const statusCount = statuses.reduce((acc, status) => {
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      updatedAvailability.status = Object.entries(statusCount)
+        .reduce((a, b) => statusCount[a[0]] > statusCount[b[0]] ? a : b)[0] as AvailabilityStatus['value'];
+
+      // Create the updated gig object
+      const updatedGig = {
+        ...gig,
+        memberAvailability: {
+          ...gig.memberAvailability,
+          [user.uid]: updatedAvailability
+        }
+      };
+
+      await updateGig(updatedGig);
+    } catch (error) {
+      console.error('Error updating availability:', error);
+      setError(error instanceof Error ? error.message : t('gigDetails.errors.updateAvailability'));
+    }
+  };
+
+  const handleUpdateDrivingStatus = async (date: string, canDrive: boolean) => {
+    if (!user) return;
+    
+    try {
+      const currentAvailability = gig.memberAvailability[user.uid];
+      if (!currentAvailability?.dateAvailability?.[date]) return;
+
+      const updatedAvailability = {
+        ...currentAvailability,
+        dateAvailability: {
+          ...currentAvailability.dateAvailability,
+          [date]: {
+            ...currentAvailability.dateAvailability[date],
+            canDrive
+          }
+        }
+      };
+
+      // Create the updated gig object
+      const updatedGig = {
+        ...gig,
+        memberAvailability: {
+          ...gig.memberAvailability,
+          [user.uid]: updatedAvailability
+        }
+      };
+
+      await updateGig(updatedGig);
+    } catch (error) {
+      console.error('Error updating driving status:', error);
+      setError(error instanceof Error ? error.message : t('gigDetails.errors.drivingStatus'));
     }
   };
 
@@ -299,6 +393,40 @@ export function GigDetails() {
     }
   };
 
+  const handleSelectSingleDate = async (selectedDate: string) => {
+    if (!user || !canEditGig) return;
+
+    try {
+      // Get the availability for the selected date
+      const updatedMemberAvailability: { [userId: string]: MemberAvailability } = {};
+      
+      Object.entries(gig.memberAvailability).forEach(([userId, availability]) => {
+        const dateAvailability = availability.dateAvailability?.[selectedDate];
+        if (dateAvailability) {
+          updatedMemberAvailability[userId] = {
+            status: dateAvailability.status,
+            note: dateAvailability.note,
+            canDrive: dateAvailability.canDrive
+          };
+        }
+      });
+
+      const updatedGig: Gig = {
+        ...gig,
+        date: selectedDate,
+        isMultiDay: false,
+        dates: [],
+        memberAvailability: updatedMemberAvailability
+      };
+
+      await updateGig(updatedGig);
+      toast.success(t('gigDetails.messages.dateSelected'));
+    } catch (error) {
+      console.error('Error converting to single date:', error);
+      setError(error instanceof Error ? error.message : t('gigDetails.errors.updateFailed'));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -402,15 +530,77 @@ export function GigDetails() {
                 <div className="flex items-center text-gray-600">
                   <Calendar className="w-5 h-5 mr-3" />
                   {isEditing ? (
-                    <input
-                      type="date"
-                      className="border-b border-gray-300 focus:outline-none focus:border-red-500"
-                      value={editedGig?.date}
-                      onChange={(e) => setEditedGig((prev: Gig | null) => prev ? { ...prev, date: e.target.value } : null)}
-                      disabled={isPastGig}
-                    />
+                    <div className="space-y-2 w-full">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="date"
+                          className="border-b border-gray-300 focus:outline-none focus:border-red-500"
+                          value={editedGig?.date}
+                          onChange={(e) => setEditedGig((prev: Gig | null) => prev ? { ...prev, date: e.target.value } : null)}
+                          disabled={isPastGig}
+                        />
+                        {editedGig?.isMultiDay && (
+                          <span className="text-sm text-gray-500">
+                            (Primary date)
+                          </span>
+                        )}
+                      </div>
+
+                      {editedGig?.isMultiDay && (
+                        <div className="space-y-2 pl-0">
+                          {editedGig.dates.map((date, index) => (
+                            <div key={index} className="flex items-center space-x-2">
+                              <input
+                                type="date"
+                                className="border-b border-gray-300 focus:outline-none focus:border-red-500"
+                                value={date}
+                                onChange={(e) => {
+                                  const newDates = [...editedGig.dates];
+                                  newDates[index] = e.target.value;
+                                  setEditedGig(prev => prev ? { ...prev, dates: newDates } : null);
+                                }}
+                                disabled={isPastGig}
+                              />
+                              <button
+                                onClick={() => {
+                                  const newDates = editedGig.dates.filter((_, i) => i !== index);
+                                  setEditedGig(prev => prev ? { ...prev, dates: newDates } : null);
+                                }}
+                                className="p-1 text-red-600 hover:text-red-700 rounded-full hover:bg-red-50"
+                                title={t('newGig.form.dates.remove')}
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => {
+                              setEditedGig(prev => prev ? {
+                                ...prev,
+                                dates: [...prev.dates, ''] // Add an empty date instead of copying the primary date
+                              } : null);
+                            }}
+                            className="flex items-center text-sm text-red-600 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50"
+                          >
+                            <Plus className="w-4 h-4 mr-1" />
+                            {t('newGig.form.dates.addDate')}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   ) : (
-                    <span>{new Date(gig.date).toLocaleDateString()}</span>
+                    <div>
+                      <span>{new Date(gig.date).toLocaleDateString()}</span>
+                      {gig.isMultiDay && gig.dates.length > 0 && (
+                        <div className="mt-1 pl-4 space-y-1 text-sm text-gray-500">
+                          {gig.dates.map((date, index) => (
+                            <div key={index}>
+                              {new Date(date).toLocaleDateString()}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
                 
@@ -545,14 +735,21 @@ export function GigDetails() {
               <div className="mt-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">{t('gigDetails.sections.bandAvailability')}</h3>
-                  {totalDrivers > 0 && (
+                  {!gig.isMultiDay && totalDrivers > 0 && (
                     <div className="flex items-center text-blue-600 bg-blue-50 px-2 py-1 rounded">
                       <Car className="w-4 h-4" />
                       <span className="ml-1 text-sm font-medium">{totalDrivers}</span>
                     </div>
                   )}
                 </div>
-                <AvailabilityOverview memberAvailability={gig.memberAvailability} />
+                {gig.isMultiDay ? (
+                  <MultiDateAvailabilityOverview 
+                    gig={gig} 
+                    onSelectSingleDate={handleSelectSingleDate}
+                  />
+                ) : (
+                  <AvailabilityOverview memberAvailability={gig.memberAvailability} />
+                )}
               </div>
             </div>
 
@@ -561,134 +758,217 @@ export function GigDetails() {
               {!isPastGig && (
                 <div className="mb-8">
                 <h3 className="text-lg font-semibold mb-4">{t('gigDetails.sections.yourAvailability')}</h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => updateAvailability('available', gig.memberAvailability[user.uid]?.canDrive ?? null)}
-                        className={`p-2 rounded-full hover:bg-green-100 ${
-                          gig.memberAvailability[user.uid]?.status === 'available' ? 'bg-green-100' : ''
-                        }`}
-                        title={t('gigs.available')}
-                      >
-                        <AvailabilityStatus status="available" />
-                      </button>
-                      <button
-                        onClick={() => updateAvailability('unavailable', gig.memberAvailability[user.uid]?.canDrive ?? null)}
-                        className={`p-2 rounded-full hover:bg-red-100 ${
-                          gig.memberAvailability[user.uid]?.status === 'unavailable' ? 'bg-red-100' : ''
-                        }`}
-                        title={t('gigs.unavailable')}
-                      >
-                        <AvailabilityStatus status="unavailable" />
-                      </button>
-                      <button
-                        onClick={() => updateAvailability('maybe', gig.memberAvailability[user.uid]?.canDrive ?? null)}
-                        className={`p-2 rounded-full hover:bg-yellow-100 ${
-                          gig.memberAvailability[user.uid]?.status === 'maybe' ? 'bg-yellow-100' : ''
-                        }`}
-                        title={t('gigs.maybe')}
-                      >
-                        <AvailabilityStatus status="maybe" />
-                      </button>
-                    </div>
-                    {gig.memberAvailability[user.uid]?.status === 'available' && (
-                      <button
-                        onClick={toggleDriving}
-                        className={`p-2 rounded-full hover:bg-blue-100 ${
-                          gig.memberAvailability[user.uid]?.canDrive ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
-                        }`}
-                        title='Chauffeur'
-                      >
-                        <Car className="w-5 h-5" />
-                      </button>
-                    )}
-                  </div>
-                  <textarea
-                    className="w-full mt-2 p-2 text-sm border rounded-md"
-                    placeholder={t('gigDetails.sections.notePlaceholder')}
-                    value={gig.memberAvailability[user.uid]?.note || ''}
-                    onChange={(e) => updateNote(e.target.value)}
-                    rows={3}
+                {gig.isMultiDay ? (
+                  <MultiDateAvailability
+                    gig={gig}
+                    onUpdateAvailability={handleUpdateAvailability}
+                    onUpdateDrivingStatus={handleUpdateDrivingStatus}
                   />
-                </div>
+                ) : (
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => updateAvailability('available', gig.memberAvailability[user.uid]?.canDrive ?? null)}
+                          className={`p-2 rounded-full hover:bg-green-100 ${
+                            gig.memberAvailability[user.uid]?.status === 'available' ? 'bg-green-100' : ''
+                          }`}
+                          title={t('gigs.available')}
+                        >
+                          <AvailabilityStatus status="available" />
+                        </button>
+                        <button
+                          onClick={() => updateAvailability('unavailable', gig.memberAvailability[user.uid]?.canDrive ?? null)}
+                          className={`p-2 rounded-full hover:bg-red-100 ${
+                            gig.memberAvailability[user.uid]?.status === 'unavailable' ? 'bg-red-100' : ''
+                          }`}
+                          title={t('gigs.unavailable')}
+                        >
+                          <AvailabilityStatus status="unavailable" />
+                        </button>
+                        <button
+                          onClick={() => updateAvailability('maybe', gig.memberAvailability[user.uid]?.canDrive ?? null)}
+                          className={`p-2 rounded-full hover:bg-yellow-100 ${
+                            gig.memberAvailability[user.uid]?.status === 'maybe' ? 'bg-yellow-100' : ''
+                          }`}
+                          title={t('gigs.maybe')}
+                        >
+                          <AvailabilityStatus status="maybe" />
+                        </button>
+                      </div>
+                      {gig.memberAvailability[user.uid]?.status === 'available' && (
+                        <button
+                          onClick={toggleDriving}
+                          className={`p-2 rounded-full hover:bg-blue-100 ${
+                            gig.memberAvailability[user.uid]?.canDrive ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
+                          }`}
+                          title='Chauffeur'
+                        >
+                          <Car className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+                    <textarea
+                      className="w-full mt-2 p-2 text-sm border rounded-md"
+                      placeholder={t('gigDetails.sections.notePlaceholder')}
+                      value={gig.memberAvailability[user.uid]?.note || ''}
+                      onChange={(e) => updateNote(e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+                )}
               </div>
               )}
 
               {/* Other Band Members Section */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">{t('gigDetails.sections.bandMembers')}</h3>
-                <div className="space-y-6">
-                  {sortedInstruments.map((instrument) => (
-                    <div key={instrument} className="bg-gray-50 p-4 rounded-lg">
-                      <h4 className="font-medium text-gray-900 mb-3">{instrument}</h4>
-                      <div className="space-y-3">
-                        {membersByInstrument[instrument].map((member) => (
-                          <div key={member.id} className="flex flex-col space-y-1">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-700">{member.name}</span>
-                              <div className="flex items-center space-x-2">
-                                {(canEditGig && isPastGig) ? (
-                                  <>
-                                    <div className="flex space-x-1">
-                                      <button
-                                        onClick={() => updateMemberAvailability(member.id, 'available')}
-                                        className={`p-1 rounded-full hover:bg-green-100 ${
-                                          gig.memberAvailability[member.id]?.status === 'available' ? 'bg-green-100' : ''
-                                        }`}
-                                      >
-                                        <AvailabilityStatus status="available" size="sm" />
-                                      </button>
-                                      <button
-                                        onClick={() => updateMemberAvailability(member.id, 'unavailable')}
-                                        className={`p-1 rounded-full hover:bg-red-100 ${
-                                          gig.memberAvailability[member.id]?.status === 'unavailable' ? 'bg-red-100' : ''
-                                        }`}
-                                      >
-                                        <AvailabilityStatus status="unavailable" size="sm" />
-                                      </button>
-                                      <button
-                                        onClick={() => updateMemberAvailability(member.id, 'maybe')}
-                                        className={`p-1 rounded-full hover:bg-yellow-100 ${
-                                          gig.memberAvailability[member.id]?.status === 'maybe' ? 'bg-yellow-100' : ''
-                                        }`}
-                                      >
-                                        <AvailabilityStatus status="maybe" size="sm" />
-                                      </button>
-                                    </div>
-                                    {gig.memberAvailability[member.id]?.status === 'available' && (
-                                      <button
-                                        onClick={() => toggleMemberDriving(member.id)}
-                                        className={`p-1 rounded-full hover:bg-blue-100 ${
-                                          gig.memberAvailability[member.id]?.canDrive ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
-                                        }`}
-                                      >
-                                        <Car className="w-4 h-4" />
-                                      </button>
-                                    )}
-                                  </>
-                                ) : (
-                                  <>
-                                    <AvailabilityStatus status={gig.memberAvailability[member.id]?.status} size="sm" />
-                                    {gig.memberAvailability[member.id]?.status === 'available' && 
-                                     gig.memberAvailability[member.id]?.canDrive && (
-                                      <Car className="w-4 h-4 text-blue-600" />
-                                    )}
-                                  </>
-                                )}
+                {gig.isMultiDay ? (
+                  <MultiDateBandAvailability 
+                    gig={gig}
+                    onUpdateMemberAvailability={async (memberId, date, status) => {
+                      if (!user) return;
+                      
+                      try {
+                        const currentAvailability = gig.memberAvailability[memberId] || {
+                          status: 'maybe',
+                          dateAvailability: {}
+                        };
+
+                        const updatedAvailability = {
+                          ...currentAvailability,
+                          dateAvailability: {
+                            ...currentAvailability.dateAvailability,
+                            [date]: {
+                              status,
+                              note: currentAvailability.dateAvailability?.[date]?.note || '',
+                              canDrive: currentAvailability.dateAvailability?.[date]?.canDrive || false
+                            }
+                          }
+                        };
+
+                        const updatedGig = {
+                          ...gig,
+                          memberAvailability: {
+                            ...gig.memberAvailability,
+                            [memberId]: updatedAvailability
+                          }
+                        };
+
+                        await updateGig(updatedGig);
+                      } catch (error) {
+                        console.error('Error updating member availability:', error);
+                        setError(error instanceof Error ? error.message : 'Failed to update member availability');
+                      }
+                    }}
+                    onUpdateMemberDriving={async (memberId, date, canDrive) => {
+                      if (!user) return;
+                      
+                      try {
+                        const currentAvailability = gig.memberAvailability[memberId] || {
+                          status: 'maybe',
+                          dateAvailability: {}
+                        };
+
+                        const updatedAvailability = {
+                          ...currentAvailability,
+                          dateAvailability: {
+                            ...currentAvailability.dateAvailability,
+                            [date]: {
+                              ...currentAvailability.dateAvailability?.[date],
+                              canDrive
+                            }
+                          }
+                        };
+
+                        const updatedGig = {
+                          ...gig,
+                          memberAvailability: {
+                            ...gig.memberAvailability,
+                            [memberId]: updatedAvailability
+                          }
+                        };
+
+                        await updateGig(updatedGig);
+                      } catch (error) {
+                        console.error('Error updating member driving status:', error);
+                        setError(error instanceof Error ? error.message : 'Failed to update driving status');
+                      }
+                    }}
+                  />
+                ) : (
+                  <div className="space-y-6">
+                    {sortedInstruments.map((instrument) => (
+                      <div key={instrument} className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="font-medium text-gray-900 mb-3">{instrument}</h4>
+                        <div className="space-y-3">
+                          {membersByInstrument[instrument].map((member) => (
+                            <div key={member.id} className="flex flex-col space-y-1">
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-gray-700">{member.name}</span>
+                                <div className="flex items-center space-x-2">
+                                  {(canEditGig && isPastGig) ? (
+                                    <>
+                                      <div className="flex space-x-1">
+                                        <button
+                                          onClick={() => updateMemberAvailability(member.id, 'available')}
+                                          className={`p-1 rounded-full hover:bg-green-100 ${
+                                            gig.memberAvailability[member.id]?.status === 'available' ? 'bg-green-100' : ''
+                                          }`}
+                                        >
+                                          <AvailabilityStatus status="available" size="sm" />
+                                        </button>
+                                        <button
+                                          onClick={() => updateMemberAvailability(member.id, 'unavailable')}
+                                          className={`p-1 rounded-full hover:bg-red-100 ${
+                                            gig.memberAvailability[member.id]?.status === 'unavailable' ? 'bg-red-100' : ''
+                                          }`}
+                                        >
+                                          <AvailabilityStatus status="unavailable" size="sm" />
+                                        </button>
+                                        <button
+                                          onClick={() => updateMemberAvailability(member.id, 'maybe')}
+                                          className={`p-1 rounded-full hover:bg-yellow-100 ${
+                                            gig.memberAvailability[member.id]?.status === 'maybe' ? 'bg-yellow-100' : ''
+                                          }`}
+                                        >
+                                          <AvailabilityStatus status="maybe" size="sm" />
+                                        </button>
+                                      </div>
+                                      {gig.memberAvailability[member.id]?.status === 'available' && (
+                                        <button
+                                          onClick={() => toggleMemberDriving(member.id)}
+                                          className={`p-1 rounded-full hover:bg-blue-100 ${
+                                            gig.memberAvailability[member.id]?.canDrive ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
+                                          }`}
+                                        >
+                                          <Car className="w-4 h-4" />
+                                        </button>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <AvailabilityStatus status={gig.memberAvailability[member.id]?.status} size="sm" />
+                                      {gig.memberAvailability[member.id]?.status === 'available' && 
+                                       gig.memberAvailability[member.id]?.canDrive && (
+                                        <Car className="w-4 h-4 text-blue-600" />
+                                      )}
+                                    </>
+                                  )}
+                                </div>
                               </div>
+                              {gig.memberAvailability[member.id]?.note && (
+                                <p className="text-sm text-gray-500 italic ml-4">
+                                  {gig.memberAvailability[member.id].note}
+                                </p>
+                              )}
                             </div>
-                            {gig.memberAvailability[member.id]?.note && (
-                              <p className="text-sm text-gray-500 italic ml-4">
-                                {gig.memberAvailability[member.id].note}
-                              </p>
-                            )}
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

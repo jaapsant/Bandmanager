@@ -17,6 +17,9 @@
       "confirmed": "Bevestigd",
       "cancelled": "Geannuleerd",
       "declined": "Afgewezen"
+    },
+    "multiDay": {
+      "tooltip": "Meerdere datums beschikbaar ({{count}} opties)"
     }
   },
   "userRoles": {
@@ -130,7 +133,8 @@
       "emailVerification": "E-mailverificatie vereist om beschikbaarheid bij te werken",
       "updateAvailability": "Bijwerken beschikbaarheid mislukt",
       "updateNote": "Bijwerken notitie mislukt",
-      "drivingStatus": "E-mailverificatie vereist om rijstatus bij te werken"
+      "drivingStatus": "E-mailverificatie vereist om rijstatus bij te werken",
+      "emptyDates": "Alle datums moeten ingevuld zijn"
     },
     "time": {
       "allDay": "Hele Dag"
@@ -160,7 +164,11 @@
       "save": "Opslaan",
       "cancel": "Annuleren",
       "delete": "Verwijderen",
-      "addToCalendar": "Toevoegen aan Agenda"
+      "addToCalendar": "Toevoegen aan Agenda",
+      "selectDate": "Kies deze datum"
+    },
+    "messages": {
+      "dateSelected": "Optreden omgezet naar enkele datum"
     }
   },
   "bandMembers": {
@@ -231,6 +239,15 @@
       "description": {
         "label": "Beschrijving",
         "placeholder": "Voer beschrijving in"
+      },
+      "multiDay": {
+        "label": "Meerdere Datums",
+        "checkbox": "Dit optreden heeft meerdere mogelijke datums"
+      },
+      "dates": {
+        "label": "Mogelijke Datums",
+        "remove": "Verwijderen",
+        "addDate": "Nog een Datum Toevoegen"
       },
       "buttons": {
         "cancel": "Annuleren",

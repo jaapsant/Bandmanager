@@ -64,6 +64,9 @@
     },
     "pay": {
       "amount": "€"
+    },
+    "multiDay": {
+      "tooltip": "Multiple dates available ({{count}} options)"
     }
   },
   "gigList": {
@@ -142,7 +145,8 @@
       "emailVerification": "Email verification required to update availability",
       "updateAvailability": "Failed to update availability",
       "updateNote": "Failed to update note",
-      "drivingStatus": "Email verification required to update driving status"
+      "drivingStatus": "Email verification required to update driving status",
+      "emptyDates": "All dates must be filled in"
     },
     "time": {
       "allDay": "All Day"
@@ -172,7 +176,11 @@
       "save": "Save",
       "cancel": "Cancel",
       "delete": "Delete",
-      "addToCalendar": "Add to Calendar"
+      "addToCalendar": "Add to Calendar",
+      "selectDate": "Select this date"
+    },
+    "messages": {
+      "dateSelected": "Gig converted to single date"
     }
   },
   "bandMembers": {
@@ -243,6 +251,15 @@
       "description": {
         "label": "Description",
         "placeholder": "Enter description"
+      },
+      "multiDay": {
+        "label": "Multiple Dates",
+        "checkbox": "This gig has multiple possible dates"
+      },
+      "dates": {
+        "label": "Possible Dates",
+        "remove": "Remove",
+        "addDate": "Add Another Date"
       },
       "buttons": {
         "cancel": "Cancel",

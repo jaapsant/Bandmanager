@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Plus, Users, History, Calendar, LayoutGrid, List, AlertCircle, BarChart3 } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Plus, Users, History, Calendar, LayoutGrid, List, AlertCircle, BarChart3, CalendarRange } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GigCard } from '../components/GigCard';
 import { useGigs } from '../context/GigContext';
@@ -36,6 +36,23 @@ export function GigList() {
     setShowHistory(state?.showHistory || false);
   }, [location]);
 
+  const sortedGigs = useMemo(() => {
+    return [...gigs].sort((a, b) => {
+      // For multi-day gigs, use the earliest date for sorting
+      const getEarliestDate = (gig: Gig) => {
+        if (gig.isMultiDay) {
+          const allDates = [gig.date, ...gig.dates].map(date => new Date(date));
+          return new Date(Math.min(...allDates.map(d => d.getTime())));
+        }
+        return new Date(gig.date);
+      };
+
+      const dateA = getEarliestDate(a);
+      const dateB = getEarliestDate(b);
+      return dateA.getTime() - dateB.getTime();
+    });
+  }, [gigs]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -48,7 +65,7 @@ export function GigList() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const { upcomingGigs, pastGigs } = gigs.reduce<{ upcomingGigs: Gig[]; pastGigs: Gig[] }>(
+  const { upcomingGigs, pastGigs } = sortedGigs.reduce<{ upcomingGigs: Gig[]; pastGigs: Gig[] }>(
     (acc, gig) => {
       const gigDate = new Date(gig.date);
       gigDate.setHours(23, 59, 59, 999);
@@ -80,8 +97,22 @@ export function GigList() {
             }`}
             onClick={() => navigate(`/gig/${gig.id}`)}
           >
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {new Date(gig.date).toLocaleDateString()}
+            <td className="px-6 py-4 whitespace-nowrap text-sm">
+              <div className="flex items-center text-gray-500">
+                {gig.isMultiDay ? (
+                  <CalendarRange className="w-4 h-4 mr-2" />
+                ) : (
+                  <Calendar className="w-4 h-4 mr-2" />
+                )}
+                <span>
+                  {new Date(gig.date).toLocaleDateString()}
+                  {gig.isMultiDay && (
+                    <span className="text-xs text-gray-400 ml-1">
+                      +{gig.dates.length}
+                    </span>
+                  )}
+                </span>
+              </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
               <div className="text-sm font-medium text-gray-900">{gig.name}</div>
