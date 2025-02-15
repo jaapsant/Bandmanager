@@ -5,7 +5,7 @@ import { useStatusOptions } from '../data';
 import { AvailabilityStatus } from '../components/AvailabilityStatus';
 import { AvailabilityOverview } from '../components/AvailabilityOverview';
 import { AddToCalendar } from '../components/AddToCalendar';
-import { Gig } from '../types';
+import { Gig, MemberAvailability, AvailabilityStatusValue } from '../types';
 import { useGigs } from '../context/GigContext';
 import { useBand } from '../context/BandContext';
 import { useAuth } from '../context/AuthContext';
@@ -100,50 +100,100 @@ export function GigDetails() {
     }
   };
 
-  const handleUpdateAvailability = async (date: string, status: AvailabilityStatus['value'], note?: string) => {
+  const handleUpdateAvailability = async (date: string, status: AvailabilityStatusValue, note?: string) => {
     if (!user) return;
     
     try {
+      if (!user.emailVerified) {
+        throw new Error(t('gigDetails.errors.emailVerification'));
+      }
+
+      // Get all dates for the gig
+      const allDates = [gig.date, ...gig.dates];
+
+      // Initialize a new availability object with proper structure
       const currentAvailability = gig.memberAvailability[user.uid] || {
         status: 'maybe',
+        note: '',
+        canDrive: false,
         dateAvailability: {}
       };
 
-      const updatedAvailability = {
-        ...currentAvailability,
-        dateAvailability: {
-          ...currentAvailability.dateAvailability,
-          [date]: {
-            status,
-            note: note || currentAvailability.dateAvailability?.[date]?.note || '',
-            canDrive: currentAvailability.dateAvailability?.[date]?.canDrive || false
+      if (gig.isMultiDay) {
+        // Create a dateAvailability object with all dates initialized
+        const initializedDateAvailability = { ...currentAvailability.dateAvailability };
+        
+        // Initialize any missing dates with 'maybe' status
+        allDates.forEach(d => {
+          if (!initializedDateAvailability[d]) {
+            initializedDateAvailability[d] = {
+              status: 'maybe',
+              note: '',
+              canDrive: false
+            };
           }
-        }
-      };
+        });
 
-      // Set the main status based on the most common status across dates
-      const statuses = Object.values(updatedAvailability.dateAvailability).map(a => a.status);
-      const statusCount = statuses.reduce((acc, status) => {
-        acc[status] = (acc[status] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      
-      updatedAvailability.status = Object.entries(statusCount)
-        .reduce((a, b) => statusCount[a[0]] > statusCount[b[0]] ? a : b)[0] as AvailabilityStatus['value'];
+        // Update the specific date with new status
+        const updatedAvailability: MemberAvailability = {
+          ...currentAvailability,
+          dateAvailability: {
+            ...initializedDateAvailability,
+            [date]: {
+              status,
+              note: note ?? initializedDateAvailability[date]?.note ?? '',
+              canDrive: initializedDateAvailability[date]?.canDrive ?? false
+            }
+          }
+        };
 
-      // Create the updated gig object
-      const updatedGig = {
-        ...gig,
-        memberAvailability: {
-          ...gig.memberAvailability,
-          [user.uid]: updatedAvailability
-        }
-      };
+        // Calculate the overall status based on all dates
+        const allStatuses = allDates.map(d => updatedAvailability.dateAvailability![d].status);
+        const statusCount = allStatuses.reduce((acc, s) => {
+          acc[s] = (acc[s] || 0) + 1;
+          return acc;
+        }, {} as Record<AvailabilityStatusValue, number>);
 
-      await updateGig(updatedGig);
-    } catch (error) {
-      console.error('Error updating availability:', error);
-      setError(error instanceof Error ? error.message : t('gigDetails.errors.updateAvailability'));
+        const mainStatus = Object.entries(statusCount).reduce((a, b) => 
+          (statusCount[a[0] as AvailabilityStatusValue] > statusCount[b[0] as AvailabilityStatusValue]) ? a : b
+        )[0] as AvailabilityStatusValue;
+
+        updatedAvailability.status = mainStatus;
+
+        const updatedGig: Gig = {
+          ...gig,
+          memberAvailability: {
+            ...gig.memberAvailability,
+            [user.uid]: updatedAvailability
+          }
+        };
+
+        await updateGig(updatedGig);
+      } else {
+        // For single-date gigs, update the main availability
+        const updatedAvailability: MemberAvailability = {
+          ...currentAvailability,
+          status,
+          note: note ?? '',
+          canDrive: currentAvailability.canDrive || false,
+          dateAvailability: {}
+        };
+
+        const updatedGig: Gig = {
+          ...gig,
+          memberAvailability: {
+            ...gig.memberAvailability,
+            [user.uid]: updatedAvailability
+          }
+        };
+
+        await updateGig(updatedGig);
+      }
+
+      setError('');
+    } catch (err) {
+      console.error('Error updating availability:', err);
+      setError(err instanceof Error ? err.message : t('gigDetails.errors.updateAvailability'));
     }
   };
 
@@ -405,9 +455,10 @@ export function GigDetails() {
         if (dateAvailability) {
           updatedMemberAvailability[userId] = {
             status: dateAvailability.status,
-            note: dateAvailability.note,
-            canDrive: dateAvailability.canDrive
-          };
+            note: dateAvailability.note || undefined,
+            canDrive: dateAvailability.canDrive || undefined,
+            dateAvailability: {}
+          } as MemberAvailability;
         }
       });
 

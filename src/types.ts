@@ -4,9 +4,26 @@ export interface GigStatus {
   color: string;
 }
 
-export type AvailabilityStatus = {
-  value: 'available' | 'unavailable' | 'maybe';
+export type AvailabilityStatusValue = 'available' | 'unavailable' | 'maybe';
+
+export interface AvailabilityStatus {
+  value: AvailabilityStatusValue;
   label: 'gigs.available' | 'gigs.unavailable' | 'gigs.maybe';
+}
+
+export interface DateAvailability {
+  status: AvailabilityStatusValue;
+  note?: string;
+  canDrive?: boolean;
+}
+
+export interface MemberAvailability {
+  status: AvailabilityStatusValue;
+  note?: string;
+  canDrive?: boolean;
+  dateAvailability: {
+    [date: string]: DateAvailability;
+  };
 }
 
 export interface BandMember {
@@ -18,19 +35,6 @@ export interface BandMember {
     note?: string;
   };
   canDrive?: boolean;
-}
-
-export interface MemberAvailability {
-  status: AvailabilityStatus['value'];
-  note?: string;
-  canDrive?: boolean;
-  dateAvailability?: {
-    [date: string]: {
-      status: AvailabilityStatus['value'];
-      note?: string;
-      canDrive?: boolean;
-    };
-  };
 }
 
 export interface Gig {
