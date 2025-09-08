@@ -1,0 +1,219 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\santja\\OneDrive - Frontliners\\Documents\\Alarmfase\\Bandmanager\\playwright.config.ts",
+    "rootDir": "C:/Users/santja/OneDrive - Frontliners/Documents/Alarmfase/Bandmanager/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "C:\\Users\\santja\\OneDrive - Frontliners\\Documents\\Alarmfase\\Bandmanager\\e2e\\setup\\global-setup.ts",
+    "globalTeardown": "C:\\Users\\santja\\OneDrive - Frontliners\\Documents\\Alarmfase\\Bandmanager\\e2e\\setup\\global-teardown.ts",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright-report/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/santja/OneDrive - Frontliners/Documents/Alarmfase/Bandmanager/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/santja/OneDrive - Frontliners/Documents/Alarmfase/Bandmanager/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/santja/OneDrive - Frontliners/Documents/Alarmfase/Bandmanager/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "C:/Users/santja/OneDrive - Frontliners/Documents/Alarmfase/Bandmanager/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/santja/OneDrive - Frontliners/Documents/Alarmfase/Bandmanager/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "C:/Users/santja/OneDrive - Frontliners/Documents/Alarmfase/Bandmanager/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/santja/OneDrive - Frontliners/Documents/Alarmfase/Bandmanager/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "C:/Users/santja/OneDrive - Frontliners/Documents/Alarmfase/Bandmanager/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/Users/santja/OneDrive - Frontliners/Documents/Alarmfase/Bandmanager/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "C:/Users/santja/OneDrive - Frontliners/Documents/Alarmfase/Bandmanager/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "3way",
+    "version": "1.55.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:5173",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "gig-management.spec.ts",
+      "file": "gig-management.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Gig Management",
+          "file": "gig-management.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should display gigs page with calendar view",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 843,
+                      "error": {
+                        "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:293:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+                        "stack": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:293:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at UtilityScript.evaluate (<anonymous>:293:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at C:\\Users\\santja\\OneDrive - Frontliners\\Documents\\Alarmfase\\Bandmanager\\e2e\\gig-management.spec.ts:6:16",
+                        "location": {
+                          "file": "<anonymous>",
+                          "column": 16,
+                          "line": 293
+                        }
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "<anonymous>",
+                            "column": 16,
+                            "line": 293
+                          },
+                          "message": "Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:293:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at UtilityScript.evaluate (<anonymous>:293:16)\u001b[22m\n\u001b[2m    at UtilityScript.<anonymous> (<anonymous>:1:44)\u001b[22m\n\u001b[2m    at C:\\Users\\santja\\OneDrive - Frontliners\\Documents\\Alarmfase\\Bandmanager\\e2e\\gig-management.spec.ts:6:16\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-08T12:07:14.206Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\santja\\OneDrive - Frontliners\\Documents\\Alarmfase\\Bandmanager\\test-results\\gig-management-Gig-Managem-02062-igs-page-with-calendar-view-chromium\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "<anonymous>",
+                        "column": 16,
+                        "line": 293
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0a5a699c34de6691556b-72681a75b4db55c5a111",
+              "file": "gig-management.spec.ts",
+              "line": 23,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-09-08T12:07:11.849Z",
+    "duration": 3726.9379999999655,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

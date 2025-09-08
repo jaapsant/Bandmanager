@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import '../types/global';
 
 export interface TestGig {
   id: string;
@@ -29,7 +30,7 @@ export interface TestBandMember {
  */
 export async function mockGigs(page: Page, gigs: TestGig[]) {
   await page.evaluate((gigs) => {
-    (window as any).mockGigs = gigs;
+    window.mockGigs = gigs;
   }, gigs);
 }
 
@@ -38,7 +39,7 @@ export async function mockGigs(page: Page, gigs: TestGig[]) {
  */
 export async function mockBandMembers(page: Page, members: TestBandMember[]) {
   await page.evaluate((members) => {
-    (window as any).mockBandMembers = members;
+    window.mockBandMembers = members;
   }, members);
 }
 
@@ -47,7 +48,7 @@ export async function mockBandMembers(page: Page, members: TestBandMember[]) {
  */
 export async function mockInstruments(page: Page, instruments: string[]) {
   await page.evaluate((instruments) => {
-    (window as any).mockInstruments = instruments;
+    window.mockInstruments = instruments;
   }, instruments);
 }
 
@@ -125,9 +126,9 @@ export async function mockCompleteDataset(page: Page) {
  */
 export async function clearMockData(page: Page) {
   await page.evaluate(() => {
-    delete (window as any).mockGigs;
-    delete (window as any).mockBandMembers;
-    delete (window as any).mockInstruments;
+    delete window.mockGigs;
+    delete window.mockBandMembers;
+    delete window.mockInstruments;
   });
 }
 
