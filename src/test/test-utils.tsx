@@ -15,22 +15,16 @@ const MockBandProvider = ({ children }: { children: ReactNode }) => (
   <>{children}</>
 );
 
-const MockMemberProvider = ({ children }: { children: ReactNode }) => (
-  <>{children}</>
-);
-
 // Custom render function with all providers
 const AllTheProviders = ({ children }: { children: ReactNode }) => {
   return (
     <BrowserRouter>
       <MockAuthProvider>
-        <MockMemberProvider>
-          <MockGigProvider>
-            <MockBandProvider>
-              {children}
-            </MockBandProvider>
-          </MockGigProvider>
-        </MockMemberProvider>
+        <MockGigProvider>
+          <MockBandProvider>
+            {children}
+          </MockBandProvider>
+        </MockGigProvider>
       </MockAuthProvider>
     </BrowserRouter>
   );

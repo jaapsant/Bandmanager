@@ -11,7 +11,6 @@ import { UserRoles } from './pages/UserRoles';
 import { AuthProvider } from './context/AuthContext';
 import { GigProvider } from './context/GigContext';
 import { BandProvider } from './context/BandContext';
-import { MemberProvider } from './context/MemberContext';
 import { PrivateRouteWrapper } from './components/PrivateRouteWrapper';
 import { Header } from './components/Header';
 import { EmailVerificationBanner } from './components/EmailVerificationBanner';
@@ -19,15 +18,13 @@ import { YearOverview } from './pages/YearOverview';
 import './i18n';
 
 const AuthenticatedApp = ({ children }: { children: React.ReactNode }) => (
-  <MemberProvider>
-    <GigProvider>
-      <BandProvider>
-        <Header />
-        <EmailVerificationBanner />
-        {children}
-      </BandProvider>
-    </GigProvider>
-  </MemberProvider>
+  <GigProvider>
+    <BandProvider>
+      <Header />
+      <EmailVerificationBanner />
+      {children}
+    </BandProvider>
+  </GigProvider>
 );
 
 const PrivateRouteWrapperWithApp = ({

@@ -3,8 +3,7 @@ import { PrivateRoute } from './PrivateRoute';
 import { AuthProvider } from '../context/AuthContext';
 import { GigProvider } from '../context/GigContext';
 import { BandProvider } from '../context/BandContext';
-import { MemberProvider } from '../context/MemberContext';
-import { EmailVerificationBanner } from '../components/EmailVerificationBanner'; 
+import { EmailVerificationBanner } from '../components/EmailVerificationBanner';
 
 interface PrivateRouteWrapperProps {
     element: React.ReactElement;
@@ -17,10 +16,8 @@ export const PrivateRouteWrapper: React.FC<PrivateRouteWrapperProps> = ({ elemen
             <AuthProvider>
                 <GigProvider>
                     <BandProvider>
-                        <MemberProvider>
-                            <EmailVerificationBanner /> {/* Conditionally render based on verification status */}
-                            {element}
-                        </MemberProvider>
+                        <EmailVerificationBanner /> {/* Conditionally render based on verification status */}
+                        {element}
                     </BandProvider>
                 </GigProvider>
             </AuthProvider>
