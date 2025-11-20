@@ -1,6 +1,7 @@
 import { AvailabilityStatus } from './AvailabilityStatus';
 import { Gig } from '../types';
 import { useBand } from '../context/BandContext';
+import { getCombinedStatus, calculateInstrumentStats } from '../utils/availabilityHelpers';
 
 interface AvailabilityOverviewProps {
   memberAvailability: Gig['memberAvailability'];
@@ -9,46 +10,8 @@ interface AvailabilityOverviewProps {
 
 export function AvailabilityOverview({ memberAvailability, compact = false }: AvailabilityOverviewProps) {
   const { bandMembers } = useBand();
-  
-  // Count total drivers who are available
-  const totalDrivers = Object.entries(memberAvailability).reduce((count, [memberId, availability]) => {
-    if (availability.status === 'available' && availability.canDrive) {
-      return count + 1;
-    }
-    return count;
-  }, 0);
 
-  const instrumentAvailability = bandMembers.reduce<Record<string, { total: number; available: number; tentative: number }>>((acc, member) => {
-    const availability = memberAvailability[member.id];
-    if (!acc[member.instrument]) {
-      acc[member.instrument] = {
-        total: 0,
-        available: 0,
-        tentative: 0,
-      };
-    }
-    
-    acc[member.instrument].total++;
-    if (availability?.status === 'available') {
-      acc[member.instrument].available++;
-    } else if (availability?.status === 'maybe') {
-      acc[member.instrument].tentative++;
-    }
-    
-    return acc;
-  }, {});
-
-  const getCombinedStatus = (stats: { total: number; available: number; tentative: number }): 'available' | 'unavailable' | 'maybe' => {
-    const availablePercentage = (stats.available / stats.total) * 100;
-    const tentativePercentage = (stats.tentative / stats.total) * 100;
-    
-    if (availablePercentage > 50) {
-      return 'available';
-    } else if (availablePercentage + tentativePercentage > 30) {
-      return 'maybe';
-    }
-    return 'unavailable';
-  };
+  const instrumentAvailability = calculateInstrumentStats(memberAvailability, bandMembers);
 
   // Sort instruments alphabetically
   const sortedInstruments = Object.keys(instrumentAvailability).sort((a, b) => a.localeCompare(b));
