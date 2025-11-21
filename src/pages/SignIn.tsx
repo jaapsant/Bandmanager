@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Music } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export function SignIn() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signIn } = useAuth();
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Get the redirect path from location state, default to /gigs
+  const from = (location.state as { from?: string })?.from || '/gigs';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +24,8 @@ export function SignIn() {
 
     try {
       await signIn(email, password);
-      navigate('/gigs');
+      // Redirect to the intended destination or /gigs
+      navigate(from, { replace: true });
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

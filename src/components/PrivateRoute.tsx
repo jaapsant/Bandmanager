@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from '../hooks/useRole';
 import { useTranslation } from 'react-i18next';
@@ -9,11 +9,12 @@ interface PrivateRouteProps {
   requireVerification?: boolean;
 }
 
-export function PrivateRoute({ 
-  children, 
+export function PrivateRoute({
+  children,
   requireVerification = false,
 }: PrivateRouteProps) {
   const { t } = useTranslation();
+  const location = useLocation();
   const { user, loading: authLoading, signOut } = useAuth();
   const { roles, loading: rolesLoading } = useRole();
 
@@ -26,7 +27,8 @@ export function PrivateRoute({
   }
 
   if (!user) {
-    return <Navigate to="/signin" />;
+    // Store the current location so we can redirect back after login
+    return <Navigate to="/signin" state={{ from: location.pathname }} replace />;
   }
 
   // Check if user has any role assigned
