@@ -26,8 +26,23 @@ export function GigDetails() {
   const { user } = useAuth();
   const { roles } = useRole();
   const gig = gigs.find((g) => g.id === id);
+
   // Get gig stats - moved up to avoid conditional hook call
   const gigStats = useGigStats(gig, bandMembers);
+
+  const isPastGig = useMemo(() => {
+    if (!gig) return false;
+    const today = new Date();
+    if (gig.isMultiDay) {
+      const dates = [gig.date, ...gig.dates].map(d => new Date(d));
+      const lastDate = new Date(Math.max(...dates.map(d => d.getTime())));
+      lastDate.setHours(23, 59, 59, 999);
+      return lastDate < today;
+    }
+    const gigDate = new Date(gig.date);
+    gigDate.setHours(23, 59, 59, 999);
+    return gigDate < today;
+  }, [gig]);
 
   // Allow editing if user is admin or band manager and is email verified
   const canEditGig = !!(user?.emailVerified && (roles.admin || roles.bandManager));
@@ -318,9 +333,6 @@ export function GigDetails() {
     return "";
   };
 
-  // Get gig stats
-
-
   const handleBack = () => {
     const gigDate = new Date(gig.date);
     gigDate.setHours(23, 59, 59, 999);
@@ -342,19 +354,6 @@ export function GigDetails() {
       setError(err instanceof Error ? err.message : 'Failed to delete gig');
     }
   };
-
-  const isPastGig = useMemo(() => {
-    const today = new Date();
-    if (gig.isMultiDay) {
-      const dates = [gig.date, ...gig.dates].map(d => new Date(d));
-      const lastDate = new Date(Math.max(...dates.map(d => d.getTime())));
-      lastDate.setHours(23, 59, 59, 999);
-      return lastDate < today;
-    }
-    const gigDate = new Date(gig.date);
-    gigDate.setHours(23, 59, 59, 999);
-    return gigDate < today;
-  }, [gig]);
 
   const openInGoogleMaps = (location: string) => {
     if (!location) return;
