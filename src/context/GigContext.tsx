@@ -31,7 +31,7 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
           const data = doc.data() as Omit<Gig, 'id'>;
           const gigDate = new Date(data.date);
           gigDate.setHours(23, 59, 59, 999);
-          
+
           if (gigDate < new Date() && data.status === 'confirmed') {
             updateDoc(doc.ref, { status: 'completed' });
             return {
@@ -40,13 +40,13 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
               status: 'completed',
             } as Gig;
           }
-          
+
           return {
             id: doc.id,
             ...data,
           } as Gig;
         });
-        
+
         setGigs(gigsData);
         setLoading(false);
       }, (error) => {
@@ -91,7 +91,7 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
     if (!gigData.isWholeDay && gigData.startTime && gigData.endTime) {
       const [startHours, startMinutes] = gigData.startTime.split(':').map(Number);
       const [endHours, endMinutes] = gigData.endTime.split(':').map(Number);
-      
+
       if (startHours > endHours || (startHours === endHours && startMinutes >= endMinutes)) {
         throw new Error(t('gigContext.errors.validation.timeRange'));
       }
@@ -147,9 +147,36 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
       }
 
       const gigRef = doc(db, 'gigs', updatedGig.id);
-      await updateDoc(gigRef, updatedGig as any);
-      
-      setGigs(prev => prev.map(gig => 
+
+      // Detect if only memberAvailability has changed
+      const changedFields: string[] = [];
+      Object.keys(updatedGig).forEach(key => {
+        if (key === 'id') return; // Skip id field
+        const originalValue = originalGig[key as keyof Gig];
+        const updatedValue = updatedGig[key as keyof Gig];
+
+        // Deep comparison for memberAvailability
+        if (key === 'memberAvailability') {
+          if (JSON.stringify(originalValue) !== JSON.stringify(updatedValue)) {
+            changedFields.push(key);
+          }
+        } else if (originalValue !== updatedValue) {
+          changedFields.push(key);
+        }
+      });
+
+      // If only memberAvailability changed, use partial update
+      // This allows band members to update their availability
+      if (changedFields.length === 1 && changedFields[0] === 'memberAvailability') {
+        await updateDoc(gigRef, {
+          memberAvailability: updatedGig.memberAvailability
+        });
+      } else {
+        // For all other cases (admins/managers editing gig details), update entire document
+        await updateDoc(gigRef, updatedGig as any);
+      }
+
+      setGigs(prev => prev.map(gig =>
         gig.id === updatedGig.id ? updatedGig : gig
       ));
     } catch (error) {

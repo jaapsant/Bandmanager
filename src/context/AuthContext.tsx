@@ -27,9 +27,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function getAuthErrorMessage(error: AuthError): string {
-  const { t } = useTranslation();
-  
+function getAuthErrorMessage(error: AuthError, t: (key: string) => string): string {
   switch (error.code) {
     case 'auth/email-already-in-use':
       return t('auth.errors.emailInUse');
@@ -119,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       console.error('Error signing in:', error);
-      throw new Error(getAuthErrorMessage(error as AuthError));
+      throw new Error(getAuthErrorMessage(error as AuthError, t));
     }
   };
 
@@ -186,7 +184,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   const { t } = useTranslation();
-  
+
   if (context === undefined) {
     throw new Error(t('auth.errors.useAuthHook'));
   }
