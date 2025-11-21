@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Music, Users, Trash2 } from 'lucide-react';
+import { ArrowLeft, Music, Users, Trash2, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { DndContext, DragEndEvent, closestCenter, DragOverlay, useSensor, useSensors, PointerSensor } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -15,11 +15,11 @@ export function BandMembers() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { roles } = useRole();
-  const { 
-    bandMembers, 
-    instruments: unsortedInstruments, 
+  const {
+    bandMembers,
+    instruments: unsortedInstruments,
     updateMemberInstrument,
-    addInstrument, 
+    addInstrument,
     removeInstrument,
     loading,
   } = useBand();
@@ -56,6 +56,16 @@ export function BandMembers() {
     return acc;
   }, {} as Record<string, typeof bandMembers>);
 
+  // Calculate sheet music summary
+  const sheetMusicSummary = Object.entries(membersByInstrument).map(([instrument, members]) => {
+    const wantsPrinted = members.filter(m => m.wantsPrintedSheetMusic).length;
+    const total = members.length;
+    return { instrument, wantsPrinted, total };
+  }).filter(item => item.total > 0);
+
+  const totalWantsPrinted = sheetMusicSummary.reduce((sum, item) => sum + item.wantsPrinted, 0);
+  const totalMembers = bandMembers.length;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -83,11 +93,11 @@ export function BandMembers() {
 
     const memberId = active.id as string;
     const newInstrument = over.id as string;
-    
+
     // Don't update if dropping in the same instrument group
     const member = bandMembers.find(m => m.id === memberId);
-    if (member?.instrument === newInstrument || 
-        (!member?.instrument && newInstrument === 'Unassigned')) {
+    if (member?.instrument === newInstrument ||
+      (!member?.instrument && newInstrument === 'Unassigned')) {
       return;
     }
 
@@ -95,7 +105,7 @@ export function BandMembers() {
       setError('');
       setSuccess('');
       await updateMemberInstrument(
-        memberId, 
+        memberId,
         newInstrument === t('bandMembers.instruments.unassigned') ? '' : newInstrument
       );
       setSuccess(t('bandMembers.messages.success.updateInstrument'));
@@ -122,7 +132,7 @@ export function BandMembers() {
 
   const handleRemoveInstrument = async (instrument: string) => {
     if (!canManageBand) return;
-    
+
     const hasMembers = membersByInstrument[instrument]?.length > 0;
     if (hasMembers) {
       setError(t('bandMembers.messages.error.removeInstrument.hasMembers'));
@@ -212,7 +222,7 @@ export function BandMembers() {
             </form>
           )}
 
-          <DndContext 
+          <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragStart={handleDragStart}
@@ -261,6 +271,28 @@ export function BandMembers() {
               )}
             </DragOverlay>
           </DndContext>
+
+          {/* Sheet Music Summary */}
+          {totalMembers > 0 && (
+            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center mb-3">
+                <FileText className="w-5 h-5 text-blue-600 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-900">{t('bandMembers.sheetMusic.title')}</h3>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm font-medium text-gray-700">
+                  {t('bandMembers.sheetMusic.total', { count: totalWantsPrinted, total: totalMembers })}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-3">
+                  {sheetMusicSummary.map(({ instrument, wantsPrinted, total }) => (
+                    <div key={instrument} className="text-sm text-gray-600 bg-white rounded px-3 py-2">
+                      <span className="font-medium">{instrument}:</span> {wantsPrinted}/{total}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

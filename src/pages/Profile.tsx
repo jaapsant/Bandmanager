@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 export function Profile() {
   const navigate = useNavigate();
   const { user, updateDisplayName } = useAuth();
-  const { instruments: unsortedInstruments, bandMembers, updateMemberInstrument, updateMemberName } = useBand();
+  const { instruments: unsortedInstruments, bandMembers, updateMemberInstrument, updateMemberName, updateMemberSheetMusicPreference } = useBand();
   const auth = getAuth();
   const { t } = useTranslation();
 
@@ -21,6 +21,7 @@ export function Profile() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [selectedInstrument, setSelectedInstrument] = useState('');
+  const [wantsPrintedSheetMusic, setWantsPrintedSheetMusic] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,6 +39,7 @@ export function Profile() {
       const currentMember = bandMembers.find(member => member.id === user.uid);
       if (currentMember) {
         setSelectedInstrument(currentMember.instrument);
+        setWantsPrintedSheetMusic(currentMember.wantsPrintedSheetMusic || false);
       }
     }
   }, [user, bandMembers]);
@@ -77,6 +79,24 @@ export function Profile() {
       setSuccess(t('profile.messages.success.instrumentUpdate'));
     } catch (error) {
       setError(t('profile.messages.error.instrumentUpdate'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateSheetMusicPreference = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      await updateMemberSheetMusicPreference(user.uid, wantsPrintedSheetMusic);
+      setSuccess(t('profile.messages.success.sheetMusicUpdate'));
+    } catch (error) {
+      setError(t('profile.messages.error.sheetMusicUpdate'));
     } finally {
       setLoading(false);
     }
@@ -193,6 +213,36 @@ export function Profile() {
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
                 >
                   {t('profile.sections.instrument.button')}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Sheet Music Preference */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              {t('profile.sections.sheetMusic.title')}
+            </h2>
+            <form onSubmit={handleUpdateSheetMusicPreference} className="space-y-4">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="wantsPrintedSheetMusic"
+                  className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                  checked={wantsPrintedSheetMusic}
+                  onChange={(e) => setWantsPrintedSheetMusic(e.target.checked)}
+                />
+                <label htmlFor="wantsPrintedSheetMusic" className="ml-2 text-sm font-medium text-gray-700">
+                  {t('profile.sections.sheetMusic.label')}
+                </label>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+                >
+                  {t('profile.sections.sheetMusic.button')}
                 </button>
               </div>
             </form>

@@ -14,6 +14,7 @@ interface BandContextType {
   removeBandMember: (memberId: string) => Promise<void>;
   updateMemberInstrument: (memberId: string, instrument: string) => Promise<void>;
   updateMemberName: (memberId: string, name: string) => Promise<void>;
+  updateMemberSheetMusicPreference: (memberId: string, wantsPrintedSheetMusic: boolean) => Promise<void>;
   addInstrument: (instrument: string) => Promise<void>;
   removeInstrument: (instrument: string) => Promise<void>;
   isInstrumentInUse: (instrument: string) => boolean;
@@ -41,6 +42,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
           id: doc.data().id || doc.id,
           name: doc.data().name || '',
           instrument: doc.data().instrument || '',
+          wantsPrintedSheetMusic: doc.data().wantsPrintedSheetMusic,
         })) as BandMember[];
         setBandMembers(membersData);
       }, (error) => {
@@ -162,7 +164,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
 
       const memberDoc = doc(db, 'bandMembers', memberId);
       const memberSnapshot = await getDocs(query(collection(db, 'bandMembers'), where('id', '==', memberId)));
-      
+
       if (memberSnapshot.empty) {
         await setDoc(memberDoc, {
           id: memberId,
@@ -192,7 +194,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
 
       const memberDoc = doc(db, 'bandMembers', memberId);
       const memberSnapshot = await getDocs(query(collection(db, 'bandMembers'), where('id', '==', memberId)));
-      
+
       if (memberSnapshot.empty) {
         await setDoc(memberDoc, {
           id: memberId,
@@ -209,6 +211,37 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
         throw error;
       }
       throw new Error(t('bandContext.errors.failedToUpdateName'));
+    }
+  };
+
+  const updateMemberSheetMusicPreference = async (memberId: string, wantsPrintedSheetMusic: boolean) => {
+    checkPermission();
+
+    try {
+      if (memberId !== user?.uid && !roles.admin && !roles.bandManager) {
+        throw new Error(t('bandContext.errors.updateOwnPreferenceOnly'));
+      }
+
+      const memberDoc = doc(db, 'bandMembers', memberId);
+      const memberSnapshot = await getDocs(query(collection(db, 'bandMembers'), where('id', '==', memberId)));
+
+      if (memberSnapshot.empty) {
+        await setDoc(memberDoc, {
+          id: memberId,
+          name: user?.displayName || '',
+          instrument: '',
+          wantsPrintedSheetMusic,
+          createdBy: user?.uid,
+        });
+      } else {
+        await updateDoc(memberDoc, { wantsPrintedSheetMusic });
+      }
+    } catch (error) {
+      console.error('Error updating sheet music preference:', error);
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error(t('bandContext.errors.failedToUpdateSheetMusicPreference'));
     }
   };
 
@@ -238,7 +271,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
       const instrumentsRef = collection(db, 'instruments');
       const q = query(instrumentsRef, where("name", "==", instrument));
       const querySnapshot = await getDocs(q);
-      
+
       const deletePromises = querySnapshot.docs.map(doc => deleteDoc(doc.ref));
       await Promise.all(deletePromises);
     } catch (error) {
@@ -251,13 +284,14 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <BandContext.Provider value={{ 
-      bandMembers, 
+    <BandContext.Provider value={{
+      bandMembers,
       instruments,
-      addBandMember, 
+      addBandMember,
       removeBandMember,
       updateMemberInstrument,
       updateMemberName,
+      updateMemberSheetMusicPreference,
       addInstrument,
       removeInstrument,
       isInstrumentInUse,

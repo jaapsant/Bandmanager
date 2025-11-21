@@ -30,6 +30,7 @@ export interface BandMember {
   id: string;
   name: string;
   instrument: string;
+  wantsPrintedSheetMusic?: boolean;
   availability?: {
     status: AvailabilityStatus['value'];
     note?: string;

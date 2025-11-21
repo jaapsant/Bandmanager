@@ -202,6 +202,10 @@
         "addInstrument": "Instrument succesvol toegevoegd",
         "removeInstrument": "Instrument succesvol verwijderd"
       }
+    },
+    "sheetMusic": {
+      "title": "Overzicht Geprinte Bladmuziek",
+      "total": "Totaal: {{count}} van de {{total}} leden willen geprinte muziek"
     }
   },
   "newGig": {
@@ -271,12 +275,14 @@
         "nameUpdate": "Naam bijwerken mislukt",
         "instrumentUpdate": "Instrument bijwerken mislukt",
         "passwordMismatch": "Nieuwe wachtwoorden komen niet overeen",
-        "passwordUpdate": "Wachtwoord bijwerken mislukt. Log opnieuw in als het al een tijdje geleden is."
+        "passwordUpdate": "Wachtwoord bijwerken mislukt. Log opnieuw in als het al een tijdje geleden is.",
+        "sheetMusicUpdate": "Bijwerken bladmuziekvoorkeur mislukt"
       },
       "success": {
         "nameUpdate": "Naam succesvol bijgewerkt",
         "instrumentUpdate": "Instrument succesvol bijgewerkt",
-        "passwordUpdate": "Wachtwoord succesvol bijgewerkt"
+        "passwordUpdate": "Wachtwoord succesvol bijgewerkt",
+        "sheetMusicUpdate": "Bladmuziekvoorkeur succesvol bijgewerkt"
       }
     },
     "sections": {
@@ -297,6 +303,11 @@
         "newPassword": "Nieuw Wachtwoord",
         "confirmPassword": "Bevestig Nieuw Wachtwoord",
         "button": "Wachtwoord Bijwerken"
+      },
+      "sheetMusic": {
+        "title": "Bladmuziek Voorkeur",
+        "label": "Ik wil geprinte bladmuziek",
+        "button": "Voorkeur Opslaan"
       }
     }
   },
@@ -318,9 +329,6 @@
         "default": "Inloggen"
       }
     },
-    "errors": {
-      "default": "Inloggen mislukt. Controleer je gegevens."
-    },
     "forgotPassword": {
       "link": "Wachtwoord vergeten?",
       "title": "Reset Wachtwoord",
@@ -330,6 +338,9 @@
       "cancel": "Annuleren",
       "success": "Wachtwoord reset e-mail verzonden! Controleer je inbox.",
       "backToSignIn": "Terug naar inloggen"
+    },
+    "errors": {
+      "default": "Inloggen mislukt. Controleer je gegevens."
     }
   },
   "signUp": {
@@ -399,6 +410,8 @@
       "failedToUpdateInstrument": "Kon instrument niet bijwerken",
       "instrumentInUse": "Kan een instrument dat in gebruik is niet verwijderen",
       "failedToRemoveInstrument": "Kon instrument niet verwijderen",
+      "updateOwnPreferenceOnly": "Je kunt alleen je eigen bladmuziekvoorkeur bijwerken",
+      "failedToUpdateSheetMusicPreference": "Kon bladmuziekvoorkeur niet bijwerken",
       "useBandHook": "useBand moet binnen een BandProvider worden gebruikt"
     }
   },

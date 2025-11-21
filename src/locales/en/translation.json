@@ -214,6 +214,10 @@
         "addInstrument": "Instrument added successfully",
         "removeInstrument": "Instrument removed successfully"
       }
+    },
+    "sheetMusic": {
+      "title": "Printed Sheet Music Summary",
+      "total": "Total: {{count}} of {{total}} members want printed music"
     }
   },
   "newGig": {
@@ -283,12 +287,14 @@
         "nameUpdate": "Failed to update name",
         "instrumentUpdate": "Failed to update instrument",
         "passwordMismatch": "New passwords do not match",
-        "passwordUpdate": "Failed to update password. Please sign in again if it has been a while."
+        "passwordUpdate": "Failed to update password. Please sign in again if it has been a while.",
+        "sheetMusicUpdate": "Failed to update sheet music preference"
       },
       "success": {
         "nameUpdate": "Name updated successfully",
         "instrumentUpdate": "Instrument updated successfully",
-        "passwordUpdate": "Password updated successfully"
+        "passwordUpdate": "Password updated successfully",
+        "sheetMusicUpdate": "Sheet music preference updated successfully"
       }
     },
     "sections": {
@@ -309,6 +315,11 @@
         "newPassword": "New Password",
         "confirmPassword": "Confirm New Password",
         "button": "Update Password"
+      },
+      "sheetMusic": {
+        "title": "Sheet Music Preference",
+        "label": "I want printed sheet music",
+        "button": "Save Preference"
       }
     }
   },
@@ -411,6 +422,8 @@
       "failedToUpdateInstrument": "Failed to update instrument",
       "instrumentInUse": "Cannot remove an instrument that is currently in use",
       "failedToRemoveInstrument": "Failed to remove instrument",
+      "updateOwnPreferenceOnly": "You can only update your own sheet music preference",
+      "failedToUpdateSheetMusicPreference": "Failed to update sheet music preference",
       "useBandHook": "useBand must be used within a BandProvider"
     }
   },
