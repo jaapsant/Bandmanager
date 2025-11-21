@@ -92,9 +92,8 @@ export function GigList() {
         return (
           <tr
             key={gig.id}
-            className={`hover:bg-gray-50 cursor-pointer ${
-              !hasUserAvailability && !showHistory ? 'bg-yellow-50' : ''
-            }`}
+            className={`hover:bg-gray-50 cursor-pointer ${!hasUserAvailability && !showHistory ? 'bg-yellow-50' : ''
+              }`}
             onClick={() => navigate(`/gig/${gig.id}`)}
           >
             <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -129,11 +128,10 @@ export function GigList() {
               )}
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
-              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                gig.status === 'completed' 
-                  ? 'bg-blue-100 text-blue-800'
-                  : statusOptions.find(s => s.value === gig.status)?.color
-              }`}>
+              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${gig.status === 'completed'
+                ? 'bg-blue-100 text-blue-800'
+                : statusOptions.find(s => s.value === gig.status)?.color
+                }`}>
                 {gig.status === 'completed' ? 'Completed' : statusOptions.find(s => s.value === gig.status)?.label}
               </span>
             </td>
@@ -147,13 +145,12 @@ export function GigList() {
             {!showHistory && (
               <td className="px-6 py-4 whitespace-nowrap">
                 {hasUserAvailability ? (
-                  <span className={`text-sm ${
-                    gig.memberAvailability[user.uid].status === 'available'
-                      ? 'text-green-600'
-                      : gig.memberAvailability[user.uid].status === 'unavailable'
+                  <span className={`text-sm ${gig.memberAvailability[user.uid].status === 'available'
+                    ? 'text-green-600'
+                    : gig.memberAvailability[user.uid].status === 'unavailable'
                       ? 'text-red-600'
                       : 'text-yellow-600'
-                  }`}>
+                    }`}>
                     {gig.memberAvailability[user.uid].status}
                   </span>
                 ) : (
@@ -172,12 +169,12 @@ export function GigList() {
     const renderTable = (gigsToRender: Gig[], yearHeader?: string) => {
       const currentYear = new Date().getFullYear().toString();
       const isExpanded = expandedYears[yearHeader || ''] ?? (yearHeader ? Number(yearHeader) >= Number(currentYear) - 1 : true);
-      
+
       return (
         <>
           {yearHeader && (
             <div className="flex items-center mb-4">
-              <div 
+              <div
                 className="flex items-center cursor-pointer"
                 onClick={() => setExpandedYears(prev => ({ ...prev, [yearHeader]: !isExpanded }))}
               >
@@ -278,22 +275,20 @@ export function GigList() {
                 <div className="flex rounded-md shadow-sm" role="group">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`px-4 py-2 text-sm font-medium border ${
-                      viewMode === 'grid'
-                        ? 'bg-red-50 text-red-600 border-red-200'
-                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
-                    } rounded-l-md flex items-center`}
+                    className={`px-4 py-2 text-sm font-medium border ${viewMode === 'grid'
+                      ? 'bg-red-50 text-red-600 border-red-200'
+                      : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                      } rounded-l-md flex items-center`}
                     title={t('gigList.viewMode.grid')}
                   >
                     <LayoutGrid className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setViewMode('compact')}
-                    className={`px-4 py-2 text-sm font-medium border-t border-b border-r ${
-                      viewMode === 'compact'
-                        ? 'bg-red-50 text-red-600 border-red-200'
-                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
-                    } rounded-r-md flex items-center`}
+                    className={`px-4 py-2 text-sm font-medium border-t border-b border-r ${viewMode === 'compact'
+                      ? 'bg-red-50 text-red-600 border-red-200'
+                      : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                      } rounded-r-md flex items-center`}
                     title={t('gigList.viewMode.compact')}
                   >
                     <List className="w-4 h-4" />
@@ -344,9 +339,8 @@ export function GigList() {
                           {({ active }) => (
                             <button
                               onClick={() => setViewMode('grid')}
-                              className={`${
-                                active ? 'bg-gray-100' : ''
-                              } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                              className={`${active ? 'bg-gray-100' : ''
+                                } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                             >
                               <LayoutGrid className="w-4 h-4 mr-2" />
                               {t('gigList.viewMode.grid')}
@@ -357,9 +351,8 @@ export function GigList() {
                           {({ active }) => (
                             <button
                               onClick={() => setViewMode('compact')}
-                              className={`${
-                                active ? 'bg-gray-100' : ''
-                              } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                              className={`${active ? 'bg-gray-100' : ''
+                                } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                             >
                               <List className="w-4 h-4 mr-2" />
                               {t('gigList.viewMode.compact')}
@@ -372,9 +365,8 @@ export function GigList() {
                       {({ active }) => (
                         <button
                           onClick={() => setShowHistory(!showHistory)}
-                          className={`${
-                            active ? 'bg-gray-100' : ''
-                          } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                          className={`${active ? 'bg-gray-100' : ''
+                            } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                         >
                           {showHistory ? (
                             <Calendar className="w-5 h-5 mr-2" />
@@ -389,9 +381,8 @@ export function GigList() {
                       {({ active }) => (
                         <button
                           onClick={() => navigate('/band-members')}
-                          className={`${
-                            active ? 'bg-gray-100' : ''
-                          } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                          className={`${active ? 'bg-gray-100' : ''
+                            } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                         >
                           <Users className="w-5 h-5 mr-2" />
                           {t('gigList.buttons.bandMembers')}
@@ -403,9 +394,8 @@ export function GigList() {
                         {({ active }) => (
                           <button
                             onClick={() => navigate('/gigs/new')}
-                            className={`${
-                              active ? 'bg-red-50' : ''
-                            } group flex rounded-md items-center w-full px-2 py-2 text-sm text-red-600`}
+                            className={`${active ? 'bg-red-50' : ''
+                              } group flex rounded-md items-center w-full px-2 py-2 text-sm text-red-600`}
                           >
                             <Plus className="w-5 h-5 mr-2" />
                             {t('gigList.buttons.newGig')}

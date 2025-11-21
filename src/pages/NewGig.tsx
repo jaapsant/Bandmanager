@@ -29,7 +29,7 @@ export function NewGig() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     try {
       if (!formData.name?.trim() || !formData.date) {
         throw new Error(t('newGig.errors.requiredFields'));
@@ -50,7 +50,7 @@ export function NewGig() {
 
       // Validate all dates if it's a multi-day gig
       if (formData.isMultiDay) {
-        const allDates = [formData.date, ...formData.dates].filter(Boolean);
+        const allDates = [formData.date, ...(formData.dates || [])].filter(Boolean);
         for (const date of allDates) {
           const checkDate = new Date(date);
           checkDate.setHours(0, 0, 0, 0);
@@ -63,7 +63,7 @@ export function NewGig() {
       else if (!formData.isWholeDay && formData.startTime && formData.endTime) {
         const [startHours, startMinutes] = formData.startTime.split(':').map(Number);
         const [endHours, endMinutes] = formData.endTime.split(':').map(Number);
-        
+
         if (startHours > endHours || (startHours === endHours && startMinutes >= endMinutes)) {
           throw new Error(t('newGig.errors.timeRange'));
         }
@@ -75,7 +75,7 @@ export function NewGig() {
         status: formData.status || 'pending',
         isWholeDay: formData.isMultiDay ? false : (formData.isWholeDay || false),
         isMultiDay: formData.isMultiDay,
-        dates: formData.isMultiDay ? formData.dates.filter(Boolean) : [],
+        dates: formData.isMultiDay ? (formData.dates || []).filter(Boolean) : [],
         memberAvailability: {},
         startTime: (!formData.isMultiDay && !formData.isWholeDay) ? formData.startTime || null : null,
         endTime: (!formData.isMultiDay && !formData.isWholeDay) ? formData.endTime || null : null,
@@ -142,8 +142,8 @@ export function NewGig() {
                     id="isMultiDay"
                     className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                     checked={formData.isMultiDay}
-                    onChange={(e) => setFormData(prev => ({ 
-                      ...prev, 
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
                       isMultiDay: e.target.checked,
                       isWholeDay: false,
                       startTime: null,
@@ -181,9 +181,9 @@ export function NewGig() {
                     placeholder={t('newGig.form.distance.placeholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                     value={formData.distance || ''}
-                    onChange={(e) => setFormData(prev => ({ 
-                      ...prev, 
-                      distance: e.target.value ? parseFloat(e.target.value) : null 
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      distance: e.target.value ? parseFloat(e.target.value) : null
                     }))}
                   />
                 </div>
@@ -202,7 +202,7 @@ export function NewGig() {
                     value={formData.date || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
                   />
-                  
+
                   {formData.isMultiDay && (
                     <div className="space-y-4">
                       {formData.dates.map((date, index) => (
@@ -213,7 +213,7 @@ export function NewGig() {
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                             value={date}
                             onChange={(e) => {
-                              const newDates = [...formData.dates];
+                              const newDates = [...(formData.dates || [])];
                               newDates[index] = e.target.value;
                               setFormData(prev => ({ ...prev, dates: newDates }));
                             }}
@@ -235,7 +235,7 @@ export function NewGig() {
                         onClick={() => {
                           setFormData(prev => ({
                             ...prev,
-                            dates: [...prev.dates, '']
+                            dates: [...(prev.dates || []), '']
                           }));
                         }}
                         className="px-4 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
@@ -259,8 +259,8 @@ export function NewGig() {
                         id="isWholeDay"
                         className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                         checked={formData.isWholeDay}
-                        onChange={(e) => setFormData(prev => ({ 
-                          ...prev, 
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
                           isWholeDay: e.target.checked,
                           startTime: e.target.checked ? null : prev.startTime,
                           endTime: e.target.checked ? null : prev.endTime,

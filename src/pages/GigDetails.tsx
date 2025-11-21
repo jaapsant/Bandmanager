@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, Euro, ArrowLeft, Edit2, Save, X, Car, MapPin, Trash2, Mail, Plus } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useStatusOptions } from '../data';
-import { AvailabilityStatus } from '../components/AvailabilityStatus';
-import { AvailabilityOverview } from '../components/AvailabilityOverview';
-import { AddToCalendar } from '../components/AddToCalendar';
 import { Gig, MemberAvailability, AvailabilityStatusValue } from '../types';
 import { useGigs } from '../context/GigContext';
 import { useBand } from '../context/BandContext';
@@ -18,9 +15,6 @@ import { UserAvailabilitySection } from '../components/GigDetails/UserAvailabili
 import { BandMembersSection } from '../components/GigDetails/BandMembersSection';
 import { DeleteConfirmDialog } from '../components/GigDetails/DeleteConfirmDialog';
 import { toast } from 'react-hot-toast';
-import { MultiDateAvailability } from '../components/MultiDateAvailability';
-import { MultiDateBandAvailability } from '../components/MultiDateBandAvailability';
-import { MultiDateAvailabilityOverview } from '../components/MultiDateAvailabilityOverview';
 
 export function GigDetails() {
   const { t } = useTranslation();
@@ -401,31 +395,6 @@ export function GigDetails() {
     } catch (err) {
       console.error('Error updating member driving status:', err);
       setError('Failed to update driving status');
-    }
-  };
-
-  const handleSendEmail = async () => {
-    try {
-      const recipients = ['example@example.com']; // Replace with actual recipients
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          gig,
-          recipients,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send email');
-      }
-
-      toast.success('Email sent successfully');
-    } catch (error) {
-      console.error('Failed to send email:', error);
-      toast.error('Failed to send email');
     }
   };
 

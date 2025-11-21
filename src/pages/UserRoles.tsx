@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield, AlertCircle, Trash2 } from 'lucide-react';
-import { collection, query, getDocs, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
-import { getAuth, deleteUser } from 'firebase/auth';
+import { collection, getDocs, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from '../hooks/useRole';
@@ -26,7 +25,7 @@ interface DeleteConfirmationProps {
 
 function DeleteConfirmation({ user, onConfirm, onCancel }: DeleteConfirmationProps) {
   const { t } = useTranslation();
-  
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
@@ -34,7 +33,7 @@ function DeleteConfirmation({ user, onConfirm, onCancel }: DeleteConfirmationPro
           {t('userRoles.deleteModal.title')}
         </h3>
         <p className="text-gray-600 mb-6">
-          {t('userRoles.deleteModal.message')} <span className="font-semibold">{user.email}</span>? 
+          {t('userRoles.deleteModal.message')} <span className="font-semibold">{user.email}</span>?
           {t('userRoles.deleteModal.warning')}
         </p>
         <div className="flex justify-end space-x-4">
@@ -78,7 +77,7 @@ export function UserRoles() {
 
         const usersSnapshot = await getDocs(collection(db, 'users'));
         const rolesSnapshot = await getDocs(collection(db, 'roles'));
-        
+
         const rolesData = rolesSnapshot.docs.reduce((acc, doc) => ({
           ...acc,
           [doc.id]: doc.data()
