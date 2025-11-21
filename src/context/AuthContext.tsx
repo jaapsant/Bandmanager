@@ -7,6 +7,7 @@ import {
   onAuthStateChanged,
   updateProfile,
   sendEmailVerification,
+  sendPasswordResetEmail,
   User as FirebaseUser,
   AuthError,
 } from 'firebase/auth';
@@ -23,6 +24,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   sendVerificationEmail: () => Promise<void>;
   updateDisplayName: (name: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -164,6 +166,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      const authError = error as AuthError;
+      if (authError.code === 'auth/user-not-found') {
+        throw new Error(t('auth.errors.userNotFoundReset'));
+      } else if (authError.code === 'auth/too-many-requests') {
+        throw new Error(t('auth.errors.tooManyRequestsReset'));
+      } else if (authError.code === 'auth/invalid-email') {
+        throw new Error(t('auth.errors.invalidEmail'));
+      }
+      throw new Error(t('auth.errors.passwordResetFailed'));
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -172,6 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut,
     sendVerificationEmail,
     updateDisplayName,
+    resetPassword,
   };
 
   return (

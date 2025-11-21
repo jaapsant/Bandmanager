@@ -320,6 +320,16 @@
     },
     "errors": {
       "default": "Inloggen mislukt. Controleer je gegevens."
+    },
+    "forgotPassword": {
+      "link": "Wachtwoord vergeten?",
+      "title": "Reset Wachtwoord",
+      "description": "Voer je e-mailadres in en we sturen je een link om je wachtwoord te resetten.",
+      "emailLabel": "E-mailadres",
+      "submit": "Verstuur Reset Link",
+      "cancel": "Annuleren",
+      "success": "Wachtwoord reset e-mail verzonden! Controleer je inbox.",
+      "backToSignIn": "Terug naar inloggen"
     }
   },
   "signUp": {
@@ -413,7 +423,10 @@
       "useAuthHook": "useAuth moet binnen een AuthProvider worden gebruikt",
       "signOut": "Uitloggen",
       "errors": {
-        "signOutError": "Fout bij uitloggen:"
+        "signOutError": "Fout bij uitloggen:",
+        "userNotFoundReset": "Geen account gevonden met dit e-mailadres.",
+        "tooManyRequestsReset": "Te veel reset pogingen. Probeer het later opnieuw.",
+        "passwordResetFailed": "Kon reset e-mail niet verzenden. Probeer het opnieuw."
       }
     }
   },
@@ -436,7 +449,7 @@
       "signOut": "Uitloggen"
     }
   },
-  "gig":{
+  "gig": {
     "time": {
       "allDay": "Hele dag"
     },
@@ -448,7 +461,8 @@
     },
     "pay": {
       "amount": "€"
-    }},
+    }
+  },
   "emailVerification": {
     "message": "Verifieer je e-mailadres om toegang te krijgen tot alle functies.",
     "success": "Verificatie-e-mail verzonden! Controleer je inbox.",
@@ -456,4 +470,4 @@
     "sending": "Verzenden...",
     "resend": "Verificatie-e-mail opnieuw verzenden"
   }
-} 
+}

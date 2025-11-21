@@ -328,6 +328,16 @@
       "submit": {
         "loading": "Signing in...",
         "default": "Sign in"
+      },
+      "forgotPassword": {
+        "link": "Forgot password?",
+        "title": "Reset Password",
+        "description": "Enter your email address and we'll send you a link to reset your password.",
+        "emailLabel": "Email address",
+        "submit": "Send Reset Link",
+        "cancel": "Cancel",
+        "success": "Password reset email sent! Check your inbox.",
+        "backToSignIn": "Back to sign in"
       }
     },
     "errors": {
@@ -425,7 +435,10 @@
       "useAuthHook": "useAuth must be used within an AuthProvider",
       "signOutError": "Error signing out:"
     },
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "userNotFoundReset": "No account found with this email address.",
+    "tooManyRequestsReset": "Too many reset attempts. Please try again later.",
+    "passwordResetFailed": "Failed to send password reset email. Please try again."
   },
   "privateRoute": {
     "accessPending": {
@@ -453,4 +466,4 @@
     "sending": "Sending...",
     "resend": "Resend verification email"
   }
-} 
+}
