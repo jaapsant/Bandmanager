@@ -78,23 +78,20 @@ export function GigCard({ gig }: GigCardProps) {
       <div className="space-y-2 flex-grow">
         <div className="flex items-center text-gray-600">
           {gig.isMultiDay ? (
-            <div className="group relative">
+            <div className="flex items-center">
               <CalendarRange className="w-4 h-4 mr-2" />
-              <div className="invisible group-hover:visible absolute left-0 -bottom-1 transform translate-y-full w-48 px-2 py-1 bg-gray-800 rounded-lg text-center text-white text-sm after:content-[''] after:absolute after:left-1/2 after:bottom-[100%] after:-translate-x-1/2 after:border-8 after:border-x-transparent after:border-t-transparent after:border-b-gray-800 z-10">
-                {t('gigs.multiDay.tooltip', { count: gig.dates.length + 1 })}
-              </div>
+              <span className="font-medium">
+                {new Date(gig.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                {' - '}
+                {new Date(gig.dates[gig.dates.length - 1] || gig.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+              </span>
             </div>
           ) : (
-            <Calendar className="w-4 h-4 mr-2" />
+            <>
+              <Calendar className="w-4 h-4 mr-2" />
+              <span>{new Date(gig.date).toLocaleDateString()}</span>
+            </>
           )}
-          <span>
-            {new Date(gig.date).toLocaleDateString()}
-            {gig.isMultiDay && (
-              <span className="text-xs text-gray-400 ml-1">
-                +{gig.dates.length}
-              </span>
-            )}
-          </span>
         </div>
 
         <div className="flex items-center text-gray-600">

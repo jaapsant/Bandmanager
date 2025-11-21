@@ -24,7 +24,7 @@ export function GigList() {
   const { user } = useAuth();
   const { roles } = useRole();
   const [showHistory, setShowHistory] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'compact'>('compact');
   const [expandedYears, setExpandedYears] = useState<{ [year: string]: boolean }>({});
   const { t } = useTranslation();
 
@@ -99,18 +99,20 @@ export function GigList() {
             <td className="px-6 py-4 whitespace-nowrap text-sm">
               <div className="flex items-center text-gray-500">
                 {gig.isMultiDay ? (
-                  <CalendarRange className="w-4 h-4 mr-2" />
-                ) : (
-                  <Calendar className="w-4 h-4 mr-2" />
-                )}
-                <span>
-                  {new Date(gig.date).toLocaleDateString()}
-                  {gig.isMultiDay && (
-                    <span className="text-xs text-gray-400 ml-1">
-                      +{gig.dates.length}
+                  <div className="flex items-center">
+                    <CalendarRange className="w-4 h-4 mr-2" />
+                    <span className="font-medium">
+                      {new Date(gig.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      {' - '}
+                      {new Date(gig.dates[gig.dates.length - 1] || gig.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                     </span>
-                  )}
-                </span>
+                  </div>
+                ) : (
+                  <>
+                    <Calendar className="w-4 h-4 mr-2" />
+                    <span>{new Date(gig.date).toLocaleDateString()}</span>
+                  </>
+                )}
               </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
