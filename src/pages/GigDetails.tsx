@@ -26,6 +26,8 @@ export function GigDetails() {
   const { user } = useAuth();
   const { roles } = useRole();
   const gig = gigs.find((g) => g.id === id);
+  // Get gig stats - moved up to avoid conditional hook call
+  const gigStats = useGigStats(gig, bandMembers);
 
   // Allow editing if user is admin or band manager and is email verified
   const canEditGig = !!(user?.emailVerified && (roles.admin || roles.bandManager));
@@ -317,7 +319,7 @@ export function GigDetails() {
   };
 
   // Get gig stats
-  const gigStats = useGigStats(gig, bandMembers);
+
 
   const handleBack = () => {
     const gigDate = new Date(gig.date);

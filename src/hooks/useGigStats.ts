@@ -12,10 +12,10 @@ export interface GigStats {
  * Custom hook to calculate gig statistics
  * Memoized to prevent unnecessary recalculations
  */
-export function useGigStats(gig: Gig, bandMembers: BandMember[]): GigStats {
+export function useGigStats(gig: Gig | undefined, bandMembers: BandMember[]): GigStats {
     const totalDrivers = useMemo(
-        () => countAvailableDrivers(gig.memberAvailability),
-        [gig.memberAvailability]
+        () => gig ? countAvailableDrivers(gig.memberAvailability) : 0,
+        [gig?.memberAvailability]
     );
 
     const membersByInstrument = useMemo(() => {
