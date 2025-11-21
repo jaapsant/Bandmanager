@@ -8,7 +8,7 @@ interface GigHeaderProps {
     isEditing: boolean;
     isPastGig: boolean;
     canEditGig: boolean;
-    statusOptions: Array<{ value: string; label: string; color: string }>;
+    statusOptions: ReadonlyArray<{ readonly value: string; readonly label: string; readonly color: string }>;
     onEdit: () => void;
     onSave: () => void;
     onCancel: () => void;

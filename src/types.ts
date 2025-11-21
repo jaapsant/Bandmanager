@@ -14,13 +14,13 @@ export interface AvailabilityStatus {
 export interface DateAvailability {
   status: AvailabilityStatusValue;
   note?: string;
-  canDrive?: boolean;
+  canDrive?: boolean | null;
 }
 
 export interface MemberAvailability {
   status: AvailabilityStatusValue;
   note?: string;
-  canDrive?: boolean;
+  canDrive?: boolean | null;
   dateAvailability: {
     [date: string]: DateAvailability;
   };
@@ -43,7 +43,7 @@ export interface Gig {
   date: string;
   startTime: string | null;
   endTime: string | null;
-  status: GigStatus;
+  status: 'pending' | 'confirmed' | 'declined' | 'completed';
   isWholeDay: boolean;
   isMultiDay: boolean;
   dates: string[];

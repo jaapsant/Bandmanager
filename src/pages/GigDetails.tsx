@@ -34,7 +34,7 @@ export function GigDetails() {
   const gig = gigs.find((g) => g.id === id);
 
   // Allow editing if user is admin or band manager and is email verified
-  const canEditGig = user?.emailVerified && (roles.admin || roles.bandManager);
+  const canEditGig = !!(user?.emailVerified && (roles.admin || roles.bandManager));
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedGig, setEditedGig] = useState<Gig | null>(null);
@@ -324,9 +324,6 @@ export function GigDetails() {
 
   // Get gig stats
   const gigStats = useGigStats(gig, bandMembers);
-  const totalDrivers = gigStats.totalDrivers; // Count available drivers
-  const membersByInstrument = gigStats.membersByInstrument; // Group band members by instrument
-  const sortedInstruments = gigStats.sortedInstruments; // Sort instruments and members within each group
 
   const handleBack = () => {
     const gigDate = new Date(gig.date);
