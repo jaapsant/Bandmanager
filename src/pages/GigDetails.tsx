@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useStatusOptions } from '../data';
@@ -343,7 +343,18 @@ export function GigDetails() {
     }
   };
 
-  const isPastGig = new Date(gig.date) < new Date();
+  const isPastGig = useMemo(() => {
+    const today = new Date();
+    if (gig.isMultiDay) {
+      const dates = [gig.date, ...gig.dates].map(d => new Date(d));
+      const lastDate = new Date(Math.max(...dates.map(d => d.getTime())));
+      lastDate.setHours(23, 59, 59, 999);
+      return lastDate < today;
+    }
+    const gigDate = new Date(gig.date);
+    gigDate.setHours(23, 59, 59, 999);
+    return gigDate < today;
+  }, [gig]);
 
   const openInGoogleMaps = (location: string) => {
     if (!location) return;
