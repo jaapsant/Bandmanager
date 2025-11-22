@@ -31,6 +31,12 @@ export interface BandMember {
   name: string;
   instrument: string;
   wantsPrintedSheetMusic?: boolean;
+  drivingAvailability?: {
+    status: AvailabilityStatusValue;
+    hasWinterTyres?: boolean;
+    hasGermanEnvironmentSticker?: boolean;
+    remark?: string;
+  };
   availability?: {
     status: AvailabilityStatus['value'];
     note?: string;

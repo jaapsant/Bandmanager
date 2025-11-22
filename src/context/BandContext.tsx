@@ -15,6 +15,7 @@ interface BandContextType {
   updateMemberInstrument: (memberId: string, instrument: string) => Promise<void>;
   updateMemberName: (memberId: string, name: string) => Promise<void>;
   updateMemberSheetMusicPreference: (memberId: string, wantsPrintedSheetMusic: boolean) => Promise<void>;
+  updateMemberDrivingPreferences: (memberId: string, preferences: BandMember['drivingAvailability']) => Promise<void>;
   addInstrument: (instrument: string) => Promise<void>;
   removeInstrument: (instrument: string) => Promise<void>;
   isInstrumentInUse: (instrument: string) => boolean;
@@ -43,6 +44,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
           name: doc.data().name || '',
           instrument: doc.data().instrument || '',
           wantsPrintedSheetMusic: doc.data().wantsPrintedSheetMusic,
+          drivingAvailability: doc.data().drivingAvailability,
         })) as BandMember[];
         setBandMembers(membersData);
       }, (error) => {
@@ -245,6 +247,37 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateMemberDrivingPreferences = async (memberId: string, preferences: BandMember['drivingAvailability']) => {
+    checkPermission();
+
+    try {
+      if (memberId !== user?.uid && !roles.admin && !roles.bandManager) {
+        throw new Error(t('bandContext.errors.updateOwnPreferenceOnly'));
+      }
+
+      const memberDoc = doc(db, 'bandMembers', memberId);
+      const memberSnapshot = await getDocs(query(collection(db, 'bandMembers'), where('id', '==', memberId)));
+
+      if (memberSnapshot.empty) {
+        await setDoc(memberDoc, {
+          id: memberId,
+          name: user?.displayName || '',
+          instrument: '',
+          drivingAvailability: preferences,
+          createdBy: user?.uid,
+        });
+      } else {
+        await updateDoc(memberDoc, { drivingAvailability: preferences });
+      }
+    } catch (error) {
+      console.error('Error updating driving preferences:', error);
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error(t('bandContext.errors.failedToUpdateDrivingPreferences'));
+    }
+  };
+
   const addInstrument = async (instrument: string) => {
     checkAdminOrManagerPermission();
 
@@ -292,6 +325,7 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
       updateMemberInstrument,
       updateMemberName,
       updateMemberSheetMusicPreference,
+      updateMemberDrivingPreferences,
       addInstrument,
       removeInstrument,
       isInstrumentInUse,

@@ -218,6 +218,22 @@
     "sheetMusic": {
       "title": "Printed Sheet Music Summary",
       "total": "Total: {{count}} of {{total}} members want printed music"
+    },
+    "driving": {
+      "title": "Driving Preferences",
+      "availabilityLabel": "Driving Availability",
+      "winterTyres": "I have winter tyres",
+      "environmentSticker": "I have a German environment sticker",
+      "remarkLabel": "Remark",
+      "remarkPlaceholder": "Add any notes about your driving preferences...",
+      "button": "Update Driving Preferences",
+      "table": {
+        "name": "Name",
+        "status": "Status",
+        "winterTyres": "Winter Tyres",
+        "environmentSticker": "Environment Sticker",
+        "remark": "Remark"
+      }
     }
   },
   "newGig": {
@@ -320,6 +336,15 @@
         "title": "Sheet Music Preference",
         "label": "I want printed sheet music",
         "button": "Save Preference"
+      },
+      "driving": {
+        "title": "Driving Preferences",
+        "availabilityLabel": "Driving Availability",
+        "winterTyres": "I have winter tyres",
+        "environmentSticker": "I have a German environment sticker",
+        "remarkLabel": "Remark",
+        "remarkPlaceholder": "Add any notes about your driving preferences...",
+        "button": "Update Driving Preferences"
       }
     }
   },

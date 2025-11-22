@@ -5,11 +5,13 @@ import { useAuth } from '../context/AuthContext';
 import { useBand } from '../context/BandContext';
 import { getAuth, updatePassword } from 'firebase/auth';
 import { useTranslation } from 'react-i18next';
+import { AvailabilityStatus } from '../components/AvailabilityStatus';
+import { AvailabilityStatusValue } from '../types';
 
 export function Profile() {
   const navigate = useNavigate();
   const { user, updateDisplayName } = useAuth();
-  const { instruments: unsortedInstruments, bandMembers, updateMemberInstrument, updateMemberName, updateMemberSheetMusicPreference } = useBand();
+  const { instruments: unsortedInstruments, bandMembers, updateMemberInstrument, updateMemberName, updateMemberSheetMusicPreference, updateMemberDrivingPreferences } = useBand();
   const auth = getAuth();
   const { t } = useTranslation();
 
@@ -21,6 +23,11 @@ export function Profile() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [selectedInstrument, setSelectedInstrument] = useState('');
+  // Driving preferences state
+  const [drivingStatus, setDrivingStatus] = useState<AvailabilityStatusValue>('maybe');
+  const [hasWinterTyres, setHasWinterTyres] = useState(false);
+  const [hasGermanEnvironmentSticker, setHasGermanEnvironmentSticker] = useState(false);
+  const [drivingRemark, setDrivingRemark] = useState('');
   const [wantsPrintedSheetMusic, setWantsPrintedSheetMusic] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -34,12 +41,21 @@ export function Profile() {
   }, [user?.displayName]);
 
   // Find the current user's band member data
+  // Find the current user's band member data
   useEffect(() => {
     if (user) {
       const currentMember = bandMembers.find(member => member.id === user.uid);
       if (currentMember) {
         setSelectedInstrument(currentMember.instrument);
         setWantsPrintedSheetMusic(currentMember.wantsPrintedSheetMusic || false);
+
+        // Initialize driving preferences
+        if (currentMember.drivingAvailability) {
+          setDrivingStatus(currentMember.drivingAvailability.status);
+          setHasWinterTyres(currentMember.drivingAvailability.hasWinterTyres || false);
+          setHasGermanEnvironmentSticker(currentMember.drivingAvailability.hasGermanEnvironmentSticker || false);
+          setDrivingRemark(currentMember.drivingAvailability.remark || '');
+        }
       }
     }
   }, [user, bandMembers]);
@@ -97,6 +113,27 @@ export function Profile() {
       setSuccess(t('profile.messages.success.sheetMusicUpdate'));
     } catch (error) {
       setError(t('profile.messages.error.sheetMusicUpdate'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateDrivingPreferences = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    setError('');
+    setSuccess('');
+    setLoading(true);
+    try {
+      await updateMemberDrivingPreferences(user.uid, {
+        status: drivingStatus,
+        hasWinterTyres,
+        hasGermanEnvironmentSticker,
+        remark: drivingRemark
+      });
+      setSuccess(t('profile.messages.success.drivingUpdate'));
+    } catch (error) {
+      setError(t('profile.messages.error.drivingUpdate'));
     } finally {
       setLoading(false);
     }
@@ -243,6 +280,94 @@ export function Profile() {
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
                 >
                   {t('profile.sections.sheetMusic.button')}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Driving Preferences */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              {t('profile.sections.driving.title')}
+            </h2>
+            <form onSubmit={handleUpdateDrivingPreferences} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  {t('profile.sections.driving.availabilityLabel')}
+                </label>
+                <div className="flex space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => setDrivingStatus('available')}
+                    className={`p-3 rounded-full transition-colors ${drivingStatus === 'available' ? 'bg-green-100 ring-2 ring-green-500' : 'hover:bg-gray-100'}`}
+                    title={t('gigs.available')}
+                  >
+                    <AvailabilityStatus status="available" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDrivingStatus('unavailable')}
+                    className={`p-3 rounded-full transition-colors ${drivingStatus === 'unavailable' ? 'bg-red-100 ring-2 ring-red-500' : 'hover:bg-gray-100'}`}
+                    title={t('gigs.unavailable')}
+                  >
+                    <AvailabilityStatus status="unavailable" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDrivingStatus('maybe')}
+                    className={`p-3 rounded-full transition-colors ${drivingStatus === 'maybe' ? 'bg-yellow-100 ring-2 ring-yellow-500' : 'hover:bg-gray-100'}`}
+                    title={t('gigs.maybe')}
+                  >
+                    <AvailabilityStatus status="maybe" />
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="hasWinterTyres"
+                    className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                    checked={hasWinterTyres}
+                    onChange={(e) => setHasWinterTyres(e.target.checked)}
+                  />
+                  <label htmlFor="hasWinterTyres" className="ml-2 text-sm font-medium text-gray-700">
+                    {t('profile.sections.driving.winterTyres')}
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="hasGermanEnvironmentSticker"
+                    className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                    checked={hasGermanEnvironmentSticker}
+                    onChange={(e) => setHasGermanEnvironmentSticker(e.target.checked)}
+                  />
+                  <label htmlFor="hasGermanEnvironmentSticker" className="ml-2 text-sm font-medium text-gray-700">
+                    {t('profile.sections.driving.environmentSticker')}
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="drivingRemark" className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('profile.sections.driving.remarkLabel')}
+                </label>
+                <textarea
+                  id="drivingRemark"
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  value={drivingRemark}
+                  onChange={(e) => setDrivingRemark(e.target.value)}
+                  placeholder={t('profile.sections.driving.remarkPlaceholder')}
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+                >
+                  {t('profile.sections.driving.button')}
                 </button>
               </div>
             </form>

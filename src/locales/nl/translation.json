@@ -206,6 +206,22 @@
     "sheetMusic": {
       "title": "Overzicht Geprinte Bladmuziek",
       "total": "Totaal: {{count}} van de {{total}} leden willen geprinte muziek"
+    },
+    "driving": {
+      "title": "Rijvoorkeuren",
+      "availabilityLabel": "Rijbeschikbaarheid",
+      "winterTyres": "Ik heb winterbanden",
+      "environmentSticker": "Ik heb een Duitse milieusticker",
+      "remarkLabel": "Opmerking",
+      "remarkPlaceholder": "Voeg eventuele opmerkingen toe over je rijvoorkeuren...",
+      "button": "Rijvoorkeuren Bijwerken",
+      "table": {
+        "name": "Naam",
+        "status": "Status",
+        "winterTyres": "Winterbanden",
+        "environmentSticker": "Milieusticker",
+        "remark": "Opmerking"
+      }
     }
   },
   "newGig": {
@@ -276,13 +292,15 @@
         "instrumentUpdate": "Instrument bijwerken mislukt",
         "passwordMismatch": "Nieuwe wachtwoorden komen niet overeen",
         "passwordUpdate": "Wachtwoord bijwerken mislukt. Log opnieuw in als het al een tijdje geleden is.",
-        "sheetMusicUpdate": "Bijwerken bladmuziekvoorkeur mislukt"
+        "sheetMusicUpdate": "Bijwerken bladmuziekvoorkeur mislukt",
+        "drivingUpdate": "Rijvoorkeuren bijwerken mislukt"
       },
       "success": {
         "nameUpdate": "Naam succesvol bijgewerkt",
         "instrumentUpdate": "Instrument succesvol bijgewerkt",
         "passwordUpdate": "Wachtwoord succesvol bijgewerkt",
-        "sheetMusicUpdate": "Bladmuziekvoorkeur succesvol bijgewerkt"
+        "sheetMusicUpdate": "Bladmuziekvoorkeur succesvol bijgewerkt",
+        "drivingUpdate": "Rijvoorkeuren succesvol bijgewerkt"
       }
     },
     "sections": {
@@ -308,6 +326,15 @@
         "title": "Bladmuziek Voorkeur",
         "label": "Ik wil geprinte bladmuziek",
         "button": "Voorkeur Opslaan"
+      },
+      "driving": {
+        "title": "Rijvoorkeur",
+        "availabilityLabel": "Rijbeschikbaarheid",
+        "winterTyres": "Ik heb winterbanden",
+        "environmentSticker": "Ik heb een Duitse milieusticker",
+        "remarkLabel": "Opmerking",
+        "remarkPlaceholder": "Voeg eventuele opmerkingen toe over je rijvoorkeuren...",
+        "button": "Rijvoorkeuren Bijwerken"
       }
     }
   },

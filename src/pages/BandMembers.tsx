@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Music, Users, Trash2, FileText } from 'lucide-react';
+import { ArrowLeft, Music, Users, Trash2, FileText, Car, Snowflake, Leaf } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { DndContext, DragEndEvent, closestCenter, DragOverlay, useSensor, useSensors, PointerSensor } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -272,27 +272,121 @@ export function BandMembers() {
             </DragOverlay>
           </DndContext>
 
-          {/* Sheet Music Summary */}
-          {totalMembers > 0 && (
-            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center mb-3">
-                <FileText className="w-5 h-5 text-blue-600 mr-2" />
-                <h3 className="text-lg font-semibold text-gray-900">{t('bandMembers.sheetMusic.title')}</h3>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm font-medium text-gray-700">
-                  {t('bandMembers.sheetMusic.total', { count: totalWantsPrinted, total: totalMembers })}
+          <div className="flex flex-col gap-6 mt-8">
+            {/* Driving Preferences List */}
+            {totalMembers > 0 && (
+              <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <Car className="w-5 h-5 text-gray-600 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900">{t('bandMembers.driving.title')}</h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-3">
-                  {sheetMusicSummary.map(({ instrument, wantsPrinted, total }) => (
-                    <div key={instrument} className="text-sm text-gray-600 bg-white rounded px-3 py-2">
-                      <span className="font-medium">{instrument}:</span> {wantsPrinted}/{total}
-                    </div>
-                  ))}
+                <div className="overflow-x-auto">
+                  <table className="divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {t('bandMembers.driving.table.name')}
+                        </th>
+                        <th scope="col" className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {t('bandMembers.driving.table.status')}
+                        </th>
+                        <th scope="col" className="px-3 py-2 text-center">
+                          {/* Winter Tyres - icon only */}
+                        </th>
+                        <th scope="col" className="px-3 py-2 text-center">
+                          {/* Environment Sticker - icon only */}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white">
+                      {bandMembers.map((member) => {
+                        const status = member.drivingAvailability?.status;
+                        const hasWinterTyres = member.drivingAvailability?.hasWinterTyres;
+                        const hasSticker = member.drivingAvailability?.hasGermanEnvironmentSticker;
+                        const remark = member.drivingAvailability?.remark;
+                        return (
+                          <React.Fragment key={member.id}>
+                            {/* Main row with member info */}
+                            <tr className="border-t border-gray-200">
+                              <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {member.name}
+                              </td>
+                              <td className="px-2 py-2 text-center">
+                                {status === 'available' && (
+                                  <div title={t('gigs.available')} className="inline-block">
+                                    <Car className="w-5 h-5 text-green-600 mx-auto" />
+                                  </div>
+                                )}
+                                {status === 'maybe' && (
+                                  <div title={t('gigs.maybe')} className="inline-block">
+                                    <Car className="w-5 h-5 text-yellow-500 mx-auto" />
+                                  </div>
+                                )}
+                                {(status === 'unavailable' || !status) && (
+                                  <div title={t('gigs.unavailable')} className="inline-block">
+                                    <Car className="w-5 h-5 text-gray-300 mx-auto" />
+                                  </div>
+                                )}
+                              </td>
+                              <td className="px-2 py-2 text-center">
+                                {hasWinterTyres ? (
+                                  <div title={t('bandMembers.driving.hasWinterTyres')} className="inline-block">
+                                    <Snowflake className="w-5 h-5 text-blue-500 mx-auto" />
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-300">-</span>
+                                )}
+                              </td>
+                              <td className="px-2 py-2 text-center">
+                                {hasSticker ? (
+                                  <div title={t('bandMembers.driving.hasEnvironmentSticker')} className="inline-block">
+                                    <Leaf className="w-5 h-5 text-green-600 mx-auto" />
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-300">-</span>
+                                )}
+                              </td>
+                            </tr>
+
+                            {/* Remark row - only shown if remark exists */}
+                            {remark && (
+                              <tr className="border-t-0">
+                                <td colSpan={4} className="px-3 pt-0 pb-2 text-xs text-gray-600 italic">
+                                  {remark}
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Sheet Music Summary */}
+            {totalMembers > 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center mb-3">
+                  <FileText className="w-5 h-5 text-blue-600 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900">{t('bandMembers.sheetMusic.title')}</h3>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-gray-700">
+                    {t('bandMembers.sheetMusic.total', { count: totalWantsPrinted, total: totalMembers })}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+                    {sheetMusicSummary.map(({ instrument, wantsPrinted, total }) => (
+                      <div key={instrument} className="text-sm text-gray-600 bg-white rounded px-3 py-2">
+                        <span className="font-medium">{instrument}:</span> {wantsPrinted}/{total}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
