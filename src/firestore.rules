@@ -51,8 +51,19 @@ service cloud.firestore {
          request.resource.data.bandManager == false && 
          request.resource.data.bandMember == false));
       
-      // Only admins can update role documents
-      allow update: if isAuthenticated() && isAdmin();
+      // Allow users to set bandMember role after email verification (if they have no roles)
+      // OR admins can update any role
+      allow update: if isAuthenticated() && (
+        isAdmin() ||
+        (request.auth.uid == userId &&
+         request.auth.token.email_verified == true &&
+         resource.data.admin == false &&
+         resource.data.bandManager == false &&
+         resource.data.bandMember == false &&
+         request.resource.data.bandMember == true &&
+         request.resource.data.admin == false &&
+         request.resource.data.bandManager == false)
+      );
       
       // Allow admins to delete role documents
       allow delete: if isAuthenticated() && isAdmin() && request.auth.uid != userId;

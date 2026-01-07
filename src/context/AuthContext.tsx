@@ -11,7 +11,7 @@ import {
   User as FirebaseUser,
   AuthError,
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { User } from '../types';
 import { useTranslation } from 'react-i18next';
@@ -72,6 +72,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           displayName: firebaseUser.displayName || '',
           emailVerified: firebaseUser.emailVerified,
         });
+
+        // Automatically assign bandMember role if email is verified and user doesn't have it yet
+        if (firebaseUser.emailVerified) {
+          try {
+            const roleDoc = await getDoc(doc(db, 'roles', firebaseUser.uid));
+            if (roleDoc.exists()) {
+              const roles = roleDoc.data();
+              // Only update if user doesn't have bandMember role yet
+              if (!roles.bandMember && !roles.bandManager && !roles.admin) {
+                await updateDoc(doc(db, 'roles', firebaseUser.uid), {
+                  bandMember: true
+                });
+                console.log('Automatically assigned bandMember role to verified user');
+              }
+            }
+          } catch (error) {
+            console.error('Error auto-assigning bandMember role:', error);
+          }
+        }
       } else {
         setUser(null);
       }
