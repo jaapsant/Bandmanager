@@ -9,10 +9,10 @@ export const handler: Handler = async (event) => {
         return { statusCode: 405, body: "Method Not Allowed" };
     }
 
-    const { to, subject, text, html } = JSON.parse(event.body || "{}");
+    const { to, bcc, subject, text, html } = JSON.parse(event.body || "{}");
 
-    if (!to) {
-        return { statusCode: 400, body: "Missing 'to' email address" };
+    if (!to && !bcc) {
+        return { statusCode: 400, body: "Missing 'to' or 'bcc' email address" };
     }
 
     try {
@@ -56,8 +56,9 @@ export const handler: Handler = async (event) => {
         }
 
         const info = await transporter.sendMail({
-            from: '"Band Manager" <no-reply@bandmanager.com>',
+            from: '"Alarmfase 3 - ledensysteem" <ledensysteem@alarmfase3.nl>',
             to: to,
+            bcc: bcc,
             subject: subject || "Hello World",
             text: text || "Hello world from Band Manager!",
             html: html || "<b>Hello world from Band Manager!</b>",

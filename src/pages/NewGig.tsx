@@ -14,6 +14,7 @@ export function NewGig() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [sendEmailNotification, setSendEmailNotification] = useState(true);
   const [formData, setFormData] = useState<Partial<Gig>>({
     name: '',
@@ -32,6 +33,7 @@ export function NewGig() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
 
     try {
       if (!formData.name?.trim() || !formData.date) {
@@ -103,7 +105,7 @@ export function NewGig() {
             );
 
             await sendEmail({
-              to: emails,
+              bcc: emails,
               ...template,
             });
           }
@@ -115,6 +117,8 @@ export function NewGig() {
     } catch (error) {
       console.error('Error creating gig:', error);
       setError(error instanceof Error ? error.message : t('newGig.errors.createFailed'));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -372,15 +376,17 @@ export function NewGig() {
               <button
                 type="button"
                 onClick={() => navigate('/gigs')}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                disabled={isSubmitting}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {t('newGig.form.buttons.cancel')}
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                disabled={isSubmitting}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {t('newGig.form.buttons.create')}
+                {isSubmitting ? t('newGig.form.buttons.creating') : t('newGig.form.buttons.create')}
               </button>
             </div>
           </form>

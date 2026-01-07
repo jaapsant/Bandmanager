@@ -287,7 +287,8 @@
       },
       "buttons": {
         "cancel": "Cancel",
-        "create": "Create Gig"
+        "create": "Create Gig",
+        "creating": "Creating..."
       }
     },
     "errors": {

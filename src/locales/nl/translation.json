@@ -275,7 +275,8 @@
       },
       "buttons": {
         "cancel": "Annuleren",
-        "create": "Optreden Aanmaken"
+        "create": "Optreden Aanmaken",
+        "creating": "Aanmaken..."
       }
     },
     "errors": {

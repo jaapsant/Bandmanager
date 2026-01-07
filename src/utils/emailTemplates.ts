@@ -8,11 +8,11 @@ export function getNewGigEmailTemplate(gig: {
   date: string;
 }, gigLink: string) {
   return {
-    subject: `New Gig: ${gig.name}`,
-    text: `A new gig has been created: "${gig.name}" on ${gig.date}.\n\nPlease add your availability: ${gigLink}`,
+    subject: `Nieuw optreden: ${gig.name}`,
+    text: `Er is een nieuw optreden aangemaakt: "${gig.name}" op ${gig.date}.\n\nVoer alsjeblieft je beschikbaarheid in: ${gigLink}`,
     html: `
-      <p>A new gig has been created: "<strong>${gig.name}</strong>" on ${gig.date}.</p>
-      <p><a href="${gigLink}">Click here to add your availability</a></p>
+      <p>Er is een nieuw optreden aangemaakt: "<strong>${gig.name}</strong>" op ${gig.date}.</p>
+      <p><a href="${gigLink}">Voer hier je beschikbaarheid in</a></p>
     `,
   };
 }
@@ -22,11 +22,11 @@ export function getNewGigEmailTemplate(gig: {
  */
 export function getGigReminderEmailTemplate(gig: Gig, gigLink: string) {
   return {
-    subject: `Action Required: Availability for ${gig.name}`,
-    text: `Please add your availability for the gig "${gig.name}" on ${gig.date}.\n\nLink: ${gigLink}`,
+    subject: `Graag invullen: Beschikbaarheid voor ${gig.name}`,
+    text: `Graag je beschikbaarheid invullen voor het optreden "${gig.name}" op ${gig.date}.\n\nLink: ${gigLink}`,
     html: `
-      <p>Please add your availability for the gig "<strong>${gig.name}</strong>" on ${gig.date}.</p>
-      <p><a href="${gigLink}">Click here to view the gig</a></p>
+      <p>Graag je beschikbaarheid invullen voor het optreden "<strong>${gig.name}</strong>" op ${gig.date}.</p>
+      <p><a href="${gigLink}">Klik hier om het optreden te zien</a></p>
     `,
   };
 }

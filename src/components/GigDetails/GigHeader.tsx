@@ -39,6 +39,12 @@ export function GigHeader({
     const { user } = useAuth();
     const [sending, setSending] = useState(false);
 
+    // Check if all members have responded
+    const allMembersResponded = bandMembers.every(member => {
+        const availability = gig.memberAvailability[member.id];
+        return !!availability;
+    });
+
     const handleSendGigEmail = async () => {
         if (!user?.email) {
             toast.error('No user email found');
@@ -74,7 +80,7 @@ export function GigHeader({
             const template = getGigReminderEmailTemplate(gig, gigLink);
 
             const result = await sendEmail({
-                to: emails,
+                bcc: emails,
                 ...template,
             });
 
@@ -154,9 +160,9 @@ export function GigHeader({
                 {canEditGig && (
                     <button
                         onClick={handleSendGigEmail}
-                        disabled={sending}
-                        className="p-2 text-gray-400 hover:text-blue-600 rounded-full hover:bg-gray-100 disabled:opacity-50"
-                        title="Email Gig Link"
+                        disabled={sending || allMembersResponded}
+                        className="p-2 text-gray-400 hover:text-blue-600 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={allMembersResponded ? "All members have responded" : "Email Gig Link"}
                     >
                         <Mail className="w-5 h-5" />
                     </button>

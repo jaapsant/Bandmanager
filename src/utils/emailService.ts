@@ -5,7 +5,8 @@ import { db } from '../lib/firebase';
  * Interface for email parameters
  */
 export interface EmailParams {
-  to: string | string[];
+  to?: string | string[];
+  bcc?: string | string[];
   subject: string;
   text: string;
   html: string;
@@ -25,12 +26,14 @@ export interface EmailResponse {
  */
 export async function sendEmail(params: EmailParams): Promise<EmailResponse> {
   try {
-    const to = Array.isArray(params.to) ? params.to.join(',') : params.to;
+    const to = params.to ? (Array.isArray(params.to) ? params.to.join(',') : params.to) : undefined;
+    const bcc = params.bcc ? (Array.isArray(params.bcc) ? params.bcc.join(',') : params.bcc) : undefined;
 
     const response = await fetch('/.netlify/functions/sendEmail', {
       method: 'POST',
       body: JSON.stringify({
         to,
+        bcc,
         subject: params.subject,
         text: params.text,
         html: params.html,
