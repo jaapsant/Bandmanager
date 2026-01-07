@@ -470,6 +470,7 @@ export function GigDetails() {
             isPastGig={isPastGig}
             canEditGig={canEditGig}
             statusOptions={statusOptions}
+            bandMembers={bandMembers}
             onEdit={handleEdit}
             onSave={handleSave}
             onCancel={handleCancel}

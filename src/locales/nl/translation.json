@@ -269,6 +269,10 @@
         "remove": "Verwijderen",
         "addDate": "Nog een Datum Toevoegen"
       },
+      "emailNotification": {
+        "label": "E-mail Notificatie",
+        "checkbox": "Verstuur e-mail notificatie aan alle leden"
+      },
       "buttons": {
         "cancel": "Annuleren",
         "create": "Optreden Aanmaken"

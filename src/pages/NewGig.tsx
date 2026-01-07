@@ -5,6 +5,8 @@ import { Gig } from '../types';
 import { useGigs } from '../context/GigContext';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 export function NewGig() {
   const navigate = useNavigate();
@@ -12,6 +14,7 @@ export function NewGig() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [error, setError] = useState('');
+  const [sendEmailNotification, setSendEmailNotification] = useState(true);
   const [formData, setFormData] = useState<Partial<Gig>>({
     name: '',
     date: '',
@@ -86,7 +89,35 @@ export function NewGig() {
         createdBy: user.uid,
       };
 
-      await addGig(gigData);
+      const newGigId = await addGig(gigData);
+
+      if (sendEmailNotification) {
+        try {
+          const usersSnapshot = await getDocs(collection(db, 'users'));
+          const emails: string[] = [];
+          usersSnapshot.forEach(doc => {
+            const userData = doc.data();
+            if (userData.email) {
+              emails.push(userData.email);
+            }
+          });
+
+          if (emails.length > 0) {
+            const gigLink = `${window.location.origin}/gigs/${newGigId}`;
+            await fetch('/.netlify/functions/sendEmail', {
+              method: 'POST',
+              body: JSON.stringify({
+                to: emails.join(','),
+                subject: `New Gig: ${gigData.name}`,
+                text: `A new gig has been created: "${gigData.name}" on ${gigData.date}.\n\nPlease add your availability: ${gigLink}`,
+                html: `<p>A new gig has been created: "<strong>${gigData.name}</strong>" on ${gigData.date}.</p><p><a href="${gigLink}">Click here to add your availability</a></p>`
+              }),
+            });
+          }
+        } catch (emailError) {
+          console.error('Failed to send email notification:', emailError);
+        }
+      }
       navigate('/gigs');
     } catch (error) {
       console.error('Error creating gig:', error);
@@ -329,6 +360,19 @@ export function NewGig() {
                 value={formData.description || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               />
+            </div>
+
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="sendEmailNotification"
+                className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                checked={sendEmailNotification}
+                onChange={(e) => setSendEmailNotification(e.target.checked)}
+              />
+              <label htmlFor="sendEmailNotification" className="ml-2 block text-sm text-gray-700">
+                {t('newGig.form.emailNotification.checkbox')}
+              </label>
             </div>
 
             <div className="flex justify-end space-x-4">

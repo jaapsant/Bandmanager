@@ -281,6 +281,10 @@
         "remove": "Remove",
         "addDate": "Add Another Date"
       },
+      "emailNotification": {
+        "label": "E-mail Notification",
+        "checkbox": "Send email notification to all members"
+      },
       "buttons": {
         "cancel": "Cancel",
         "create": "Create Gig"

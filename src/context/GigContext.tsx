@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 interface GigContextType {
   gigs: Gig[];
-  addGig: (gig: Omit<Gig, 'id'>) => Promise<void>;
+  addGig: (gig: Omit<Gig, 'id'>) => Promise<string>;
   updateGig: (gig: Gig) => Promise<void>;
   deleteGig: (gigId: string) => Promise<void>;
   loading: boolean;
@@ -123,7 +123,8 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
         distance: newGig.distance || null,
       };
 
-      await addDoc(collection(db, 'gigs'), gigData);
+      const docRef = await addDoc(collection(db, 'gigs'), gigData);
+      return docRef.id;
     } catch (error) {
       console.error('Error adding gig:', error);
       throw error instanceof Error ? error : new Error(t('gigContext.errors.addGig'));
