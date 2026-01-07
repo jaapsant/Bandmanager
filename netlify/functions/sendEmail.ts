@@ -23,10 +23,6 @@ export const handler: Handler = async (event) => {
         const user = process.env.SMTP_USER;
         const pass = process.env.SMTP_PASS;
 
-        console.log("SMTP Config - Host:", host, "Port:", port, "User:", user ? "Set" : "Not Set");
-        console.log("Current Working Directory:", process.cwd());
-        console.log("Available Env Vars:", Object.keys(process.env).filter(key => key.includes('SMTP') || key.includes('VITE')));
-
         let transporter;
 
         if (user && pass) {
