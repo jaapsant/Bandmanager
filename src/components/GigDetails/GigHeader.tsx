@@ -4,8 +4,8 @@ import { AddToCalendar } from '../AddToCalendar';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { sendEmail, getEmailsForUserIds } from '../../utils/emailService';
+import { getGigReminderEmailTemplate } from '../../utils/emailTemplates';
 
 interface GigHeaderProps {
     gig: Gig;
@@ -50,10 +50,6 @@ export function GigHeader({
             // 1. Identify members who haven't responded
             const missingMembers = bandMembers.filter(member => {
                 const availability = gig.memberAvailability[member.id];
-                // If no availability record, or status is 'maybe' (assuming 'maybe' means not yet decided/responded)
-                // Adjust logic if 'maybe' is a valid response. The user said "not yet added their availability".
-                // Usually "maybe" is the default state if we pre-fill, but here we check for existence or explicit 'maybe' if that's the default.
-                // Let's assume !availability is the main check.
                 return !availability;
             });
 
@@ -65,20 +61,7 @@ export function GigHeader({
 
             // 2. Fetch emails for these members
             const missingMemberIds = missingMembers.map(m => m.id);
-            // Firestore 'in' query supports up to 10 items. If more, we need to batch or fetch all.
-            // For simplicity and small bands, let's fetch all users and filter, or batch if needed.
-            // Let's try fetching all users for now as it's safer than complex batching logic for this task.
-            const usersSnapshot = await getDocs(collection(db, 'users'));
-            const emails: string[] = [];
-
-            usersSnapshot.forEach(doc => {
-                if (missingMemberIds.includes(doc.id)) {
-                    const userData = doc.data();
-                    if (userData.email) {
-                        emails.push(userData.email);
-                    }
-                }
-            });
+            const emails = await getEmailsForUserIds(missingMemberIds);
 
             if (emails.length === 0) {
                 toast.error('No emails found for missing members');
@@ -86,29 +69,27 @@ export function GigHeader({
                 return;
             }
 
+            // 3. Send reminder email
             const gigLink = window.location.href;
-            const response = await fetch('/.netlify/functions/sendEmail', {
-                method: 'POST',
-                body: JSON.stringify({
-                    to: emails.join(','), // Send to all
-                    subject: `Action Required: Availability for ${gig.name}`,
-                    text: `Please add your availability for the gig "${gig.name}" on ${gig.date}.\n\nLink: ${gigLink}`,
-                    html: `<p>Please add your availability for the gig "<strong>${gig.name}</strong>" on ${gig.date}.</p><p><a href="${gigLink}">Click here to view the gig</a></p>`
-                }),
+            const template = getGigReminderEmailTemplate(gig, gigLink);
+
+            const result = await sendEmail({
+                to: emails,
+                ...template,
             });
-            const data = await response.json();
-            if (response.ok) {
+
+            if (result.success) {
                 toast.success(`Email sent to ${emails.length} members!`);
-                if (data.previewUrl) {
-                    console.log('Preview URL:', data.previewUrl);
+                if (result.previewUrl) {
+                    console.log('Preview URL:', result.previewUrl);
                     toast((_) => (
                         <span>
-                            Email sent! <a href={data.previewUrl} target="_blank" rel="noreferrer" className="underline">View Preview</a>
+                            Email sent! <a href={result.previewUrl} target="_blank" rel="noreferrer" className="underline">View Preview</a>
                         </span>
                     ), { duration: 10000 });
                 }
             } else {
-                throw new Error(data.error || 'Failed to send');
+                throw new Error(result.error || 'Failed to send');
             }
         } catch (error) {
             console.error(error);

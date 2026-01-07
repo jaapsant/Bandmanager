@@ -27,6 +27,7 @@ This is **Bandmanager**, a React-based web application for managing band gigs an
 - **Frontend**: React 18 + TypeScript + Vite
 - **Styling**: Tailwind CSS + PostCSS
 - **Backend**: Firebase (Firestore database + Auth)
+- **Email**: Netlify serverless functions + Nodemailer
 - **Routing**: React Router v6
 - **Internationalization**: i18next with Dutch (default) and English
 - **UI Components**: Headless UI, Lucide React icons
@@ -41,10 +42,13 @@ src/
 ├── context/         # React Context providers (Auth, Gig, Band, Member)
 ├── hooks/           # Custom React hooks (useRole)
 ├── lib/             # External service configurations (Firebase)
-├── utils/           # Utility functions (calendar operations)
+├── utils/           # Utility functions (calendar, email service, email templates)
 ├── locales/         # Translation files (en/, nl/)
 ├── types/           # TypeScript type definitions
 └── app/api/         # API-related code
+
+netlify/
+└── functions/       # Netlify serverless functions (email sending)
 ```
 
 ### Key Architecture Patterns
@@ -61,6 +65,13 @@ src/
 - `bandMember` - Can view gigs and set availability
 
 **Multi-Date Gig Support**: Gigs can span multiple dates with per-date availability tracking for each member.
+
+**Email Service Architecture**: Centralized email functionality using Netlify serverless functions:
+- `src/utils/emailService.ts` - Core email sending logic and Firestore email fetching helpers
+- `src/utils/emailTemplates.ts` - Email content templates (separated from logic for easy content updates)
+- `netlify/functions/sendEmail.ts` - Netlify serverless function using Nodemailer
+- Environment variables for SMTP configuration (see Environment Configuration below)
+- Automatic fallback to Ethereal test accounts in development
 
 ### Firebase Integration
 
@@ -79,12 +90,20 @@ Key Firestore collections:
 ### Environment Configuration
 
 Required environment variables (see `.env.example`):
+
+**Firebase Configuration:**
 - `VITE_FIREBASE_API_KEY`
-- `VITE_FIREBASE_AUTH_DOMAIN` 
+- `VITE_FIREBASE_AUTH_DOMAIN`
 - `VITE_FIREBASE_PROJECT_ID`
 - `VITE_FIREBASE_STORAGE_BUCKET`
 - `VITE_FIREBASE_MESSAGING_SENDER_ID`
 - `VITE_FIREBASE_APP_ID`
+
+**Email Configuration (Netlify environment variables):**
+- `SMTP_HOST` - SMTP server hostname (optional, defaults to Ethereal for testing)
+- `SMTP_PORT` - SMTP port (optional, defaults to 587)
+- `SMTP_USER` - SMTP username/email (optional)
+- `SMTP_PASS` - SMTP password (optional)
 
 ### TypeScript Configuration
 
@@ -146,7 +165,12 @@ Test helpers and utilities:
 - Drag-and-drop functionality for assigning members to instruments
 - Calendar export functionality for accepted gigs
 - Toast notifications for user feedback
-- **Always run tests before making changes**: 
+- **Email functionality**:
+  - Centralized in `src/utils/emailService.ts` and `src/utils/emailTemplates.ts`
+  - To add new email types, create a new template function in `emailTemplates.ts` and use the `sendEmail()` function
+  - Email content is separated from logic for easy maintenance
+  - Uses Netlify serverless function at `/.netlify/functions/sendEmail`
+- **Always run tests before making changes**:
   - Unit tests: `npm run test:run`
   - E2E tests: `npm run test:e2e` (requires dev server running)
 - **Use coverage reports** to identify untested code: `npm run test:coverage`

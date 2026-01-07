@@ -5,8 +5,8 @@ import { Gig } from '../types';
 import { useGigs } from '../context/GigContext';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { sendEmail, getAllUserEmails } from '../utils/emailService';
+import { getNewGigEmailTemplate } from '../utils/emailTemplates';
 
 export function NewGig() {
   const navigate = useNavigate();
@@ -93,25 +93,18 @@ export function NewGig() {
 
       if (sendEmailNotification) {
         try {
-          const usersSnapshot = await getDocs(collection(db, 'users'));
-          const emails: string[] = [];
-          usersSnapshot.forEach(doc => {
-            const userData = doc.data();
-            if (userData.email) {
-              emails.push(userData.email);
-            }
-          });
+          const emails = await getAllUserEmails();
 
           if (emails.length > 0) {
             const gigLink = `${window.location.origin}/gigs/${newGigId}`;
-            await fetch('/.netlify/functions/sendEmail', {
-              method: 'POST',
-              body: JSON.stringify({
-                to: emails.join(','),
-                subject: `New Gig: ${gigData.name}`,
-                text: `A new gig has been created: "${gigData.name}" on ${gigData.date}.\n\nPlease add your availability: ${gigLink}`,
-                html: `<p>A new gig has been created: "<strong>${gigData.name}</strong>" on ${gigData.date}.</p><p><a href="${gigLink}">Click here to add your availability</a></p>`
-              }),
+            const template = getNewGigEmailTemplate(
+              { name: gigData.name, date: gigData.date },
+              gigLink
+            );
+
+            await sendEmail({
+              to: emails,
+              ...template,
             });
           }
         } catch (emailError) {
