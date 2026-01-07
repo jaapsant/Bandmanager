@@ -18,8 +18,8 @@ export const handler: Handler = async (event) => {
     try {
         // Create a test account if no env vars are set
         // In production, these should be set in Netlify environment variables
-        const host = process.env.SMTP_HOST || "smtp.ethereal.email";
-        const port = parseInt(process.env.SMTP_PORT || "587");
+        const host = process.env.SMTP_HOST;
+        const port = parseInt(process.env.SMTP_PORT);
         const user = process.env.SMTP_USER;
         const pass = process.env.SMTP_PASS;
 
