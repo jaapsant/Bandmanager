@@ -48,7 +48,7 @@ export const handler: Handler = async (event) => {
                     pass: testAccount.pass,
                 },
             });
-            console.log("Ethereal Test Account created:", testAccount.user);
+            console.log("Ethereal Test Account created successfully");
         }
 
         const info = await transporter.sendMail({
