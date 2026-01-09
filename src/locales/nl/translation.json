@@ -184,7 +184,7 @@
         "title": "Instrument Naam",
         "placeholder": "bijv. Piano",
         "cancel": "Annuleren",
-        "submit": "Instrument Toevoegen"
+        "submit": "Toevoegen"
       },
       "removeButton": "Instrument verwijderen"
     },

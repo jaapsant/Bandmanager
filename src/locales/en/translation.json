@@ -196,7 +196,7 @@
         "title": "Instrument Name",
         "placeholder": "e.g., Piano",
         "cancel": "Cancel",
-        "submit": "Add Instrument"
+        "submit": "Add"
       },
       "removeButton": "Remove instrument"
     },
