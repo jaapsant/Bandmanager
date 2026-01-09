@@ -106,8 +106,8 @@ export function GigHeader({
     };
 
     return (
-        <div className="flex justify-between items-start mb-6">
-            <div className="flex-1">
+        <div className="mb-6">
+            <div className="mb-3">
                 {isEditing ? (
                     <input
                         type="text"
@@ -120,70 +120,74 @@ export function GigHeader({
                     <h1 className="text-3xl font-bold text-gray-900">{gig.name}</h1>
                 )}
             </div>
-            <div className="flex items-center space-x-4">
-                {isEditing ? (
-                    <select
-                        className={`px-4 py-2 rounded-full text-sm ${statusOptions.find(s => s.value === editedGig?.status)?.color}`}
-                        value={editedGig?.status}
-                        onChange={(e) => onUpdateGig((prev: Gig | null) => prev ? { ...prev, status: e.target.value as Gig['status'] } : null)}
-                    >
-                        {statusOptions.map(status => (
-                            <option key={status.value} value={status.value}>
-                                {status.label}
-                            </option>
-                        ))}
-                    </select>
-                ) : (
-                    <span className={`px-4 py-2 rounded-full text-sm ${gig.status === 'completed'
-                        ? 'bg-blue-100 text-blue-800'
-                        : statusOptions.find(s => s.value === gig.status)?.color
-                        }`}>
-                        {gig.status === 'completed' ? 'Completed' : statusOptions.find(s => s.value === gig.status)?.label}
-                    </span>
-                )}
-                {canEditGig && !isEditing && (
-                    <>
-                        <button
-                            onClick={onEdit}
-                            className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
+            <div className="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                    {isEditing ? (
+                        <select
+                            className={`px-4 py-2 rounded-full text-sm ${statusOptions.find(s => s.value === editedGig?.status)?.color}`}
+                            value={editedGig?.status}
+                            onChange={(e) => onUpdateGig((prev: Gig | null) => prev ? { ...prev, status: e.target.value as Gig['status'] } : null)}
                         >
-                            <Edit2 className="w-5 h-5" />
-                        </button>
+                            {statusOptions.map(status => (
+                                <option key={status.value} value={status.value}>
+                                    {status.label}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <span className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${gig.status === 'completed'
+                            ? 'bg-blue-100 text-blue-800'
+                            : statusOptions.find(s => s.value === gig.status)?.color
+                            }`}>
+                            {gig.status === 'completed' ? 'Completed' : statusOptions.find(s => s.value === gig.status)?.label}
+                        </span>
+                    )}
+                </div>
+                <div className="flex items-center space-x-2">
+                    {canEditGig && !isEditing && (
+                        <>
+                            <button
+                                onClick={onEdit}
+                                className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
+                            >
+                                <Edit2 className="w-5 h-5" />
+                            </button>
+                            <button
+                                onClick={onDelete}
+                                className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
+                            >
+                                <Trash2 className="w-5 h-5" />
+                            </button>
+                        </>
+                    )}
+                    {canEditGig && (
                         <button
-                            onClick={onDelete}
-                            className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
+                            onClick={handleSendGigEmail}
+                            disabled={sending || allMembersResponded}
+                            className="p-2 text-gray-400 hover:text-blue-600 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title={allMembersResponded ? "All members have responded" : "Email Gig Link"}
                         >
-                            <Trash2 className="w-5 h-5" />
+                            <Mail className="w-5 h-5" />
                         </button>
-                    </>
-                )}
-                {canEditGig && (
-                    <button
-                        onClick={handleSendGigEmail}
-                        disabled={sending || allMembersResponded}
-                        className="p-2 text-gray-400 hover:text-blue-600 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                        title={allMembersResponded ? "All members have responded" : "Email Gig Link"}
-                    >
-                        <Mail className="w-5 h-5" />
-                    </button>
-                )}
-                <AddToCalendar gig={gig} />
-                {isEditing && (
-                    <div className="flex space-x-2">
-                        <button
-                            onClick={onCancel}
-                            className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={onSave}
-                            className="p-2 text-white bg-red-600 hover:bg-red-700 rounded-full"
-                        >
-                            <Save className="w-5 h-5" />
-                        </button>
-                    </div>
-                )}
+                    )}
+                    <AddToCalendar gig={gig} />
+                    {isEditing && (
+                        <div className="flex space-x-2">
+                            <button
+                                onClick={onCancel}
+                                className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <button
+                                onClick={onSave}
+                                className="p-2 text-white bg-red-600 hover:bg-red-700 rounded-full"
+                            >
+                                <Save className="w-5 h-5" />
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

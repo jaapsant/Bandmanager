@@ -48,14 +48,17 @@ export function GigCard({ gig }: GigCardProps) {
       className={`bg-white rounded-lg shadow overflow-hidden cursor-pointer hover:shadow-md transition-shadow p-4 ${!hasUserAvailability ? 'ring-2 ring-yellow-400' : ''
         }`}
     >
-      <div className="flex justify-between items-start mb-4">
-        <Link to={`/gig/${gig.id}`} className="flex-grow">
-          <h3 className="text-xl font-semibold text-gray-900">{gig.name}</h3>
+      <div className="mb-4">
+        <Link to={`/gig/${gig.id}`}>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">{gig.name}</h3>
         </Link>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${status?.color}`}>
+            {status?.label}
+          </span>
           {!hasUserAvailability && !isPastGig ? (
             <span
-              className="flex items-center text-yellow-600 text-xs bg-yellow-50 px-2 py-1 rounded"
+              className="flex items-center text-yellow-600 text-xs bg-yellow-50 px-2 py-1 rounded whitespace-nowrap"
               onClick={(e) => e.stopPropagation()}
             >
               <AlertCircle className="w-3 h-3 mr-1" />
@@ -69,9 +72,6 @@ export function GigCard({ gig }: GigCardProps) {
               <AvailabilityStatus status={gig.memberAvailability[user.uid].status} />
             </span>
           )}
-          <span className={`px-3 py-1 rounded-full text-sm ${status?.color}`}>
-            {status?.label}
-          </span>
         </div>
       </div>
 
