@@ -1,4 +1,4 @@
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where, documentId } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 /**
@@ -80,20 +80,32 @@ export async function getAllUserEmails(): Promise<string[]> {
 }
 
 /**
- * Fetch emails for specific user IDs from Firestore
+ * Fetch emails for specific user IDs from Firestore.
+ * Uses batched queries for efficiency (Firestore 'in' queries support max 30 items).
+ * Only fetches the specific users needed rather than all users.
  */
 export async function getEmailsForUserIds(userIds: string[]): Promise<string[]> {
-  const usersSnapshot = await getDocs(collection(db, 'users'));
-  const emails: string[] = [];
+  if (userIds.length === 0) {
+    return [];
+  }
 
-  usersSnapshot.forEach(doc => {
-    if (userIds.includes(doc.id)) {
-      const userData = doc.data();
-      if (userData.email) {
-        emails.push(userData.email);
+  const emails: string[] = [];
+  const usersRef = collection(db, 'users');
+
+  // Firestore 'in' queries support max 30 items, so batch if needed
+  const batchSize = 30;
+  for (let i = 0; i < userIds.length; i += batchSize) {
+    const batch = userIds.slice(i, i + batchSize);
+    const usersQuery = query(usersRef, where(documentId(), 'in', batch));
+    const snapshot = await getDocs(usersQuery);
+
+    snapshot.docs.forEach(doc => {
+      const email = doc.data().email;
+      if (email) {
+        emails.push(email);
       }
-    }
-  });
+    });
+  }
 
   return emails;
 }
