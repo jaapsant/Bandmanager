@@ -15,6 +15,12 @@ import { UserAvailabilitySection } from '../components/GigDetails/UserAvailabili
 import { BandMembersSection } from '../components/GigDetails/BandMembersSection';
 import { DeleteConfirmDialog } from '../components/GigDetails/DeleteConfirmDialog';
 import { toast } from 'react-hot-toast';
+import {
+  updateMemberAvailabilityInGig,
+  updateDrivingStatusInGig,
+  toggleMemberDrivingInGig,
+  getMemberAvailability
+} from '../utils/availabilityHelpers';
 
 export function GigDetails() {
   const { t } = useTranslation();
@@ -125,88 +131,14 @@ export function GigDetails() {
         throw new Error(t('gigDetails.errors.emailVerification'));
       }
 
-      // Get all dates for the gig
-      const allDates = [gig.date, ...gig.dates];
+      const updatedGig = updateMemberAvailabilityInGig(
+        gig,
+        user.uid,
+        { status, note },
+        gig.isMultiDay ? date : undefined
+      );
 
-      // Initialize a new availability object with proper structure
-      const currentAvailability = gig.memberAvailability[user.uid] || {
-        status: 'maybe',
-        note: '',
-        canDrive: false,
-        dateAvailability: {}
-      };
-
-      if (gig.isMultiDay) {
-        // Create a dateAvailability object with all dates initialized
-        const initializedDateAvailability = { ...currentAvailability.dateAvailability };
-
-        // Initialize any missing dates with 'maybe' status
-        allDates.forEach(d => {
-          if (!initializedDateAvailability[d]) {
-            initializedDateAvailability[d] = {
-              status: 'maybe',
-              note: '',
-              canDrive: false
-            };
-          }
-        });
-
-        // Update the specific date with new status
-        const updatedAvailability: MemberAvailability = {
-          ...currentAvailability,
-          dateAvailability: {
-            ...initializedDateAvailability,
-            [date]: {
-              status,
-              note: note ?? initializedDateAvailability[date]?.note ?? '',
-              canDrive: initializedDateAvailability[date]?.canDrive ?? false
-            }
-          }
-        };
-
-        // Calculate the overall status based on all dates
-        const allStatuses = allDates.map(d => updatedAvailability.dateAvailability![d].status);
-        const statusCount = allStatuses.reduce((acc, s) => {
-          acc[s] = (acc[s] || 0) + 1;
-          return acc;
-        }, {} as Record<AvailabilityStatusValue, number>);
-
-        const mainStatus = Object.entries(statusCount).reduce((a, b) =>
-          (statusCount[a[0] as AvailabilityStatusValue] > statusCount[b[0] as AvailabilityStatusValue]) ? a : b
-        )[0] as AvailabilityStatusValue;
-
-        updatedAvailability.status = mainStatus;
-
-        const updatedGig: Gig = {
-          ...gig,
-          memberAvailability: {
-            ...gig.memberAvailability,
-            [user.uid]: updatedAvailability
-          }
-        };
-
-        await updateGig(updatedGig);
-      } else {
-        // For single-date gigs, update the main availability
-        const updatedAvailability: MemberAvailability = {
-          ...currentAvailability,
-          status,
-          note: note ?? '',
-          canDrive: currentAvailability.canDrive || false,
-          dateAvailability: {}
-        };
-
-        const updatedGig: Gig = {
-          ...gig,
-          memberAvailability: {
-            ...gig.memberAvailability,
-            [user.uid]: updatedAvailability
-          }
-        };
-
-        await updateGig(updatedGig);
-      }
-
+      await updateGig(updatedGig);
       setError('');
     } catch (err) {
       console.error('Error updating availability:', err);
@@ -218,28 +150,8 @@ export function GigDetails() {
     if (!user) return;
 
     try {
-      const currentAvailability = gig.memberAvailability[user.uid];
-      if (!currentAvailability?.dateAvailability?.[date]) return;
-
-      const updatedAvailability = {
-        ...currentAvailability,
-        dateAvailability: {
-          ...currentAvailability.dateAvailability,
-          [date]: {
-            ...currentAvailability.dateAvailability[date],
-            canDrive
-          }
-        }
-      };
-
-      // Create the updated gig object
-      const updatedGig = {
-        ...gig,
-        memberAvailability: {
-          ...gig.memberAvailability,
-          [user.uid]: updatedAvailability
-        }
-      };
+      const updatedGig = updateDrivingStatusInGig(gig, user.uid, date, canDrive);
+      if (!updatedGig) return; // Date availability doesn't exist yet
 
       await updateGig(updatedGig);
     } catch (error) {
@@ -255,21 +167,15 @@ export function GigDetails() {
     }
 
     try {
-      const currentAvailability = gig.memberAvailability[user.uid] || {};
-      const updatedAvailability = {
-        ...gig.memberAvailability,
-        [user.uid]: {
-          ...currentAvailability,
+      const currentAvailability = getMemberAvailability(gig, user.uid);
+      const updatedGig = updateMemberAvailabilityInGig(
+        gig,
+        user.uid,
+        {
           status,
-          note: currentAvailability.note || '',
-          canDrive: canDrive !== null ? canDrive : currentAvailability.canDrive || null,
-        },
-      };
-
-      const updatedGig = {
-        ...gig,
-        memberAvailability: updatedAvailability,
-      };
+          canDrive: canDrive !== null ? canDrive : (currentAvailability.canDrive ?? false)
+        }
+      );
 
       await updateGig(updatedGig);
       setError('');
@@ -286,21 +192,7 @@ export function GigDetails() {
     }
 
     try {
-      const currentAvailability = gig.memberAvailability[user.uid] || {};
-      const updatedAvailability = {
-        ...gig.memberAvailability,
-        [user.uid]: {
-          ...currentAvailability,
-          status: currentAvailability.status || 'maybe',
-          note,
-          canDrive: currentAvailability.canDrive || false,
-        },
-      };
-
-      const updatedGig = {
-        ...gig,
-        memberAvailability: updatedAvailability,
-      };
+      const updatedGig = updateMemberAvailabilityInGig(gig, user.uid, { note });
 
       await updateGig(updatedGig);
       setError('');
@@ -316,11 +208,14 @@ export function GigDetails() {
       return;
     }
 
-    const currentAvailability = gig.memberAvailability[user.uid] || {};
-    await updateAvailability(
-      currentAvailability.status || 'maybe',
-      !currentAvailability.canDrive
-    );
+    try {
+      const updatedGig = toggleMemberDrivingInGig(gig, user.uid);
+      await updateGig(updatedGig);
+      setError('');
+    } catch (err) {
+      console.error('Error toggling driving status:', err);
+      setError('Failed to update driving status');
+    }
   };
 
   const formatTime = () => {
@@ -364,21 +259,8 @@ export function GigDetails() {
 
   const updateMemberAvailability = async (memberId: string, status: 'available' | 'unavailable' | 'maybe') => {
     try {
-      const currentAvailability = gig.memberAvailability[memberId] || {};
-      const updatedAvailability = {
-        ...gig.memberAvailability,
-        [memberId]: {
-          ...currentAvailability,
-          status,
-          note: currentAvailability.note || '',
-          canDrive: currentAvailability.canDrive || false,
-        },
-      };
-
-      await updateGig({
-        ...gig,
-        memberAvailability: updatedAvailability,
-      });
+      const updatedGig = updateMemberAvailabilityInGig(gig, memberId, { status });
+      await updateGig(updatedGig);
       setError('');
     } catch (err) {
       console.error('Error updating member availability:', err);
@@ -388,21 +270,8 @@ export function GigDetails() {
 
   const toggleMemberDriving = async (memberId: string) => {
     try {
-      const currentAvailability = gig.memberAvailability[memberId] || {};
-      const updatedAvailability = {
-        ...gig.memberAvailability,
-        [memberId]: {
-          ...currentAvailability,
-          status: currentAvailability.status || 'maybe',
-          note: currentAvailability.note || '',
-          canDrive: !currentAvailability.canDrive,
-        },
-      };
-
-      await updateGig({
-        ...gig,
-        memberAvailability: updatedAvailability,
-      });
+      const updatedGig = toggleMemberDrivingInGig(gig, memberId);
+      await updateGig(updatedGig);
       setError('');
     } catch (err) {
       console.error('Error updating member driving status:', err);
