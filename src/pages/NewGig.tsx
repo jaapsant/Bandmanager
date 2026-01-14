@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { sendEmail, getAllUserEmails } from '../utils/emailService';
 import { getNewGigEmailTemplate } from '../utils/emailTemplates';
+import { validateGig, ValidationMessages } from '../utils/gigValidation';
 
 export function NewGig() {
   const navigate = useNavigate();
@@ -36,42 +37,22 @@ export function NewGig() {
     setIsSubmitting(true);
 
     try {
-      if (!formData.name?.trim() || !formData.date) {
-        throw new Error(t('newGig.errors.requiredFields'));
-      }
-
       if (!user) {
         throw new Error(t('newGig.errors.loginRequired'));
       }
 
-      const gigDate = new Date(formData.date);
-      gigDate.setHours(23, 59, 59, 999);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const validationMessages: ValidationMessages = {
+        nameRequired: t('newGig.errors.requiredFields'),
+        dateRequired: t('newGig.errors.requiredFields'),
+        pastDate: t('newGig.errors.pastDate'),
+        changePastDate: t('newGig.errors.pastDate'),
+        emptyDates: t('newGig.errors.emptyDates'),
+        timeRange: t('newGig.errors.timeRange'),
+      };
 
-      if (gigDate < today) {
-        throw new Error(t('newGig.errors.pastDate'));
-      }
-
-      // Validate all dates if it's a multi-day gig
-      if (formData.isMultiDay) {
-        const allDates = [formData.date, ...(formData.dates || [])].filter(Boolean);
-        for (const date of allDates) {
-          const checkDate = new Date(date);
-          checkDate.setHours(0, 0, 0, 0);
-          if (checkDate < today) {
-            throw new Error(t('newGig.errors.pastDate'));
-          }
-        }
-      }
-      // Only validate time if it's not a multi-day gig
-      else if (!formData.isWholeDay && formData.startTime && formData.endTime) {
-        const [startHours, startMinutes] = formData.startTime.split(':').map(Number);
-        const [endHours, endMinutes] = formData.endTime.split(':').map(Number);
-
-        if (startHours > endHours || (startHours === endHours && startMinutes >= endMinutes)) {
-          throw new Error(t('newGig.errors.timeRange'));
-        }
+      const validation = validateGig(formData, validationMessages);
+      if (!validation.valid) {
+        throw new Error(validation.error);
       }
 
       const gigData: Omit<Gig, 'id'> = {

@@ -4,6 +4,7 @@ import { db } from '../lib/firebase';
 import { Gig } from '../types';
 import { useAuth } from './AuthContext';
 import { useTranslation } from 'react-i18next';
+import { validateGig, ValidationMessages } from '../utils/gigValidation';
 
 interface GigContextType {
   gigs: Gig[];
@@ -65,38 +66,20 @@ export function GigProvider({ children }: { children: React.ReactNode }) {
     };
   }, [user, t]);
 
+  const getValidationMessages = (): ValidationMessages => ({
+    nameRequired: t('gigContext.errors.validation.nameRequired'),
+    dateRequired: t('gigContext.errors.validation.dateRequired'),
+    pastDate: t('gigContext.errors.validation.pastDate'),
+    changePastDate: t('gigContext.errors.validation.changePastDate'),
+    emptyDates: t('gigContext.errors.validation.emptyDates'),
+    timeRange: t('gigContext.errors.validation.timeRange'),
+  });
+
   const validateGigData = (gigData: Partial<Gig>, originalGig?: Gig) => {
-    if (!gigData.name?.trim()) {
-      throw new Error(t('gigContext.errors.validation.nameRequired'));
+    const result = validateGig(gigData, getValidationMessages(), originalGig?.date);
+    if (!result.valid) {
+      throw new Error(result.error);
     }
-
-    if (!gigData.date) {
-      throw new Error(t('gigContext.errors.validation.dateRequired'));
-    }
-
-    const gigDate = new Date(gigData.date);
-    gigDate.setHours(23, 59, 59, 999);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (originalGig) {
-      const originalDate = new Date(originalGig.date);
-      if (gigDate.getTime() !== originalDate.getTime() && gigDate < today) {
-        throw new Error(t('gigContext.errors.validation.changePastDate'));
-      }
-    } else if (gigDate < today) {
-      throw new Error(t('gigContext.errors.validation.pastDate'));
-    }
-
-    if (!gigData.isWholeDay && gigData.startTime && gigData.endTime) {
-      const [startHours, startMinutes] = gigData.startTime.split(':').map(Number);
-      const [endHours, endMinutes] = gigData.endTime.split(':').map(Number);
-
-      if (startHours > endHours || (startHours === endHours && startMinutes >= endMinutes)) {
-        throw new Error(t('gigContext.errors.validation.timeRange'));
-      }
-    }
-
     return true;
   };
 

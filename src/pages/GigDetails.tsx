@@ -21,6 +21,11 @@ import {
   toggleMemberDrivingInGig,
   getMemberAvailability
 } from '../utils/availabilityHelpers';
+import {
+  validateGig,
+  validateRequiredFields,
+  ValidationMessages
+} from '../utils/gigValidation';
 
 export function GigDetails() {
   const { t } = useTranslation();
@@ -75,42 +80,22 @@ export function GigDetails() {
   const handleSave = async () => {
     if (editedGig) {
       try {
-        if (!editedGig.name?.trim() || !editedGig.date) {
-          throw new Error(t('gigDetails.errors.requiredFields'));
-        }
-
         if (!user) {
           throw new Error(t('gigDetails.errors.loginRequired'));
         }
 
-        // Validate all dates if it's a multi-day gig
-        if (editedGig.isMultiDay) {
-          const allDates = [editedGig.date, ...editedGig.dates].filter(Boolean);
+        const validationMessages: ValidationMessages = {
+          nameRequired: t('gigDetails.errors.requiredFields'),
+          dateRequired: t('gigDetails.errors.requiredFields'),
+          pastDate: t('gigDetails.errors.pastDate'),
+          changePastDate: t('gigDetails.errors.pastDate'),
+          emptyDates: t('gigDetails.errors.emptyDates'),
+          timeRange: t('gigDetails.errors.timeRange'),
+        };
 
-          // Check for empty dates
-          if (editedGig.dates.some(date => !date)) {
-            throw new Error(t('gigDetails.errors.emptyDates'));
-          }
-
-          for (const date of allDates) {
-            const checkDate = new Date(date);
-            checkDate.setHours(0, 0, 0, 0);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            if (checkDate < today) {
-              throw new Error(t('gigDetails.errors.pastDate'));
-            }
-          }
-        }
-
-        if (!editedGig.isWholeDay && editedGig.startTime && editedGig.endTime) {
-          const [startHours, startMinutes] = editedGig.startTime.split(':').map(Number);
-          const [endHours, endMinutes] = editedGig.endTime.split(':').map(Number);
-
-          if (startHours > endHours || (startHours === endHours && startMinutes >= endMinutes)) {
-            throw new Error(t('gigDetails.errors.timeRange'));
-          }
+        const validation = validateGig(editedGig, validationMessages, gig.date);
+        if (!validation.valid) {
+          throw new Error(validation.error);
         }
 
         await updateGig(editedGig);
