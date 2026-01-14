@@ -14,6 +14,7 @@ import { BandProvider } from './context/BandContext';
 import { PrivateRouteWrapper } from './components/PrivateRouteWrapper';
 import { Header } from './components/Header';
 import { EmailVerificationBanner } from './components/EmailVerificationBanner';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { YearOverview } from './pages/YearOverview';
 import './i18n';
 
@@ -39,8 +40,9 @@ const PrivateRouteWrapperWithApp = ({
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
         <Routes>
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
@@ -77,8 +79,9 @@ function App() {
             element={<PrivateRouteWrapperWithApp element={<YearOverview />} />}
           />
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
