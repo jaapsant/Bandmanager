@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { collection, deleteDoc, doc, onSnapshot, query, getDocs, updateDoc, where, setDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, onSnapshot, query, getDocs, where, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { BandMember } from '../types';
 import { useAuth } from './AuthContext';
 import { useRole } from '../hooks/useRole';
 import { useTranslation } from 'react-i18next';
+import { updateOrCreateMember } from '../utils/firestoreHelpers';
 
 
 interface BandContextType {
@@ -164,19 +165,11 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
         throw new Error(t('bandContext.errors.updateOwnInstrumentOnly'));
       }
 
-      const memberDoc = doc(db, 'bandMembers', memberId);
-      const memberSnapshot = await getDocs(query(collection(db, 'bandMembers'), where('id', '==', memberId)));
-
-      if (memberSnapshot.empty) {
-        await setDoc(memberDoc, {
-          id: memberId,
-          name: user?.displayName || '',
-          instrument: instrument,
-          createdBy: user?.uid,
-        });
-      } else {
-        await updateDoc(memberDoc, { instrument });
-      }
+      await updateOrCreateMember(
+        memberId,
+        { instrument },
+        { name: user?.displayName || '', createdBy: user?.uid }
+      );
     } catch (error) {
       console.error('Error updating instrument:', error);
       if (error instanceof Error) {
@@ -194,19 +187,11 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
         throw new Error(t('bandContext.errors.updateOwnNameOnly'));
       }
 
-      const memberDoc = doc(db, 'bandMembers', memberId);
-      const memberSnapshot = await getDocs(query(collection(db, 'bandMembers'), where('id', '==', memberId)));
-
-      if (memberSnapshot.empty) {
-        await setDoc(memberDoc, {
-          id: memberId,
-          name: name.trim(),
-          instrument: '',
-          createdBy: user?.uid,
-        });
-      } else {
-        await updateDoc(memberDoc, { name: name.trim() });
-      }
+      await updateOrCreateMember(
+        memberId,
+        { name: name.trim() },
+        { name: name.trim(), createdBy: user?.uid }
+      );
     } catch (error) {
       console.error('Error updating name:', error);
       if (error instanceof Error) {
@@ -224,20 +209,11 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
         throw new Error(t('bandContext.errors.updateOwnPreferenceOnly'));
       }
 
-      const memberDoc = doc(db, 'bandMembers', memberId);
-      const memberSnapshot = await getDocs(query(collection(db, 'bandMembers'), where('id', '==', memberId)));
-
-      if (memberSnapshot.empty) {
-        await setDoc(memberDoc, {
-          id: memberId,
-          name: user?.displayName || '',
-          instrument: '',
-          wantsPrintedSheetMusic,
-          createdBy: user?.uid,
-        });
-      } else {
-        await updateDoc(memberDoc, { wantsPrintedSheetMusic });
-      }
+      await updateOrCreateMember(
+        memberId,
+        { wantsPrintedSheetMusic },
+        { name: user?.displayName || '', createdBy: user?.uid }
+      );
     } catch (error) {
       console.error('Error updating sheet music preference:', error);
       if (error instanceof Error) {
@@ -255,20 +231,11 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
         throw new Error(t('bandContext.errors.updateOwnPreferenceOnly'));
       }
 
-      const memberDoc = doc(db, 'bandMembers', memberId);
-      const memberSnapshot = await getDocs(query(collection(db, 'bandMembers'), where('id', '==', memberId)));
-
-      if (memberSnapshot.empty) {
-        await setDoc(memberDoc, {
-          id: memberId,
-          name: user?.displayName || '',
-          instrument: '',
-          drivingAvailability: preferences,
-          createdBy: user?.uid,
-        });
-      } else {
-        await updateDoc(memberDoc, { drivingAvailability: preferences });
-      }
+      await updateOrCreateMember(
+        memberId,
+        { drivingAvailability: preferences },
+        { name: user?.displayName || '', createdBy: user?.uid }
+      );
     } catch (error) {
       console.error('Error updating driving preferences:', error);
       if (error instanceof Error) {
