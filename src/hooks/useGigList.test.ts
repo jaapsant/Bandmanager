@@ -43,6 +43,20 @@ vi.mock('./useRole', () => ({
   }),
 }));
 
+// Mock useViewModePreference
+let mockViewMode: 'grid' | 'compact' = 'compact';
+const mockSetViewMode = vi.fn((mode: 'grid' | 'compact') => {
+  mockViewMode = mode;
+});
+
+vi.mock('./useViewModePreference', () => ({
+  useViewModePreference: () => ({
+    viewMode: mockViewMode,
+    setViewMode: mockSetViewMode,
+    deviceType: 'desktop',
+  }),
+}));
+
 // Helper to create test gig
 const createTestGig = (overrides: Partial<Gig> = {}): Gig => ({
   id: 'gig-1',
@@ -71,7 +85,9 @@ describe('useGigList', () => {
     vi.clearAllMocks();
     mockGigs.length = 0;
     mockLoading = false;
+    mockViewMode = 'compact';
     mockNavigate.mockClear();
+    mockSetViewMode.mockClear();
     mockLocation.state = null;
   });
 
@@ -179,22 +195,20 @@ describe('useGigList', () => {
   });
 
   describe('view mode', () => {
-    it('should toggle view mode', () => {
+    it('should return viewMode from useViewModePreference', () => {
       const { result } = renderHook(() => useGigList());
 
       expect(result.current.viewMode).toBe('compact');
+    });
+
+    it('should call setViewMode from useViewModePreference', () => {
+      const { result } = renderHook(() => useGigList());
 
       act(() => {
         result.current.setViewMode('grid');
       });
 
-      expect(result.current.viewMode).toBe('grid');
-
-      act(() => {
-        result.current.setViewMode('compact');
-      });
-
-      expect(result.current.viewMode).toBe('compact');
+      expect(mockSetViewMode).toHaveBeenCalledWith('grid');
     });
   });
 

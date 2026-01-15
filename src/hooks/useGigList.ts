@@ -4,13 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { useGigs } from '../context/GigContext';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from './useRole';
+import { useViewModePreference, ViewMode } from './useViewModePreference';
 import { Gig } from '../types';
 
 export type GroupedGigs = {
   [year: string]: Gig[];
 };
 
-export type ViewMode = 'grid' | 'compact';
+export type { ViewMode } from './useViewModePreference';
 
 export interface UseGigListReturn {
   // Data
@@ -63,9 +64,9 @@ export function useGigList(): UseGigListReturn {
   const { gigs, loading } = useGigs();
   const { user } = useAuth();
   const { roles } = useRole();
+  const { viewMode, setViewMode } = useViewModePreference();
 
   const [showHistory, setShowHistory] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('compact');
   const [expandedYears, setExpandedYears] = useState<{ [year: string]: boolean }>({});
 
   const canManageGigs = roles.admin || roles.bandManager;
