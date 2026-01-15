@@ -9,11 +9,7 @@
     padding-right: 1rem;
   }
 
-  table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
+  /* Removed global table styles that caused overflow issues */
 
   /* Make text smaller on mobile */
   h1 {

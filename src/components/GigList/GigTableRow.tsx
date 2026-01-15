@@ -60,7 +60,7 @@ export function GigTableRow({
       onClick={() => onNavigate(gig.id)}
     >
       {/* Date column - with time on mobile */}
-      <td className="px-3 md:px-6 py-3 md:py-4 text-sm whitespace-nowrap">
+      <td className="px-3 md:px-6 py-3 md:py-4 text-sm">
         <div className="flex items-center text-gray-700">
           {gig.isMultiDay ? (
             <>
@@ -92,7 +92,7 @@ export function GigTableRow({
 
       {/* Gig column - stacks more info on mobile */}
       <td className="px-3 md:px-6 py-3 md:py-4">
-        <div className="text-sm font-medium text-gray-900 mb-1">{gig.name}</div>
+        <div className="text-sm font-medium text-gray-900 mb-1 break-words">{gig.name}</div>
 
         {/* Show on mobile: status badge and availability icon */}
         <div className="sm:hidden">
