@@ -27,5 +27,10 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
 # Local Netlify folder
 .netlify
+
+# Production planning (internal use only)
+PRODUCTION_READINESS.md
+PLAN_*.md

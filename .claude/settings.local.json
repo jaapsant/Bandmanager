@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(npm run build:*)",
-      "Bash(npm run test:run:*)"
+      "Bash(npm run test:run:*)",
+      "Bash(dir /s /B \"C:\\\\Users\\\\santja\\\\DEV\\\\Ledensysteem\\\\Bandmanager\\\\src\")",
+      "Bash(findstr:*)",
+      "Bash(wc:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vitest run:*)"
     ]
   }
 }

@@ -1,6 +1,24 @@
 import { createEvent } from 'ics';
 import { Gig } from '../types';
 
+/**
+ * Maps gig status to valid iCal status values.
+ * iCal only supports: TENTATIVE, CANCELLED, CONFIRMED
+ */
+function mapGigStatusToICalStatus(status: Gig['status']): 'TENTATIVE' | 'CANCELLED' | 'CONFIRMED' {
+  switch (status) {
+    case 'pending':
+      return 'TENTATIVE';
+    case 'declined':
+      return 'CANCELLED';
+    case 'confirmed':
+    case 'completed':
+      return 'CONFIRMED';
+    default:
+      return 'TENTATIVE';
+  }
+}
+
 export function generateCalendarEvent(gig: Gig) {
   const gigDate = new Date(gig.date);
   const year = gigDate.getFullYear();
@@ -28,9 +46,9 @@ export function generateCalendarEvent(gig: Gig) {
     end: endTime,
     title: gig.name,
     description,
-    location: '',
-    status: gig.status.toUpperCase(),
-    busyStatus: 'BUSY',
+    location: gig.location || '',
+    status: mapGigStatusToICalStatus(gig.status),
+    busyStatus: 'BUSY' as const,
   };
 
   return new Promise<string>((resolve, reject) => {

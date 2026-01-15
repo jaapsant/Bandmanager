@@ -71,6 +71,15 @@ export function AddToCalendar({ gig }: AddToCalendarProps) {
             </button>
             <button
               onClick={() => {
+                downloadIcs();
+                setIsOpen(false);
+              }}
+              className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
+            >
+              Apple iCal
+            </button>
+            <button
+              onClick={() => {
                 window.open(generateOutlookCalendarUrl(gig), '_blank');
                 setIsOpen(false);
               }}
@@ -78,15 +87,6 @@ export function AddToCalendar({ gig }: AddToCalendarProps) {
             >
               Outlook Calendar
             </button>
-{/*             <button
-              onClick={() => {
-                downloadIcs();
-                setIsOpen(false);
-              }}
-              className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
-            >
-              Download .ics file
-            </button> */}
           </div>
         </div>
       )}
