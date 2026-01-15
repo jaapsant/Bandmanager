@@ -1,115 +1,45 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { Gig } from '../types';
-import { useGigs } from '../context/GigContext';
-import { useAuth } from '../context/AuthContext';
-import { useTranslation } from 'react-i18next';
-import { sendEmail, getAllUserEmails } from '../utils/emailService';
-import { getNewGigEmailTemplate } from '../utils/emailTemplates';
-import { validateGig, ValidationMessages } from '../utils/gigValidation';
+import { useNewGig } from '../hooks/useNewGig';
+import {
+  GigNameField,
+  GigDateSection,
+  GigTimeSection,
+  GigLocationSection,
+  GigDetailsSection,
+  GigFormActions,
+} from '../components/NewGig';
 
 export function NewGig() {
-  const navigate = useNavigate();
-  const { addGig } = useGigs();
-  const { user } = useAuth();
-  const { t } = useTranslation();
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [sendEmailNotification, setSendEmailNotification] = useState(true);
-  const [formData, setFormData] = useState<Partial<Gig>>({
-    name: '',
-    date: '',
-    startTime: '',
-    endTime: '',
-    status: 'pending',
-    isWholeDay: false,
-    isMultiDay: false,
-    dates: [],
-    location: '',
-    distance: null,
-    memberAvailability: {},
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsSubmitting(true);
-
-    try {
-      if (!user) {
-        throw new Error(t('newGig.errors.loginRequired'));
-      }
-
-      const validationMessages: ValidationMessages = {
-        nameRequired: t('newGig.errors.requiredFields'),
-        dateRequired: t('newGig.errors.requiredFields'),
-        pastDate: t('newGig.errors.pastDate'),
-        changePastDate: t('newGig.errors.pastDate'),
-        emptyDates: t('newGig.errors.emptyDates'),
-        timeRange: t('newGig.errors.timeRange'),
-      };
-
-      const validation = validateGig(formData, validationMessages);
-      if (!validation.valid) {
-        throw new Error(validation.error);
-      }
-
-      const gigData: Omit<Gig, 'id'> = {
-        name: formData.name.trim(),
-        date: formData.date,
-        status: formData.status || 'pending',
-        isWholeDay: formData.isMultiDay ? false : (formData.isWholeDay || false),
-        isMultiDay: formData.isMultiDay,
-        dates: formData.isMultiDay ? (formData.dates || []).filter(Boolean) : [],
-        memberAvailability: {},
-        startTime: (!formData.isMultiDay && !formData.isWholeDay) ? formData.startTime || null : null,
-        endTime: (!formData.isMultiDay && !formData.isWholeDay) ? formData.endTime || null : null,
-        location: formData.location?.trim() || null,
-        distance: formData.distance || null,
-        pay: formData.pay || null,
-        description: formData.description?.trim() || null,
-        createdBy: user.uid,
-      };
-
-      const newGigId = await addGig(gigData);
-
-      if (sendEmailNotification) {
-        try {
-          const emails = await getAllUserEmails();
-
-          if (emails.length > 0) {
-            const gigLink = `${window.location.origin}/gigs/${newGigId}`;
-            const template = getNewGigEmailTemplate(
-              { name: gigData.name, date: gigData.date },
-              gigLink
-            );
-
-            await sendEmail({
-              bcc: emails,
-              ...template,
-            });
-          }
-        } catch (emailError) {
-          console.error('Failed to send email notification:', emailError);
-        }
-      }
-      navigate('/gigs');
-    } catch (error) {
-      console.error('Error creating gig:', error);
-      setError(error instanceof Error ? error.message : t('newGig.errors.createFailed'));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const today = new Date().toISOString().split('T')[0];
+  const {
+    formData,
+    sendEmailNotification,
+    setSendEmailNotification,
+    error,
+    isSubmitting,
+    today,
+    handleSubmit,
+    handleNameChange,
+    handleMultiDayChange,
+    handleLocationChange,
+    handleDistanceChange,
+    handleDateChange,
+    handleWholeDayChange,
+    handleStartTimeChange,
+    handleEndTimeChange,
+    handlePayChange,
+    handleDescriptionChange,
+    handleAddDate,
+    handleRemoveDate,
+    handleDateAtIndexChange,
+    navigateBack,
+    t,
+  } = useNewGig();
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <button
-          onClick={() => navigate('/gigs')}
+          onClick={navigateBack}
           className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
@@ -127,249 +57,60 @@ export function NewGig() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('newGig.form.name.label')}
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder={t('newGig.form.name.placeholder')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  value={formData.name || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                />
-              </div>
+              <GigNameField
+                name={formData.name}
+                onNameChange={handleNameChange}
+                t={t}
+              />
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('newGig.form.multiDay.label')}
-                </label>
-                <div className="flex items-center mt-2">
-                  <input
-                    type="checkbox"
-                    id="isMultiDay"
-                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
-                    checked={formData.isMultiDay}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      isMultiDay: e.target.checked,
-                      isWholeDay: false,
-                      startTime: null,
-                      endTime: null,
-                    }))}
-                  />
-                  <label htmlFor="isMultiDay" className="ml-2 block text-sm text-gray-700">
-                    {t('newGig.form.multiDay.checkbox')}
-                  </label>
-                </div>
-              </div>
+              <GigDateSection
+                isMultiDay={formData.isMultiDay}
+                date={formData.date}
+                dates={formData.dates}
+                today={today}
+                onMultiDayChange={handleMultiDayChange}
+                onDateChange={handleDateChange}
+                onAddDate={handleAddDate}
+                onRemoveDate={handleRemoveDate}
+                onDateAtIndexChange={handleDateAtIndexChange}
+                t={t}
+              />
 
-              <div className="md:col-span-2 grid grid-cols-4 gap-6">
-                <div className="col-span-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('newGig.form.location.label')}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder={t('newGig.form.location.placeholder')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    value={formData.location || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                  />
-                </div>
+              <GigLocationSection
+                location={formData.location}
+                distance={formData.distance}
+                onLocationChange={handleLocationChange}
+                onDistanceChange={handleDistanceChange}
+                t={t}
+              />
 
-                <div className="col-span-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('newGig.form.distance.label')}
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    placeholder={t('newGig.form.distance.placeholder')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    value={formData.distance || ''}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      distance: e.target.value ? parseFloat(e.target.value) : null
-                    }))}
-                  />
-                </div>
-              </div>
+              <GigTimeSection
+                isMultiDay={formData.isMultiDay}
+                isWholeDay={formData.isWholeDay}
+                startTime={formData.startTime}
+                endTime={formData.endTime}
+                onWholeDayChange={handleWholeDayChange}
+                onStartTimeChange={handleStartTimeChange}
+                onEndTimeChange={handleEndTimeChange}
+                t={t}
+              />
 
-              <div className={formData.isMultiDay ? 'md:col-span-2' : ''}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {formData.isMultiDay ? t('newGig.form.dates.label') : t('newGig.form.date.label')}
-                </label>
-                <div className="space-y-4">
-                  <input
-                    type="date"
-                    required
-                    min={today}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    value={formData.date || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                  />
-
-                  {formData.isMultiDay && (
-                    <div className="space-y-4">
-                      {formData.dates.map((date, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <input
-                            type="date"
-                            min={today}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                            value={date}
-                            onChange={(e) => {
-                              const newDates = [...(formData.dates || [])];
-                              newDates[index] = e.target.value;
-                              setFormData(prev => ({ ...prev, dates: newDates }));
-                            }}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newDates = formData.dates.filter((_, i) => i !== index);
-                              setFormData(prev => ({ ...prev, dates: newDates }));
-                            }}
-                            className="p-2 text-red-600 hover:text-red-700"
-                          >
-                            {t('newGig.form.dates.remove')}
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setFormData(prev => ({
-                            ...prev,
-                            dates: [...(prev.dates || []), '']
-                          }));
-                        }}
-                        className="px-4 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                      >
-                        {t('newGig.form.dates.addDate')}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {!formData.isMultiDay && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('newGig.form.wholeDay.label')}
-                    </label>
-                    <div className="flex items-center mt-2">
-                      <input
-                        type="checkbox"
-                        id="isWholeDay"
-                        className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
-                        checked={formData.isWholeDay}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          isWholeDay: e.target.checked,
-                          startTime: e.target.checked ? null : prev.startTime,
-                          endTime: e.target.checked ? null : prev.endTime,
-                        }))}
-                      />
-                      <label htmlFor="isWholeDay" className="ml-2 block text-sm text-gray-700">
-                        {t('newGig.form.wholeDay.checkbox')}
-                      </label>
-                    </div>
-                  </div>
-
-                  {!formData.isWholeDay && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {t('newGig.form.time.start')}
-                        </label>
-                        <input
-                          type="time"
-                          required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                          value={formData.startTime || ''}
-                          onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {t('newGig.form.time.end')}
-                        </label>
-                        <input
-                          type="time"
-                          required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                          value={formData.endTime || ''}
-                          onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
-                        />
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('newGig.form.pay.label')}
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  value={formData.pay || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, pay: e.target.value ? parseFloat(e.target.value) : null }))}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('newGig.form.description.label')}
-              </label>
-              <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                rows={4}
-                value={formData.description || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              <GigDetailsSection
+                pay={formData.pay}
+                description={formData.description}
+                onPayChange={handlePayChange}
+                onDescriptionChange={handleDescriptionChange}
+                t={t}
               />
             </div>
 
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="sendEmailNotification"
-                className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
-                checked={sendEmailNotification}
-                onChange={(e) => setSendEmailNotification(e.target.checked)}
-              />
-              <label htmlFor="sendEmailNotification" className="ml-2 block text-sm text-gray-700">
-                {t('newGig.form.emailNotification.checkbox')}
-              </label>
-            </div>
-
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => navigate('/gigs')}
-                disabled={isSubmitting}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {t('newGig.form.buttons.cancel')}
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? t('newGig.form.buttons.creating') : t('newGig.form.buttons.create')}
-              </button>
-            </div>
+            <GigFormActions
+              sendEmailNotification={sendEmailNotification}
+              onSendEmailNotificationChange={setSendEmailNotification}
+              isSubmitting={isSubmitting}
+              onCancel={navigateBack}
+              t={t}
+            />
           </form>
         </div>
       </div>
