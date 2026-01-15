@@ -1,303 +1,53 @@
-import { useState, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useStatusOptions } from '../data';
-import { Gig, MemberAvailability, AvailabilityStatusValue } from '../types';
-import { useGigs } from '../context/GigContext';
-import { useBand } from '../context/BandContext';
-import { useAuth } from '../context/AuthContext';
-import { useRole } from '../hooks/useRole';
-import { useTranslation } from 'react-i18next';
-import { useGigStats } from '../hooks/useGigStats';
-import { GigHeader } from '../components/GigDetails/GigHeader';
-import { GigInfoSection } from '../components/GigDetails/GigInfoSection';
-import { UserAvailabilitySection } from '../components/GigDetails/UserAvailabilitySection';
-import { BandMembersSection } from '../components/GigDetails/BandMembersSection';
-import { DeleteConfirmDialog } from '../components/GigDetails/DeleteConfirmDialog';
-import { toast } from 'react-hot-toast';
+import { useGigDetails } from '../hooks/useGigDetails';
 import {
-  updateMemberAvailabilityInGig,
-  updateDrivingStatusInGig,
-  toggleMemberDrivingInGig,
-  getMemberAvailability
-} from '../utils/availabilityHelpers';
-import {
-  validateGig,
-  validateRequiredFields,
-  ValidationMessages
-} from '../utils/gigValidation';
+  GigHeader,
+  GigInfoSection,
+  UserAvailabilitySection,
+  BandMembersSection,
+  DeleteConfirmDialog,
+} from '../components/GigDetails';
 
 export function GigDetails() {
-  const { t } = useTranslation();
   const statusOptions = useStatusOptions();
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { gigs, updateGig, deleteGig } = useGigs();
-  const { bandMembers } = useBand();
-  const { user } = useAuth();
-  const { roles } = useRole();
-  const gig = gigs.find((g) => g.id === id);
 
-  // Get gig stats - moved up to avoid conditional hook call
-  const gigStats = useGigStats(gig, bandMembers);
-
-  const isPastGig = useMemo(() => {
-    if (!gig) return false;
-    const today = new Date();
-    if (gig.isMultiDay) {
-      const dates = [gig.date, ...gig.dates].map(d => new Date(d));
-      const lastDate = new Date(Math.max(...dates.map(d => d.getTime())));
-      lastDate.setHours(23, 59, 59, 999);
-      return lastDate < today;
-    }
-    const gigDate = new Date(gig.date);
-    gigDate.setHours(23, 59, 59, 999);
-    return gigDate < today;
-  }, [gig]);
-
-  // Allow editing if user is admin or band manager and is email verified
-  const canEditGig = !!(user?.emailVerified && (roles.admin || roles.bandManager));
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedGig, setEditedGig] = useState<Gig | null>(null);
-  const [error, setError] = useState('');
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const {
+    gig,
+    editedGig,
+    user,
+    bandMembers,
+    gigStats,
+    isEditing,
+    error,
+    showDeleteConfirm,
+    isPastGig,
+    canEditGig,
+    handleEdit,
+    handleCancel,
+    handleSave,
+    handleDelete,
+    handleBack,
+    setShowDeleteConfirm,
+    setEditedGig,
+    handleUpdateAvailability,
+    handleUpdateDrivingStatus,
+    updateAvailability,
+    updateNote,
+    toggleDriving,
+    updateMemberAvailability,
+    toggleMemberDriving,
+    handleSelectSingleDate,
+    formatTime,
+    openInGoogleMaps,
+    updateGig,
+    t,
+  } = useGigDetails(id);
 
   if (!gig) return <div>{t('gigDetails.errors.notFound')}</div>;
   if (!user) return <div>{t('gigDetails.errors.signIn')}</div>;
-
-  const handleEdit = () => {
-    setEditedGig(gig);
-    setIsEditing(true);
-  };
-
-  const handleCancel = () => {
-    setEditedGig(null);
-    setIsEditing(false);
-    setError('');
-  };
-
-  const handleSave = async () => {
-    if (editedGig) {
-      try {
-        if (!user) {
-          throw new Error(t('gigDetails.errors.loginRequired'));
-        }
-
-        const validationMessages: ValidationMessages = {
-          nameRequired: t('gigDetails.errors.requiredFields'),
-          dateRequired: t('gigDetails.errors.requiredFields'),
-          pastDate: t('gigDetails.errors.pastDate'),
-          changePastDate: t('gigDetails.errors.pastDate'),
-          emptyDates: t('gigDetails.errors.emptyDates'),
-          timeRange: t('gigDetails.errors.timeRange'),
-        };
-
-        const validation = validateGig(editedGig, validationMessages, gig.date);
-        if (!validation.valid) {
-          throw new Error(validation.error);
-        }
-
-        await updateGig(editedGig);
-        setIsEditing(false);
-        setEditedGig(null);
-        setError('');
-      } catch (err) {
-        setError(err instanceof Error ? err.message : t('gigDetails.errors.updateFailed'));
-      }
-    }
-  };
-
-  const handleUpdateAvailability = async (date: string, status: AvailabilityStatusValue, note?: string) => {
-    if (!user) return;
-
-    try {
-      if (!user.emailVerified) {
-        throw new Error(t('gigDetails.errors.emailVerification'));
-      }
-
-      const updatedGig = updateMemberAvailabilityInGig(
-        gig,
-        user.uid,
-        { status, note },
-        gig.isMultiDay ? date : undefined
-      );
-
-      await updateGig(updatedGig);
-      setError('');
-    } catch (err) {
-      console.error('Error updating availability:', err);
-      setError(err instanceof Error ? err.message : t('gigDetails.errors.updateAvailability'));
-    }
-  };
-
-  const handleUpdateDrivingStatus = async (date: string, canDrive: boolean) => {
-    if (!user) return;
-
-    try {
-      const updatedGig = updateDrivingStatusInGig(gig, user.uid, date, canDrive);
-      if (!updatedGig) return; // Date availability doesn't exist yet
-
-      await updateGig(updatedGig);
-    } catch (error) {
-      console.error('Error updating driving status:', error);
-      setError(error instanceof Error ? error.message : t('gigDetails.errors.drivingStatus'));
-    }
-  };
-
-  const updateAvailability = async (status: 'available' | 'unavailable' | 'maybe', canDrive: boolean | null) => {
-    if (!user?.emailVerified) {
-      setError('Email verification required to update availability');
-      return;
-    }
-
-    try {
-      const currentAvailability = getMemberAvailability(gig, user.uid);
-      const updatedGig = updateMemberAvailabilityInGig(
-        gig,
-        user.uid,
-        {
-          status,
-          canDrive: canDrive !== null ? canDrive : (currentAvailability.canDrive ?? false)
-        }
-      );
-
-      await updateGig(updatedGig);
-      setError('');
-    } catch (err) {
-      console.error('Error updating availability:', err);
-      setError('Failed to update availability');
-    }
-  };
-
-  const updateNote = async (note: string) => {
-    if (!user?.emailVerified) {
-      setError('Email verification required to update notes');
-      return;
-    }
-
-    try {
-      const updatedGig = updateMemberAvailabilityInGig(gig, user.uid, { note });
-
-      await updateGig(updatedGig);
-      setError('');
-    } catch (err) {
-      console.error('Error updating note:', err);
-      setError('Failed to update note');
-    }
-  };
-
-  const toggleDriving = async () => {
-    if (!user?.emailVerified) {
-      setError('Email verification required to update driving status');
-      return;
-    }
-
-    try {
-      const updatedGig = toggleMemberDrivingInGig(gig, user.uid);
-      await updateGig(updatedGig);
-      setError('');
-    } catch (err) {
-      console.error('Error toggling driving status:', err);
-      setError('Failed to update driving status');
-    }
-  };
-
-  const formatTime = () => {
-    if (gig.isWholeDay) {
-      return t('gigDetails.time.allDay');
-    }
-    if (gig.startTime && gig.endTime) {
-      return `${gig.startTime} - ${gig.endTime}`;
-    }
-    return "";
-  };
-
-  const handleBack = () => {
-    const gigDate = new Date(gig.date);
-    gigDate.setHours(23, 59, 59, 999);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (gigDate < today) {
-      navigate('/gigs', { state: { showHistory: true } });
-    } else {
-      navigate('/gigs');
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      await deleteGig(gig.id);
-      navigate('/gigs');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete gig');
-    }
-  };
-
-  const openInGoogleMaps = (location: string) => {
-    if (!location) return;
-    const encodedLocation = encodeURIComponent(location);
-    //https://www.google.com/maps/search/?api=1&query=${encodedLocation}`
-    window.open(`https://www.google.com/maps/dir/Theaterkerk+Bemmel,+Markt+5,+6681+AE+Bemmel/${encodedLocation}`, '_blank');
-  };
-
-  const updateMemberAvailability = async (memberId: string, status: 'available' | 'unavailable' | 'maybe') => {
-    try {
-      const updatedGig = updateMemberAvailabilityInGig(gig, memberId, { status });
-      await updateGig(updatedGig);
-      setError('');
-    } catch (err) {
-      console.error('Error updating member availability:', err);
-      setError('Failed to update member availability');
-    }
-  };
-
-  const toggleMemberDriving = async (memberId: string) => {
-    try {
-      const updatedGig = toggleMemberDrivingInGig(gig, memberId);
-      await updateGig(updatedGig);
-      setError('');
-    } catch (err) {
-      console.error('Error updating member driving status:', err);
-      setError('Failed to update driving status');
-    }
-  };
-
-  const handleSelectSingleDate = async (selectedDate: string) => {
-    if (!user || !canEditGig) return;
-
-    try {
-      // Get the availability for the selected date
-      const updatedMemberAvailability: { [userId: string]: MemberAvailability } = {};
-
-      Object.entries(gig.memberAvailability).forEach(([userId, availability]) => {
-        const dateAvailability = availability.dateAvailability?.[selectedDate];
-        if (dateAvailability) {
-          updatedMemberAvailability[userId] = {
-            status: dateAvailability.status,
-            note: dateAvailability.note || undefined,
-            canDrive: dateAvailability.canDrive || undefined,
-            dateAvailability: {}
-          } as MemberAvailability;
-        }
-      });
-
-      const updatedGig: Gig = {
-        ...gig,
-        date: selectedDate,
-        isMultiDay: false,
-        dates: [],
-        memberAvailability: updatedMemberAvailability
-      };
-
-      await updateGig(updatedGig);
-      toast.success(t('gigDetails.messages.dateSelected'));
-    } catch (error) {
-      console.error('Error converting to single date:', error);
-      setError(error instanceof Error ? error.message : t('gigDetails.errors.updateFailed'));
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -371,8 +121,6 @@ export function GigDetails() {
                 updateGig={updateGig}
                 t={t}
               />
-
-
             </div>
           </div>
         </div>
