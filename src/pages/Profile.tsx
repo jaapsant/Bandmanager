@@ -23,6 +23,8 @@ export function Profile() {
     setHasWinterTyres,
     hasGermanEnvironmentSticker,
     setHasGermanEnvironmentSticker,
+    hasLeaseCar,
+    setHasLeaseCar,
     drivingRemark,
     setDrivingRemark,
     currentPassword,
@@ -99,6 +101,8 @@ export function Profile() {
             onHasWinterTyresChange={setHasWinterTyres}
             hasGermanEnvironmentSticker={hasGermanEnvironmentSticker}
             onHasGermanEnvironmentStickerChange={setHasGermanEnvironmentSticker}
+            hasLeaseCar={hasLeaseCar}
+            onHasLeaseCarChange={setHasLeaseCar}
             drivingRemark={drivingRemark}
             onDrivingRemarkChange={setDrivingRemark}
             onSubmit={handleUpdateDrivingPreferences}

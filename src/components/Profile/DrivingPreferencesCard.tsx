@@ -9,6 +9,8 @@ interface DrivingPreferencesCardProps {
   onHasWinterTyresChange: (has: boolean) => void;
   hasGermanEnvironmentSticker: boolean;
   onHasGermanEnvironmentStickerChange: (has: boolean) => void;
+  hasLeaseCar: boolean;
+  onHasLeaseCarChange: (has: boolean) => void;
   drivingRemark: string;
   onDrivingRemarkChange: (remark: string) => void;
   onSubmit: (e: React.FormEvent) => Promise<void>;
@@ -23,6 +25,8 @@ export function DrivingPreferencesCard({
   onHasWinterTyresChange,
   hasGermanEnvironmentSticker,
   onHasGermanEnvironmentStickerChange,
+  hasLeaseCar,
+  onHasLeaseCarChange,
   drivingRemark,
   onDrivingRemarkChange,
   onSubmit,
@@ -104,6 +108,21 @@ export function DrivingPreferencesCard({
               className="ml-2 text-sm font-medium text-gray-700"
             >
               {t('profile.sections.driving.environmentSticker')}
+            </label>
+          </div>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="hasLeaseCar"
+              className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              checked={hasLeaseCar}
+              onChange={(e) => onHasLeaseCarChange(e.target.checked)}
+            />
+            <label
+              htmlFor="hasLeaseCar"
+              className="ml-2 text-sm font-medium text-gray-700"
+            >
+              {t('profile.sections.driving.leaseCar')}
             </label>
           </div>
         </div>

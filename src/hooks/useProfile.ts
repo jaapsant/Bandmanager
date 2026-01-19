@@ -31,6 +31,8 @@ export interface UseProfileReturn {
   setHasWinterTyres: (has: boolean) => void;
   hasGermanEnvironmentSticker: boolean;
   setHasGermanEnvironmentSticker: (has: boolean) => void;
+  hasLeaseCar: boolean;
+  setHasLeaseCar: (has: boolean) => void;
   drivingRemark: string;
   setDrivingRemark: (remark: string) => void;
 
@@ -89,6 +91,7 @@ export function useProfile(): UseProfileReturn {
   const [drivingStatus, setDrivingStatus] = useState<AvailabilityStatusValue>('maybe');
   const [hasWinterTyres, setHasWinterTyres] = useState(false);
   const [hasGermanEnvironmentSticker, setHasGermanEnvironmentSticker] = useState(false);
+  const [hasLeaseCar, setHasLeaseCar] = useState(false);
   const [drivingRemark, setDrivingRemark] = useState('');
 
   // Form state - Password
@@ -123,6 +126,7 @@ export function useProfile(): UseProfileReturn {
           setHasGermanEnvironmentSticker(
             currentMember.drivingAvailability.hasGermanEnvironmentSticker || false
           );
+          setHasLeaseCar(currentMember.drivingAvailability.hasLeaseCar || false);
           setDrivingRemark(currentMember.drivingAvailability.remark || '');
         }
       }
@@ -210,6 +214,7 @@ export function useProfile(): UseProfileReturn {
           status: drivingStatus,
           hasWinterTyres,
           hasGermanEnvironmentSticker,
+          hasLeaseCar,
           remark: drivingRemark,
         };
         await updateMemberDrivingPreferences(user.uid, drivingPreferences);
@@ -225,6 +230,7 @@ export function useProfile(): UseProfileReturn {
       drivingStatus,
       hasWinterTyres,
       hasGermanEnvironmentSticker,
+      hasLeaseCar,
       drivingRemark,
       updateMemberDrivingPreferences,
       t,
@@ -288,6 +294,8 @@ export function useProfile(): UseProfileReturn {
     setHasWinterTyres,
     hasGermanEnvironmentSticker,
     setHasGermanEnvironmentSticker,
+    hasLeaseCar,
+    setHasLeaseCar,
     drivingRemark,
     setDrivingRemark,
 

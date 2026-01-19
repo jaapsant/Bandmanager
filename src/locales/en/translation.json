@@ -347,6 +347,7 @@
         "availabilityLabel": "Driving Availability",
         "winterTyres": "I have winter tyres",
         "environmentSticker": "I have a German environment sticker",
+        "leaseCar": "I have a lease car",
         "remarkLabel": "Remark",
         "remarkPlaceholder": "Add any notes about your driving preferences...",
         "button": "Update Driving Preferences"

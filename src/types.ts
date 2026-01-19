@@ -26,17 +26,20 @@ export interface MemberAvailability {
   };
 }
 
+export interface DrivingAvailability {
+  status: AvailabilityStatusValue;
+  hasWinterTyres?: boolean;
+  hasGermanEnvironmentSticker?: boolean;
+  hasLeaseCar?: boolean;
+  remark?: string;
+}
+
 export interface BandMember {
   id: string;
   name: string;
   instrument: string;
   wantsPrintedSheetMusic?: boolean;
-  drivingAvailability?: {
-    status: AvailabilityStatusValue;
-    hasWinterTyres?: boolean;
-    hasGermanEnvironmentSticker?: boolean;
-    remark?: string;
-  };
+  drivingAvailability?: DrivingAvailability;
   availability?: {
     status: AvailabilityStatus['value'];
     note?: string;
