@@ -292,12 +292,18 @@ export function useGigDetails(gigId: string | undefined): UseGigDetailsReturn {
       Object.entries(gig.memberAvailability).forEach(([userId, availability]) => {
         const dateAvailability = availability.dateAvailability?.[selectedDate];
         if (dateAvailability) {
-          updatedMemberAvailability[userId] = {
+          const memberAvail: MemberAvailability = {
             status: dateAvailability.status,
-            note: dateAvailability.note || undefined,
-            canDrive: dateAvailability.canDrive || undefined,
             dateAvailability: {}
-          } as MemberAvailability;
+          };
+          // Only include note and canDrive if they have values (Firestore doesn't accept undefined)
+          if (dateAvailability.note) {
+            memberAvail.note = dateAvailability.note;
+          }
+          if (dateAvailability.canDrive !== undefined && dateAvailability.canDrive !== null) {
+            memberAvail.canDrive = dateAvailability.canDrive;
+          }
+          updatedMemberAvailability[userId] = memberAvail;
         }
       });
 
