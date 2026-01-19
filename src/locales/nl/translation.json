@@ -107,7 +107,8 @@
       "table": {
         "name": "Naam",
         "gigsPlayed": "Gespeelde Optredens",
-        "distanceDriven": "Gereden Afstand"
+        "distanceDriven": "Gereden Afstand",
+        "drivingCosts": "Rijkosten"
       }
     },
     "drivingDetails": {

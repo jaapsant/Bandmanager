@@ -119,7 +119,8 @@
       "table": {
         "name": "Name",
         "gigsPlayed": "Gigs Played",
-        "distanceDriven": "Distance Driven"
+        "distanceDriven": "Distance Driven",
+        "drivingCosts": "Driving Costs"
       }
     },
     "drivingDetails": {

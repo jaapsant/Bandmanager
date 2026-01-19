@@ -5,6 +5,9 @@ import { useBand } from '../context/BandContext';
 import { useState } from 'react';
 import { useRole } from '../hooks/useRole';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '../utils/dateFormat';
+
+const COST_PER_KM = 0.23;
 
 export function YearOverview() {
   const { year } = useParams();
@@ -184,12 +187,17 @@ export function YearOverview() {
                   </th>
                 )}
                 <th className="px-6 py-3 text-left border-l">
-                  <button 
+                  <button
                     className="flex items-center gap-1 font-semibold text-gray-900 hover:text-red-600"
                     onClick={() => handleSort('totalDistance')}
                   >
                     {t('yearOverview.bandMembers.table.distanceDriven')} <ArrowUpDown className="h-4 w-4" />
                   </button>
+                </th>
+                <th className="px-6 py-3 text-left">
+                  <span className="font-semibold text-gray-900">
+                    {t('yearOverview.bandMembers.table.drivingCosts')}
+                  </span>
                 </th>
               </tr>
             </thead>
@@ -210,6 +218,9 @@ export function YearOverview() {
                     >
                       {stats.totalDistance.toLocaleString()} km
                     </button>
+                  </td>
+                  <td className="px-6 py-4 text-red-600">
+                    {formatCurrency(stats.totalDistance * COST_PER_KM)}
                   </td>
                 </tr>
               ))}
