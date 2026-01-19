@@ -2,6 +2,7 @@ import { Calendar, Clock, Euro, MapPin, Car, X, Plus } from 'lucide-react';
 import { Gig } from '../../types';
 import { MultiDateAvailabilityOverview } from '../MultiDateAvailabilityOverview';
 import { AvailabilityOverview } from '../AvailabilityOverview';
+import { formatDate } from '../../utils/dateFormat';
 
 interface GigInfoSectionProps {
     gig: Gig;
@@ -96,12 +97,12 @@ export function GigInfoSection({
                             </div>
                         ) : (
                             <div>
-                                <span>{new Date(gig.date).toLocaleDateString()}</span>
+                                <span>{formatDate(gig.date)}</span>
                                 {gig.isMultiDay && gig.dates.length > 0 && (
                                     <div className="mt-1 pl-4 space-y-1 text-sm text-gray-500">
                                         {gig.dates.map((date, index) => (
                                             <div key={index}>
-                                                {new Date(date).toLocaleDateString()}
+                                                {formatDate(date)}
                                             </div>
                                         ))}
                                     </div>

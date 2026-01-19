@@ -5,11 +5,11 @@ import { useStatusOptions } from '../data';
 import { Link, useNavigate } from 'react-router-dom';
 import { AvailabilityOverview } from './AvailabilityOverview';
 import { useAuth } from '../context/AuthContext';
-import { AddToCalendar } from './AddToCalendar';
 import { useTranslation } from 'react-i18next';
 import { AvailabilityStatus } from './AvailabilityStatus';
 import { useBand } from '../context/BandContext';
 import { useGigStats } from '../hooks/useGigStats';
+import { formatDate, formatDateShort } from '../utils/dateFormat';
 
 interface GigCardProps {
   gig: Gig;
@@ -81,15 +81,15 @@ export function GigCard({ gig }: GigCardProps) {
             <div className="flex items-center">
               <CalendarRange className="w-4 h-4 mr-2" />
               <span className="font-medium">
-                {new Date(gig.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                {formatDateShort(gig.date)}
                 {' - '}
-                {new Date(gig.dates[gig.dates.length - 1] || gig.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                {formatDateShort(gig.dates[gig.dates.length - 1] || gig.date)}
               </span>
             </div>
           ) : (
             <>
               <Calendar className="w-4 h-4 mr-2" />
-              <span>{new Date(gig.date).toLocaleDateString()}</span>
+              <span>{formatDate(gig.date)}</span>
             </>
           )}
         </div>

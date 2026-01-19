@@ -4,6 +4,7 @@ import { Gig, AvailabilityStatus as AvailabilityStatusType } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { Car } from 'lucide-react';
 import { AvailabilityStatus } from './AvailabilityStatus';
+import { formatDate } from '../utils/dateFormat';
 
 interface MultiDateAvailabilityProps {
   gig: Gig;
@@ -28,7 +29,7 @@ export function MultiDateAvailability({ gig, onUpdateAvailability, onUpdateDrivi
           <div key={date} className="bg-gray-50 p-4 rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium">
-                {new Date(date).toLocaleDateString()}
+                {formatDate(date)}
               </span>
               <div className="flex items-center space-x-2">
                 <div className="flex space-x-2">

@@ -5,6 +5,7 @@ import { useBand } from '../context/BandContext';
 import { useRole } from '../hooks/useRole';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
+import { formatDate } from '../utils/dateFormat';
 
 interface MultiDateAvailabilityOverviewProps {
   gig: Gig;
@@ -110,7 +111,7 @@ export function MultiDateAvailabilityOverview({ gig, onSelectSingleDate }: Multi
                     )}
                   </button>
                   <span className="text-sm font-medium text-gray-700">
-                    {new Date(date).toLocaleDateString()}
+                    {formatDate(date)}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">

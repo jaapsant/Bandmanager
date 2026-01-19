@@ -5,6 +5,7 @@ import { useRole } from '../hooks/useRole';
 import { useBand } from '../context/BandContext';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { formatDate } from '../utils/dateFormat';
 
 interface MultiDateBandAvailabilityProps {
   gig: Gig;
@@ -55,7 +56,7 @@ export function MultiDateBandAvailability({ gig, onUpdateMemberAvailability, onU
                       <div key={date} className="space-y-2">
                         <div className="flex items-center justify-between bg-white p-2 rounded">
                           <span className="text-sm text-gray-500">
-                            {new Date(date).toLocaleDateString()}
+                            {formatDate(date)}
                           </span>
                           <div className="flex items-center space-x-2">
                             {(canEditGig && isPastGig && onUpdateMemberAvailability) ? (

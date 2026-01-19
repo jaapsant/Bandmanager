@@ -2,6 +2,7 @@ import { Calendar, CalendarRange, AlertCircle } from 'lucide-react';
 import { TFunction } from 'i18next';
 import { Gig, AvailabilityStatusValue } from '../../types';
 import { AvailabilityStatus } from '../AvailabilityStatus';
+import { formatDateShort } from '../../utils/dateFormat';
 
 interface StatusOption {
   value: string;
@@ -66,16 +67,16 @@ export function GigTableRow({
             <>
               <CalendarRange className="w-4 h-4 mr-1.5 flex-shrink-0" />
               <span className="text-xs sm:text-sm">
-                {new Date(gig.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                {formatDateShort(gig.date)}
                 {' - '}
-                {new Date(gig.dates[gig.dates.length - 1] || gig.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                {formatDateShort(gig.dates[gig.dates.length - 1] || gig.date)}
               </span>
             </>
           ) : (
             <>
               <Calendar className="w-4 h-4 mr-1.5 flex-shrink-0" />
               <span className="text-xs sm:text-sm">
-                {new Date(gig.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                {formatDateShort(gig.date)}
               </span>
             </>
           )}
