@@ -6,6 +6,8 @@ import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { sendEmail, getEmailsForUserIds } from '../../utils/emailService';
 import { getGigReminderEmailTemplate } from '../../utils/emailTemplates';
+import { EmailDraftDialog } from './EmailDraftDialog';
+import { useTranslation } from 'react-i18next';
 
 interface GigHeaderProps {
     gig: Gig;
@@ -37,7 +39,11 @@ export function GigHeader({
     onUpdateGig,
 }: GigHeaderProps) {
     const { user } = useAuth();
+    const { t } = useTranslation();
     const [sending, setSending] = useState(false);
+    const [showEmailDraft, setShowEmailDraft] = useState(false);
+    const [emailRecipients, setEmailRecipients] = useState<string[]>([]);
+    const [emailTemplate, setEmailTemplate] = useState({ subject: '', text: '' });
 
     // Check if all members have responded
     const allMembersResponded = bandMembers.every(member => {
@@ -45,12 +51,11 @@ export function GigHeader({
         return !!availability;
     });
 
-    const handleSendGigEmail = async () => {
+    const handleOpenEmailDraft = async () => {
         if (!user?.email) {
             toast.error('No user email found');
             return;
         }
-        setSending(true);
 
         try {
             // 1. Identify members who haven't responded
@@ -60,8 +65,7 @@ export function GigHeader({
             });
 
             if (missingMembers.length === 0) {
-                toast.success('All members have responded!');
-                setSending(false);
+                toast.success(t('gigDetails.emailDraft.allResponded'));
                 return;
             }
 
@@ -70,27 +74,43 @@ export function GigHeader({
             const emails = await getEmailsForUserIds(missingMemberIds);
 
             if (emails.length === 0) {
-                toast.error('No emails found for missing members');
-                setSending(false);
+                toast.error(t('gigDetails.emailDraft.noEmails'));
                 return;
             }
 
-            // 3. Send reminder email
+            // 3. Prepare the draft
             const gigLink = window.location.href;
             const template = getGigReminderEmailTemplate(gig, gigLink);
 
+            setEmailRecipients(emails);
+            setEmailTemplate({ subject: template.subject, text: template.text });
+            setShowEmailDraft(true);
+        } catch (error) {
+            console.error(error);
+            toast.error(t('gigDetails.emailDraft.prepareFailed'));
+        }
+    };
+
+    const handleSendEmail = async (subject: string, body: string) => {
+        setSending(true);
+
+        try {
+            const gigLink = window.location.href;
             const result = await sendEmail({
-                bcc: emails,
-                ...template,
+                bcc: emailRecipients,
+                subject,
+                text: body,
+                html: `<p>${body.replace(/\n/g, '</p><p>')}</p><p><a href="${gigLink}">${t('gigDetails.emailDraft.clickHere')}</a></p>`,
             });
 
             if (result.success) {
-                toast.success(`Email sent to ${emails.length} members!`);
+                toast.success(t('gigDetails.emailDraft.sent', { count: emailRecipients.length }));
+                setShowEmailDraft(false);
                 if (result.previewUrl) {
                     console.log('Preview URL:', result.previewUrl);
                     toast((_) => (
                         <span>
-                            Email sent! <a href={result.previewUrl} target="_blank" rel="noreferrer" className="underline">View Preview</a>
+                            {t('gigDetails.emailDraft.sentWithPreview')} <a href={result.previewUrl} target="_blank" rel="noreferrer" className="underline">{t('gigDetails.emailDraft.viewPreview')}</a>
                         </span>
                     ), { duration: 10000 });
                 }
@@ -99,7 +119,7 @@ export function GigHeader({
             }
         } catch (error) {
             console.error(error);
-            toast.error('Failed to send gig email');
+            toast.error(t('gigDetails.emailDraft.sendFailed'));
         } finally {
             setSending(false);
         }
@@ -162,10 +182,10 @@ export function GigHeader({
                     )}
                     {canEditGig && (
                         <button
-                            onClick={handleSendGigEmail}
+                            onClick={handleOpenEmailDraft}
                             disabled={sending || allMembersResponded}
                             className="p-2 text-gray-400 hover:text-blue-600 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                            title={allMembersResponded ? "All members have responded" : "Email Gig Link"}
+                            title={allMembersResponded ? t('gigDetails.emailDraft.allRespondedTooltip') : t('gigDetails.emailDraft.tooltip')}
                         >
                             <Mail className="w-5 h-5" />
                         </button>
@@ -189,6 +209,17 @@ export function GigHeader({
                     )}
                 </div>
             </div>
+
+            <EmailDraftDialog
+                isOpen={showEmailDraft}
+                recipients={emailRecipients}
+                initialSubject={emailTemplate.subject}
+                initialBody={emailTemplate.text}
+                sending={sending}
+                onSend={handleSendEmail}
+                onCancel={() => setShowEmailDraft(false)}
+                t={t}
+            />
         </div>
     );
 }

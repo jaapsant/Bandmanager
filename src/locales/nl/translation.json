@@ -161,6 +161,26 @@
       "cancel": "Annuleren",
       "confirm": "Verwijderen"
     },
+    "emailDraft": {
+      "title": "Herinneringsmail",
+      "recipients": "Ontvangers",
+      "recipientCount": "leden die nog niet gereageerd hebben",
+      "subject": "Onderwerp",
+      "message": "Bericht",
+      "cancel": "Annuleren",
+      "send": "Versturen",
+      "sending": "Versturen...",
+      "sent": "Email verstuurd naar {{count}} leden!",
+      "sentWithPreview": "Email verstuurd!",
+      "viewPreview": "Bekijk voorbeeld",
+      "allResponded": "Alle leden hebben al gereageerd!",
+      "allRespondedTooltip": "Alle leden hebben gereageerd",
+      "tooltip": "Stuur herinneringsmail",
+      "noEmails": "Geen emailadressen gevonden voor leden",
+      "prepareFailed": "Kon email niet voorbereiden",
+      "sendFailed": "Versturen email mislukt",
+      "clickHere": "Klik hier om het optreden te bekijken"
+    },
     "actions": {
       "edit": "Bewerken",
       "save": "Opslaan",

@@ -173,6 +173,26 @@
       "cancel": "Cancel",
       "confirm": "Delete"
     },
+    "emailDraft": {
+      "title": "Reminder Email",
+      "recipients": "Recipients",
+      "recipientCount": "members who haven't responded yet",
+      "subject": "Subject",
+      "message": "Message",
+      "cancel": "Cancel",
+      "send": "Send",
+      "sending": "Sending...",
+      "sent": "Email sent to {{count}} members!",
+      "sentWithPreview": "Email sent!",
+      "viewPreview": "View Preview",
+      "allResponded": "All members have already responded!",
+      "allRespondedTooltip": "All members have responded",
+      "tooltip": "Send reminder email",
+      "noEmails": "No email addresses found for members",
+      "prepareFailed": "Could not prepare email",
+      "sendFailed": "Failed to send email",
+      "clickHere": "Click here to view the gig"
+    },
     "actions": {
       "edit": "Edit",
       "save": "Save",
