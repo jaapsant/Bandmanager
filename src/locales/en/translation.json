@@ -120,7 +120,8 @@
         "name": "Name",
         "gigsPlayed": "Gigs Played",
         "distanceDriven": "Distance Driven",
-        "drivingCosts": "Driving Costs"
+        "drivingCosts": "Driving Costs",
+        "costDistribution": "Settlement"
       }
     },
     "drivingDetails": {

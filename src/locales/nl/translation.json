@@ -108,7 +108,8 @@
         "name": "Naam",
         "gigsPlayed": "Gespeelde Optredens",
         "distanceDriven": "Gereden Afstand",
-        "drivingCosts": "Rijkosten"
+        "drivingCosts": "Rijkosten",
+        "costDistribution": "Verrekening"
       }
     },
     "drivingDetails": {

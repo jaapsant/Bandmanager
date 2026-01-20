@@ -35,31 +35,47 @@ export function YearOverview() {
   };
 
   const memberStats = Array.from(new Set(
-    yearGigs.flatMap(gig => 
+    yearGigs.flatMap(gig =>
       Object.entries(gig.memberAvailability || {}).map(([memberId]) => memberId)
     )
   )).map(memberId => {
-    const memberName = bandMembers.find(m => m.id === memberId)?.name || memberId;
+    const memberData = bandMembers.find(m => m.id === memberId);
+    const memberName = memberData?.name || memberId;
+    const hasLeaseCar = memberData?.drivingAvailability?.hasLeaseCar || false;
 
-    const memberGigs = yearGigs.filter(gig => 
-      gig.status !== 'declined' && 
+    const memberGigs = yearGigs.filter(gig =>
+      gig.status !== 'declined' &&
       gig.memberAvailability?.[memberId]?.status !== undefined
     );
 
+    const totalDistance = memberGigs.reduce((sum, gig) => {
+      const isAvailableAndDriving = gig.memberAvailability?.[memberId]?.status === 'available'
+        && gig.memberAvailability?.[memberId]?.canDrive === true;
+      return sum + (isAvailableAndDriving ? (Number(gig.distance) || 0) : 0);
+    }, 0);
+
     return {
       member: { id: memberId, name: memberName },
+      hasLeaseCar,
       stats: {
-        available: memberGigs.filter(gig => 
+        available: memberGigs.filter(gig =>
           gig.memberAvailability?.[memberId]?.status === 'available'
         ).length,
-        totalDistance: memberGigs.reduce((sum, gig) => {
-          const isAvailableAndDriving = gig.memberAvailability?.[memberId]?.status === 'available' 
-            && gig.memberAvailability?.[memberId]?.canDrive === true;
-          return sum + (isAvailableAndDriving ? (Number(gig.distance) || 0) : 0);
-        }, 0)
+        totalDistance,
+        drivingCosts: totalDistance * COST_PER_KM
       }
     };
   });
+
+  // Calculate cost distribution for non-lease car drivers
+  const nonLeaseCarMembers = memberStats.filter(m => !m.hasLeaseCar);
+  const totalNonLeaseCosts = nonLeaseCarMembers.reduce(
+    (sum, m) => sum + m.stats.drivingCosts,
+    0
+  );
+  const averageCostPerMember = nonLeaseCarMembers.length > 0
+    ? totalNonLeaseCosts / nonLeaseCarMembers.length
+    : 0;
 
   console.log('Year Gigs:', yearGigs);
   console.log('Member Stats:', memberStats);
@@ -199,31 +215,43 @@ export function YearOverview() {
                     {t('yearOverview.bandMembers.table.drivingCosts')}
                   </span>
                 </th>
+                <th className="px-6 py-3 text-left">
+                  <span className="font-semibold text-gray-900">
+                    {t('yearOverview.bandMembers.table.costDistribution')}
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>
-              {sortedMemberStats.map(({ member, stats }) => (
-                <tr key={member.id} className="border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium">{member.name}</td>
-                  {(roles.admin || roles.bandManager) && (
-                    <td className="px-6 py-4 text-green-600">{stats.available}</td>
-                  )}
-                  <td className="px-6 py-4 border-l text-red-600">
-                    <button
-                      onClick={() => setSelectedMember({
-                        member,
-                        gigs: getDriverGigs(member.id)
-                      })}
-                      className="hover:underline focus:outline-none"
-                    >
-                      {stats.totalDistance.toLocaleString()} km
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 text-red-600">
-                    {formatCurrency(stats.totalDistance * COST_PER_KM)}
-                  </td>
-                </tr>
-              ))}
+              {sortedMemberStats.map(({ member, hasLeaseCar, stats }) => {
+                const costDifference = hasLeaseCar ? null : stats.drivingCosts - averageCostPerMember;
+
+                return (
+                  <tr key={member.id} className="border-b hover:bg-gray-50">
+                    <td className="px-6 py-4 font-medium">{member.name}</td>
+                    {(roles.admin || roles.bandManager) && (
+                      <td className="px-6 py-4 text-green-600">{stats.available}</td>
+                    )}
+                    <td className="px-6 py-4 border-l text-red-600">
+                      <button
+                        onClick={() => setSelectedMember({
+                          member,
+                          gigs: getDriverGigs(member.id)
+                        })}
+                        className="hover:underline focus:outline-none"
+                      >
+                        {stats.totalDistance.toLocaleString()} km
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 text-red-600">
+                      {formatCurrency(stats.drivingCosts)}
+                    </td>
+                    <td className={`px-6 py-4 ${costDifference !== null ? (costDifference >= 0 ? 'text-green-600' : 'text-red-600') : ''}`}>
+                      {costDifference !== null ? formatCurrency(costDifference) : ''}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
