@@ -196,7 +196,10 @@
       "italic": "Italic",
       "addLink": "Add link",
       "bulletList": "Bullet list",
-      "enterUrl": "Enter the URL:"
+      "enterUrl": "Enter the URL:",
+      "currentGig": "current gig",
+      "missingMembers": "Not yet responded",
+      "noOtherGigs": "No other gigs with missing responses"
     },
     "actions": {
       "edit": "Edit",

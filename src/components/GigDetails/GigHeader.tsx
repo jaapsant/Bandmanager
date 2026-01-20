@@ -1,7 +1,7 @@
 import { Edit2, Save, X, Trash2, Mail } from 'lucide-react';
 import { Gig, BandMember } from '../../types';
 import { AddToCalendar } from '../AddToCalendar';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { sendEmail, getEmailsForUserIds } from '../../utils/emailService';
@@ -17,6 +17,7 @@ interface GigHeaderProps {
     canEditGig: boolean;
     statusOptions: ReadonlyArray<{ readonly value: string; readonly label: string; readonly color: string }>;
     bandMembers: BandMember[];
+    allGigs: Gig[];
     onEdit: () => void;
     onSave: () => void;
     onCancel: () => void;
@@ -32,6 +33,7 @@ export function GigHeader({
     canEditGig,
     statusOptions,
     bandMembers,
+    allGigs,
     onEdit,
     onSave,
     onCancel,
@@ -42,7 +44,7 @@ export function GigHeader({
     const { t } = useTranslation();
     const [sending, setSending] = useState(false);
     const [showEmailDraft, setShowEmailDraft] = useState(false);
-    const [emailRecipients, setEmailRecipients] = useState<string[]>([]);
+    const [initialRecipientEmails, setInitialRecipientEmails] = useState<string[]>([]);
     const [emailTemplate, setEmailTemplate] = useState({ subject: '', html: '' });
 
     // Check if all members have responded
@@ -51,6 +53,26 @@ export function GigHeader({
         return !!availability;
     });
 
+    // Get all gigs with missing members (for the multi-select)
+    const gigsWithMissingMembers = useMemo(() => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        return allGigs
+            .filter(g => {
+                // Only include pending or confirmed gigs in the future
+                const gigDate = new Date(g.date);
+                return gigDate >= today && (g.status === 'pending' || g.status === 'confirmed');
+            })
+            .map(g => {
+                const missingMemberIds = bandMembers
+                    .filter(member => !g.memberAvailability?.[member.id])
+                    .map(member => member.id);
+                return { gig: g, missingMemberIds };
+            })
+            .filter(({ missingMemberIds }) => missingMemberIds.length > 0);
+    }, [allGigs, bandMembers]);
+
     const handleOpenEmailDraft = async () => {
         if (!user?.email) {
             toast.error('No user email found');
@@ -58,7 +80,7 @@ export function GigHeader({
         }
 
         try {
-            // 1. Identify members who haven't responded
+            // 1. Identify members who haven't responded for current gig
             const missingMembers = bandMembers.filter(member => {
                 const availability = gig.memberAvailability[member.id];
                 return !availability;
@@ -82,7 +104,7 @@ export function GigHeader({
             const gigLink = window.location.href;
             const template = getGigReminderEmailTemplate(gig, gigLink);
 
-            setEmailRecipients(emails);
+            setInitialRecipientEmails(emails);
             setEmailTemplate({ subject: template.subject, html: template.html });
             setShowEmailDraft(true);
         } catch (error) {
@@ -91,7 +113,7 @@ export function GigHeader({
         }
     };
 
-    const handleSendEmail = async (subject: string, html: string) => {
+    const handleSendEmail = async (subject: string, html: string, recipientEmails: string[]) => {
         setSending(true);
 
         try {
@@ -101,14 +123,14 @@ export function GigHeader({
             const textContent = tempDiv.textContent || tempDiv.innerText || '';
 
             const result = await sendEmail({
-                bcc: emailRecipients,
+                bcc: recipientEmails,
                 subject,
                 text: textContent,
                 html,
             });
 
             if (result.success) {
-                toast.success(t('gigDetails.emailDraft.sent', { count: emailRecipients.length }));
+                toast.success(t('gigDetails.emailDraft.sent', { count: recipientEmails.length }));
                 setShowEmailDraft(false);
                 if (result.previewUrl) {
                     console.log('Preview URL:', result.previewUrl);
@@ -216,12 +238,16 @@ export function GigHeader({
 
             <EmailDraftDialog
                 isOpen={showEmailDraft}
-                recipients={emailRecipients}
+                currentGigId={gig.id}
+                initialRecipientEmails={initialRecipientEmails}
                 initialSubject={emailTemplate.subject}
                 initialHtml={emailTemplate.html}
                 sending={sending}
+                gigsWithMissingMembers={gigsWithMissingMembers}
+                bandMembers={bandMembers}
                 onSend={handleSendEmail}
                 onCancel={() => setShowEmailDraft(false)}
+                onFetchEmails={getEmailsForUserIds}
                 t={t}
             />
         </div>

@@ -19,6 +19,7 @@ import { validateGig, ValidationMessages } from '../utils/gigValidation';
 export interface UseGigDetailsReturn {
   // Data
   gig: Gig | undefined;
+  allGigs: Gig[];
   editedGig: Gig | null;
   user: ReturnType<typeof useAuth>['user'];
   bandMembers: ReturnType<typeof useBand>['bandMembers'];
@@ -343,6 +344,7 @@ export function useGigDetails(gigId: string | undefined): UseGigDetailsReturn {
   return {
     // Data
     gig,
+    allGigs: gigs,
     editedGig,
     user,
     bandMembers,

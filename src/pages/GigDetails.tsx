@@ -16,6 +16,7 @@ export function GigDetails() {
 
   const {
     gig,
+    allGigs,
     editedGig,
     user,
     bandMembers,
@@ -75,6 +76,7 @@ export function GigDetails() {
             canEditGig={canEditGig}
             statusOptions={statusOptions}
             bandMembers={bandMembers}
+            allGigs={allGigs}
             onEdit={handleEdit}
             onSave={handleSave}
             onCancel={handleCancel}

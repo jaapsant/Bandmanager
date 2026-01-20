@@ -184,7 +184,10 @@
       "italic": "Cursief",
       "addLink": "Link toevoegen",
       "bulletList": "Opsommingslijst",
-      "enterUrl": "Voer de URL in:"
+      "enterUrl": "Voer de URL in:",
+      "currentGig": "huidig optreden",
+      "missingMembers": "Nog niet gereageerd",
+      "noOtherGigs": "Geen andere optredens met ontbrekende reacties"
     },
     "actions": {
       "edit": "Bewerken",
