@@ -191,7 +191,12 @@
       "noEmails": "No email addresses found for members",
       "prepareFailed": "Could not prepare email",
       "sendFailed": "Failed to send email",
-      "clickHere": "Click here to view the gig"
+      "clickHere": "Click here to view the gig",
+      "bold": "Bold",
+      "italic": "Italic",
+      "addLink": "Add link",
+      "bulletList": "Bullet list",
+      "enterUrl": "Enter the URL:"
     },
     "actions": {
       "edit": "Edit",

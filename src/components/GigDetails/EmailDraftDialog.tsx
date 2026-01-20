@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { X, Send } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Send, Bold, Italic, Link, List } from 'lucide-react';
 
 interface EmailDraftDialogProps {
     isOpen: boolean;
     recipients: string[];
     initialSubject: string;
-    initialBody: string;
+    initialHtml: string;
     sending: boolean;
-    onSend: (subject: string, body: string) => void;
+    onSend: (subject: string, html: string) => void;
     onCancel: () => void;
     t: (key: string, params?: Record<string, string | number>) => string;
 }
@@ -16,25 +16,50 @@ export function EmailDraftDialog({
     isOpen,
     recipients,
     initialSubject,
-    initialBody,
+    initialHtml,
     sending,
     onSend,
     onCancel,
     t,
 }: EmailDraftDialogProps) {
     const [subject, setSubject] = useState(initialSubject);
-    const [body, setBody] = useState(initialBody);
+    const editorRef = useRef<HTMLDivElement>(null);
 
     // Update local state when initial values change (when dialog opens)
     useEffect(() => {
         setSubject(initialSubject);
-        setBody(initialBody);
-    }, [initialSubject, initialBody]);
+        if (editorRef.current) {
+            editorRef.current.innerHTML = initialHtml;
+        }
+    }, [initialSubject, initialHtml]);
 
     if (!isOpen) return null;
 
     const handleSend = () => {
-        onSend(subject, body);
+        const html = editorRef.current?.innerHTML || '';
+        onSend(subject, html);
+    };
+
+    const execCommand = (command: string, value?: string) => {
+        document.execCommand(command, false, value);
+        editorRef.current?.focus();
+    };
+
+    const handleBold = () => execCommand('bold');
+    const handleItalic = () => execCommand('italic');
+    const handleList = () => execCommand('insertUnorderedList');
+
+    const handleLink = () => {
+        const url = prompt(t('gigDetails.emailDraft.enterUrl'));
+        if (url) {
+            execCommand('createLink', url);
+        }
+    };
+
+    const isEditorEmpty = () => {
+        if (!editorRef.current) return true;
+        const text = editorRef.current.innerText.trim();
+        return text === '';
     };
 
     return (
@@ -76,12 +101,67 @@ export function EmailDraftDialog({
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             {t('gigDetails.emailDraft.message')}
                         </label>
-                        <textarea
-                            value={body}
-                            onChange={(e) => setBody(e.target.value)}
-                            rows={8}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-y"
-                        />
+                        <div className="border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-red-500 focus-within:border-transparent">
+                            <div className="flex items-center gap-1 p-2 border-b border-gray-200 bg-gray-50">
+                                <button
+                                    type="button"
+                                    onClick={handleBold}
+                                    className="p-1.5 rounded hover:bg-gray-200 text-gray-600"
+                                    title={t('gigDetails.emailDraft.bold')}
+                                >
+                                    <Bold className="w-4 h-4" />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleItalic}
+                                    className="p-1.5 rounded hover:bg-gray-200 text-gray-600"
+                                    title={t('gigDetails.emailDraft.italic')}
+                                >
+                                    <Italic className="w-4 h-4" />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleLink}
+                                    className="p-1.5 rounded hover:bg-gray-200 text-gray-600"
+                                    title={t('gigDetails.emailDraft.addLink')}
+                                >
+                                    <Link className="w-4 h-4" />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleList}
+                                    className="p-1.5 rounded hover:bg-gray-200 text-gray-600"
+                                    title={t('gigDetails.emailDraft.bulletList')}
+                                >
+                                    <List className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <style>
+                                {`
+                                    .email-editor a {
+                                        color: #2563eb;
+                                        text-decoration: underline;
+                                    }
+                                    .email-editor a:hover {
+                                        color: #1d4ed8;
+                                    }
+                                    .email-editor ul {
+                                        list-style-type: disc;
+                                        padding-left: 1.5rem;
+                                        margin: 0.5rem 0;
+                                    }
+                                    .email-editor p {
+                                        margin: 0.25rem 0;
+                                    }
+                                `}
+                            </style>
+                            <div
+                                ref={editorRef}
+                                contentEditable
+                                className="email-editor min-h-[200px] p-3 focus:outline-none"
+                                dangerouslySetInnerHTML={{ __html: initialHtml }}
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -95,7 +175,7 @@ export function EmailDraftDialog({
                     </button>
                     <button
                         onClick={handleSend}
-                        disabled={sending || !subject.trim() || !body.trim()}
+                        disabled={sending || !subject.trim() || isEditorEmpty()}
                         className="px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                         <Send className="w-4 h-4" />

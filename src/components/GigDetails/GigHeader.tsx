@@ -43,7 +43,7 @@ export function GigHeader({
     const [sending, setSending] = useState(false);
     const [showEmailDraft, setShowEmailDraft] = useState(false);
     const [emailRecipients, setEmailRecipients] = useState<string[]>([]);
-    const [emailTemplate, setEmailTemplate] = useState({ subject: '', text: '' });
+    const [emailTemplate, setEmailTemplate] = useState({ subject: '', html: '' });
 
     // Check if all members have responded
     const allMembersResponded = bandMembers.every(member => {
@@ -83,7 +83,7 @@ export function GigHeader({
             const template = getGigReminderEmailTemplate(gig, gigLink);
 
             setEmailRecipients(emails);
-            setEmailTemplate({ subject: template.subject, text: template.text });
+            setEmailTemplate({ subject: template.subject, html: template.html });
             setShowEmailDraft(true);
         } catch (error) {
             console.error(error);
@@ -91,16 +91,20 @@ export function GigHeader({
         }
     };
 
-    const handleSendEmail = async (subject: string, body: string) => {
+    const handleSendEmail = async (subject: string, html: string) => {
         setSending(true);
 
         try {
-            const gigLink = window.location.href;
+            // Convert HTML to plain text for the text version
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            const textContent = tempDiv.textContent || tempDiv.innerText || '';
+
             const result = await sendEmail({
                 bcc: emailRecipients,
                 subject,
-                text: body,
-                html: `<p>${body.replace(/\n/g, '</p><p>')}</p><p><a href="${gigLink}">${t('gigDetails.emailDraft.clickHere')}</a></p>`,
+                text: textContent,
+                html,
             });
 
             if (result.success) {
@@ -214,7 +218,7 @@ export function GigHeader({
                 isOpen={showEmailDraft}
                 recipients={emailRecipients}
                 initialSubject={emailTemplate.subject}
-                initialBody={emailTemplate.text}
+                initialHtml={emailTemplate.html}
                 sending={sending}
                 onSend={handleSendEmail}
                 onCancel={() => setShowEmailDraft(false)}

@@ -179,7 +179,12 @@
       "noEmails": "Geen emailadressen gevonden voor leden",
       "prepareFailed": "Kon email niet voorbereiden",
       "sendFailed": "Versturen email mislukt",
-      "clickHere": "Klik hier om het optreden te bekijken"
+      "clickHere": "Klik hier om het optreden te bekijken",
+      "bold": "Vet",
+      "italic": "Cursief",
+      "addLink": "Link toevoegen",
+      "bulletList": "Opsommingslijst",
+      "enterUrl": "Voer de URL in:"
     },
     "actions": {
       "edit": "Bewerken",
