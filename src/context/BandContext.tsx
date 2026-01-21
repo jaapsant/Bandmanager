@@ -33,32 +33,88 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
   const { roles } = useRole();
   const { t } = useTranslation();
 
-  // Listen for band members changes
+  // Listen for band members changes and merge with users who have bandMember role
   useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
+    let unsubscribeBandMembers: (() => void) | undefined;
+    let unsubscribeRoles: (() => void) | undefined;
+    let unsubscribeUsers: (() => void) | undefined;
 
     if (user) {
+      let bandMembersData: BandMember[] = [];
+      let rolesData: Record<string, { bandMember?: boolean }> = {};
+      let usersData: Record<string, { displayName?: string; email?: string }> = {};
+
+      const mergeAndSetMembers = () => {
+        // Start with existing band members
+        const memberMap = new Map<string, BandMember>();
+
+        bandMembersData.forEach(member => {
+          memberMap.set(member.id, member);
+        });
+
+        // Add users who have bandMember role but no bandMembers document yet
+        Object.entries(rolesData).forEach(([uid, role]) => {
+          if (role.bandMember && !memberMap.has(uid)) {
+            const userData = usersData[uid];
+            memberMap.set(uid, {
+              id: uid,
+              name: userData?.displayName || userData?.email || '',
+              instrument: '',
+              wantsPrintedSheetMusic: undefined,
+              drivingAvailability: undefined,
+            });
+          }
+        });
+
+        setBandMembers(Array.from(memberMap.values()));
+      };
+
+      // Listen to bandMembers collection
       const membersQuery = query(collection(db, 'bandMembers'));
-      unsubscribe = onSnapshot(membersQuery, (snapshot) => {
-        const membersData = snapshot.docs.map(doc => ({
+      unsubscribeBandMembers = onSnapshot(membersQuery, (snapshot) => {
+        bandMembersData = snapshot.docs.map(doc => ({
           id: doc.data().id || doc.id,
           name: doc.data().name || '',
           instrument: doc.data().instrument || '',
           wantsPrintedSheetMusic: doc.data().wantsPrintedSheetMusic,
           drivingAvailability: doc.data().drivingAvailability,
         })) as BandMember[];
-        setBandMembers(membersData);
+        mergeAndSetMembers();
       }, (error) => {
         console.error('Error fetching band members:', error);
+      });
+
+      // Listen to roles collection
+      const rolesQuery = query(collection(db, 'roles'));
+      unsubscribeRoles = onSnapshot(rolesQuery, (snapshot) => {
+        rolesData = {};
+        snapshot.docs.forEach(doc => {
+          rolesData[doc.id] = doc.data() as { bandMember?: boolean };
+        });
+        mergeAndSetMembers();
+      }, (error) => {
+        console.error('Error fetching roles:', error);
+      });
+
+      // Listen to users collection
+      const usersQuery = query(collection(db, 'users'));
+      unsubscribeUsers = onSnapshot(usersQuery, (snapshot) => {
+        usersData = {};
+        snapshot.docs.forEach(doc => {
+          usersData[doc.id] = doc.data() as { displayName?: string; email?: string };
+        });
+        mergeAndSetMembers();
+      }, (error) => {
+        console.error('Error fetching users:', error);
       });
     } else {
       setBandMembers([]);
     }
 
     return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
+      if (unsubscribeBandMembers) unsubscribeBandMembers();
+      if (unsubscribeRoles) unsubscribeRoles();
+      if (unsubscribeUsers) unsubscribeUsers();
     };
   }, [user]);
 
@@ -165,10 +221,14 @@ export function BandProvider({ children }: { children: React.ReactNode }) {
         throw new Error(t('bandContext.errors.updateOwnInstrumentOnly'));
       }
 
+      // Get the member's current name from bandMembers state (not the admin's name)
+      const member = bandMembers.find(m => m.id === memberId);
+      const memberName = member?.name || '';
+
       await updateOrCreateMember(
         memberId,
         { instrument },
-        { name: user?.displayName || '', createdBy: user?.uid }
+        { name: memberName, createdBy: user?.uid }
       );
     } catch (error) {
       console.error('Error updating instrument:', error);

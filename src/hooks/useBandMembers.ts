@@ -85,16 +85,17 @@ export function useBandMembers(): UseBandMembersReturn {
   );
 
   // Group members by instrument
+  const unassignedLabel = t('bandMembers.instruments.unassigned');
   const membersByInstrument = useMemo(() => {
     return bandMembers.reduce((acc, member) => {
-      const instrument = member.instrument || 'Unassigned';
+      const instrument = member.instrument || unassignedLabel;
       if (!acc[instrument]) {
         acc[instrument] = [];
       }
       acc[instrument].push(member);
       return acc;
     }, {} as Record<string, BandMember[]>);
-  }, [bandMembers]);
+  }, [bandMembers, unassignedLabel]);
 
   // Calculate sheet music summary
   const sheetMusicSummary = useMemo(() => {
