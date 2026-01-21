@@ -100,7 +100,7 @@ export function GigCompactTable({
           </table>
           {gigs.length === 0 && (
             <div className="text-center text-gray-500 py-8">
-              No {showHistory ? 'past' : 'upcoming'} gigs found
+              {showHistory ? t('gigList.table.noGigs.past') : t('gigList.table.noGigs.upcoming')}
             </div>
           )}
         </div>

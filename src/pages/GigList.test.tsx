@@ -201,7 +201,7 @@ describe('GigList', () => {
 
       render(<GigList />);
 
-      expect(screen.getByText('No upcoming gigs found')).toBeInTheDocument();
+      expect(screen.getByText('gigs.table.noGigs.upcoming')).toBeInTheDocument();
     });
   });
 

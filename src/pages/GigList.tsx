@@ -40,7 +40,7 @@ export function GigList() {
       ))}
       {gigs.length === 0 && (
         <div className="col-span-full text-center text-gray-500 py-8">
-          No upcoming gigs found
+          {t('gigList.table.noGigs.upcoming')}
         </div>
       )}
     </div>
