@@ -14,3 +14,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+
+// Expose db for migration scripts (can be removed after migration)
+if (typeof window !== 'undefined') {
+  (window as any).__FIREBASE_DB__ = db;
+}

@@ -152,33 +152,21 @@ function findMatch(searchName, items, nameField) {
 // ============================================
 
 async function fetchData() {
-  // Access Firebase from the app's global scope
-  const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
-
-  // Get the Firestore instance from window (set by the app)
-  // We need to access the app's Firebase instance
-  const firebaseApp = window.__FIREBASE_APP__ || null;
-
-  // Alternative: directly query using the app's db reference
-  // The app exposes db through the module, we need to find it
-
   console.log('Fetching data from Firebase...');
 
-  // Since we're in the browser with the app loaded, we can use the app's Firebase instance
-  // Let's try to access it through React's internals or the window object
-
-  // For now, let's use a workaround: make fetch requests to get the data
-  // Actually, let's access Firestore directly since the app has initialized it
-
-  const { getFirestore } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
-  const { getApps } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
-
-  const apps = getApps();
-  if (apps.length === 0) {
-    throw new Error('Firebase app not initialized. Make sure you are on the Bandmanager app page.');
+  // Get the Firestore instance exposed by the app
+  const db = window.__FIREBASE_DB__;
+  if (!db) {
+    throw new Error(
+      'Firebase db not found. Make sure you:\n' +
+      '1. Are on the Bandmanager app page\n' +
+      '2. Have reloaded the page after the latest code update\n' +
+      '3. Are logged in'
+    );
   }
 
-  const db = getFirestore(apps[0]);
+  // Import Firestore functions from the same CDN version
+  const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
 
   // Fetch band members
   const membersSnapshot = await getDocs(collection(db, 'bandMembers'));
@@ -304,18 +292,19 @@ async function executeMigration() {
   console.log('EXECUTING MIGRATION');
   console.log('='.repeat(60));
 
-  const confirm = prompt(`You are about to update ${updates.length} notes. Type "YES" to confirm:`);
-  if (confirm !== 'YES') {
+  const confirmResult = prompt(`You are about to update ${updates.length} notes. Type "YES" to confirm:`);
+  if (confirmResult !== 'YES') {
     console.log('Migration cancelled.');
     return;
   }
 
   try {
-    const { doc, updateDoc, getFirestore } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
-    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+    const { doc, updateDoc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
 
-    const apps = getApps();
-    const db = getFirestore(apps[0]);
+    const db = window.__FIREBASE_DB__;
+    if (!db) {
+      throw new Error('Firebase db not found. Reload the page and try again.');
+    }
 
     let successCount = 0;
     let errorCount = 0;
@@ -340,7 +329,6 @@ async function executeMigration() {
     for (const [gigId, gigUpdates] of Object.entries(updatesByGig)) {
       try {
         // Fetch current gig data
-        const { getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
         const gigRef = doc(db, 'gigs', gigId);
         const gigSnap = await getDoc(gigRef);
 
