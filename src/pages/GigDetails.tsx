@@ -1,7 +1,10 @@
+import { useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { useStatusOptions } from '../data';
 import { useGigDetails } from '../hooks/useGigDetails';
+import { calculateDistance } from '../utils/distanceService';
 import {
   GigHeader,
   GigInfoSection,
@@ -46,6 +49,34 @@ export function GigDetails() {
     updateGig,
     t,
   } = useGigDetails(id);
+
+  const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
+
+  const handleCalculateDistance = useCallback(async () => {
+    const location = editedGig?.location;
+    if (!location || location.trim().length === 0) {
+      toast.error(t('newGig.form.distance.error.emptyLocation'));
+      return;
+    }
+
+    setIsCalculatingDistance(true);
+    try {
+      const result = await calculateDistance(location);
+
+      if (result.success && result.distance !== undefined) {
+        setEditedGig((prev) => prev ? { ...prev, distance: result.distance! } : null);
+        toast.success(t('newGig.form.distance.calculated', { distance: result.distance }));
+      } else {
+        const errorKey = `newGig.form.distance.error.${result.error || 'apiError'}`;
+        toast.error(t(errorKey));
+      }
+    } catch (err) {
+      console.error('Error calculating distance:', err);
+      toast.error(t('newGig.form.distance.error.apiError'));
+    } finally {
+      setIsCalculatingDistance(false);
+    }
+  }, [editedGig?.location, setEditedGig, t]);
 
   if (!gig) return <div>{t('gigDetails.errors.notFound')}</div>;
   if (!user) return <div>{t('gigDetails.errors.signIn')}</div>;
@@ -95,6 +126,8 @@ export function GigDetails() {
               openInGoogleMaps={openInGoogleMaps}
               onUpdateGig={setEditedGig}
               onSelectSingleDate={handleSelectSingleDate}
+              onCalculateDistance={handleCalculateDistance}
+              isCalculatingDistance={isCalculatingDistance}
               t={t}
             />
 

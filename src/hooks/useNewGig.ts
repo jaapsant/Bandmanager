@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import { Gig } from '../types';
 import { useGigs } from '../context/GigContext';
 import { useAuth } from '../context/AuthContext';
@@ -7,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { sendEmail, getAllUserEmails } from '../utils/emailService';
 import { getNewGigEmailTemplate } from '../utils/emailTemplates';
 import { validateGig, ValidationMessages } from '../utils/gigValidation';
+import { calculateDistance } from '../utils/distanceService';
 import { TFunction } from 'i18next';
 
 export interface NewGigFormData extends Partial<Gig> {
@@ -36,6 +38,7 @@ export interface UseNewGigReturn {
   // UI state
   error: string;
   isSubmitting: boolean;
+  isCalculatingDistance: boolean;
 
   // Computed values
   today: string;
@@ -46,6 +49,7 @@ export interface UseNewGigReturn {
   handleMultiDayChange: (isMultiDay: boolean) => void;
   handleLocationChange: (location: string) => void;
   handleDistanceChange: (distance: string) => void;
+  handleCalculateDistance: () => Promise<void>;
   handleDateChange: (date: string) => void;
   handleWholeDayChange: (isWholeDay: boolean) => void;
   handleStartTimeChange: (time: string) => void;
@@ -84,6 +88,7 @@ export function useNewGig(): UseNewGigReturn {
   const [formData, setFormData] = useState<NewGigFormData>(initialFormData);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
   const [sendEmailNotification, setSendEmailNotification] = useState(true);
 
   const today = new Date().toISOString().split('T')[0];
@@ -190,6 +195,31 @@ export function useNewGig(): UseNewGigReturn {
     }));
   }, []);
 
+  const handleCalculateDistance = useCallback(async () => {
+    if (!formData.location || formData.location.trim().length === 0) {
+      toast.error(t('newGig.form.distance.error.emptyLocation'));
+      return;
+    }
+
+    setIsCalculatingDistance(true);
+    try {
+      const result = await calculateDistance(formData.location);
+
+      if (result.success && result.distance !== undefined) {
+        setFormData((prev) => ({ ...prev, distance: result.distance! }));
+        toast.success(t('newGig.form.distance.calculated', { distance: result.distance }));
+      } else {
+        const errorKey = `newGig.form.distance.error.${result.error || 'apiError'}`;
+        toast.error(t(errorKey));
+      }
+    } catch (error) {
+      console.error('Error calculating distance:', error);
+      toast.error(t('newGig.form.distance.error.apiError'));
+    } finally {
+      setIsCalculatingDistance(false);
+    }
+  }, [formData.location, t]);
+
   const handleDateChange = useCallback((date: string) => {
     setFormData((prev) => ({ ...prev, date }));
   }, []);
@@ -260,6 +290,7 @@ export function useNewGig(): UseNewGigReturn {
     // UI state
     error,
     isSubmitting,
+    isCalculatingDistance,
 
     // Computed values
     today,
@@ -270,6 +301,7 @@ export function useNewGig(): UseNewGigReturn {
     handleMultiDayChange,
     handleLocationChange,
     handleDistanceChange,
+    handleCalculateDistance,
     handleDateChange,
     handleWholeDayChange,
     handleStartTimeChange,

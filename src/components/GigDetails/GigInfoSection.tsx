@@ -1,4 +1,4 @@
-import { Calendar, Clock, Euro, MapPin, Car, X, Plus } from 'lucide-react';
+import { Calendar, Clock, Euro, MapPin, Car, X, Plus, Route, Loader2 } from 'lucide-react';
 import { Gig } from '../../types';
 import { MultiDateAvailabilityOverview } from '../MultiDateAvailabilityOverview';
 import { AvailabilityOverview } from '../AvailabilityOverview';
@@ -14,6 +14,8 @@ interface GigInfoSectionProps {
     openInGoogleMaps: (location: string) => void;
     onUpdateGig: (updater: (prev: Gig | null) => Gig | null) => void;
     onSelectSingleDate?: (date: string) => void;
+    onCalculateDistance?: () => void;
+    isCalculatingDistance?: boolean;
     t: (key: string) => string;
 }
 
@@ -27,8 +29,11 @@ export function GigInfoSection({
     openInGoogleMaps,
     onUpdateGig,
     onSelectSingleDate,
+    onCalculateDistance,
+    isCalculatingDistance = false,
     t,
 }: GigInfoSectionProps) {
+    const canCalculate = (editedGig?.location || '').trim().length > 0 && !isCalculatingDistance;
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-6">
@@ -184,6 +189,29 @@ export function GigInfoSection({
                                         min="0"
                                         step="0.1"
                                     />
+                                    {onCalculateDistance && (
+                                        <button
+                                            type="button"
+                                            onClick={onCalculateDistance}
+                                            disabled={!canCalculate}
+                                            className={`p-1.5 rounded transition-colors ${
+                                                canCalculate
+                                                    ? 'text-gray-600 hover:text-red-600 hover:bg-red-50'
+                                                    : 'text-gray-300 cursor-not-allowed'
+                                            }`}
+                                            title={
+                                                !(editedGig?.location || '').trim()
+                                                    ? t('newGig.form.distance.error.emptyLocation')
+                                                    : t('newGig.form.distance.calculate')
+                                            }
+                                        >
+                                            {isCalculatingDistance ? (
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                            ) : (
+                                                <Route className="w-4 h-4" />
+                                            )}
+                                        </button>
+                                    )}
                                 </div>
                             </>
                         ) : (

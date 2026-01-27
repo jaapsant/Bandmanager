@@ -282,7 +282,17 @@
       },
       "distance": {
         "label": "Distance (km)",
-        "placeholder": "km"
+        "placeholder": "km",
+        "calculate": "Calculate distance",
+        "calculated": "Distance calculated: {{distance}} km",
+        "error": {
+          "emptyLocation": "Please enter a location first",
+          "location_not_found": "Location not found. Try a more specific address.",
+          "route_not_found": "Could not find a route to this location.",
+          "rate_limited": "Please wait a moment before trying again.",
+          "apiError": "Could not calculate distance. Please try again.",
+          "network_error": "Network error. Please check your connection."
+        }
       },
       "date": {
         "label": "Date"

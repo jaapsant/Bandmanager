@@ -16,12 +16,14 @@ export function NewGig() {
     setSendEmailNotification,
     error,
     isSubmitting,
+    isCalculatingDistance,
     today,
     handleSubmit,
     handleNameChange,
     handleMultiDayChange,
     handleLocationChange,
     handleDistanceChange,
+    handleCalculateDistance,
     handleDateChange,
     handleWholeDayChange,
     handleStartTimeChange,
@@ -81,6 +83,8 @@ export function NewGig() {
                 distance={formData.distance}
                 onLocationChange={handleLocationChange}
                 onDistanceChange={handleDistanceChange}
+                onCalculateDistance={handleCalculateDistance}
+                isCalculatingDistance={isCalculatingDistance}
                 t={t}
               />
 

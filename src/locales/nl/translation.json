@@ -270,7 +270,17 @@
       },
       "distance": {
         "label": "Afstand (km)",
-        "placeholder": "km"
+        "placeholder": "km",
+        "calculate": "Bereken afstand",
+        "calculated": "Afstand berekend: {{distance}} km",
+        "error": {
+          "emptyLocation": "Vul eerst een locatie in",
+          "location_not_found": "Locatie niet gevonden. Probeer een specifieker adres.",
+          "route_not_found": "Kon geen route naar deze locatie vinden.",
+          "rate_limited": "Wacht even voordat je het opnieuw probeert.",
+          "apiError": "Kon afstand niet berekenen. Probeer het opnieuw.",
+          "network_error": "Netwerkfout. Controleer je verbinding."
+        }
       },
       "date": {
         "label": "Datum"
