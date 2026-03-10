@@ -16,7 +16,7 @@ export interface NewGigFormData extends Partial<Gig> {
   date: string;
   startTime: string | null;
   endTime: string | null;
-  status: string;
+  status: Gig['status'];
   isWholeDay: boolean;
   isMultiDay: boolean;
   dates: string[];
@@ -89,7 +89,7 @@ export function useNewGig(): UseNewGigReturn {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCalculatingDistance, setIsCalculatingDistance] = useState(false);
-  const [sendEmailNotification, setSendEmailNotification] = useState(true);
+  const [sendEmailNotification, setSendEmailNotification] = useState(false);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -121,7 +121,7 @@ export function useNewGig(): UseNewGigReturn {
         const gigData: Omit<Gig, 'id'> = {
           name: formData.name.trim(),
           date: formData.date,
-          status: formData.status || 'pending',
+          status: (formData.status || 'pending') as Gig['status'],
           isWholeDay: formData.isMultiDay ? false : formData.isWholeDay || false,
           isMultiDay: formData.isMultiDay,
           dates: formData.isMultiDay ? (formData.dates || []).filter(Boolean) : [],
